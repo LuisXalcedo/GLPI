@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -46,18 +47,24 @@ class NotificationTargetCrontask extends NotificationTarget {
 
 
    function getEvents() {
-      return ['alert' => __('Monitoring of automatic actions')];
+      return array('alert' => __('Monitoring of automatic actions'));
    }
 
 
-   function addDataForTemplate($event, $options = []) {
+   /**
+    * Get all data needed for template processing
+    *
+    * @param $event
+    * @param $options   array
+   **/
+   function getDatasForTemplate($event, $options=array()) {
 
       $events                             = $this->getAllEvents();
-      $this->data['##crontask.action##'] = $events[$event];
+      $this->datas['##crontask.action##'] = $events[$event];
 
       $cron                               = new Crontask();
       foreach ($options['items'] as $id => $crontask) {
-         $tmp                      = [];
+         $tmp                      = array();
          $tmp['##crontask.name##'] = '';
 
          if ($isplug=isPluginItemType($crontask["itemtype"])) {
@@ -68,13 +75,13 @@ class NotificationTargetCrontask extends NotificationTarget {
          $tmp['##crontask.description##'] = $cron->getDescription($id);
          $tmp['##crontask.url##']         = $this->formatURL($options['additionnaloption']['usertype'],
                                                              "Crontask_".$id);
-         $this->data['crontasks'][] = $tmp;
+         $this->datas['crontasks'][] = $tmp;
       }
 
       $this->getTags();
       foreach ($this->tag_descriptions[NotificationTarget::TAG_LANGUAGE] as $tag => $values) {
-         if (!isset($this->data[$tag])) {
-            $this->data[$tag] = $values['label'];
+         if (!isset($this->datas[$tag])) {
+            $this->datas[$tag] = $values['label'];
          }
       }
    }
@@ -82,32 +89,35 @@ class NotificationTargetCrontask extends NotificationTarget {
 
    function getTags() {
 
-      $tags = ['crontask.action'      => __('Monitoring of automatic actions'),
+      $tags = array('crontask.action'      => __('Monitoring of automatic actions'),
                     'crontask.url'         => __('URL'),
                     'crontask.name'        => __('Name'),
-                    'crontask.description' => __('Description')];
+                    'crontask.description' => __('Description'));
 
       foreach ($tags as $tag => $label) {
-         $this->addTagToList(['tag'   => $tag,
+         $this->addTagToList(array('tag'   => $tag,
                                    'label' => $label,
-                                   'value' => true]);
+                                   'value' => true));
       }
 
-      $this->addTagToList(['tag'     => 'crontasks',
+      $this->addTagToList(array('tag'     => 'crontasks',
                                 'label'   => __('Device list'),
                                 'value'   => false,
-                                'foreach' => true]);
+                                'foreach' => true));
 
       //Tags with just lang
-      $tags = ['crontask.warning'
-                     => __('The following automatic actions are in error. They require intervention.')];
+      $tags = array('crontask.warning'
+                     => __('The following automatic actions are in error. They require intervention.'));
       foreach ($tags as $tag => $label) {
-         $this->addTagToList(['tag'   => $tag,
+         $this->addTagToList(array('tag'   => $tag,
                                    'label' => $label,
                                    'value' => false,
-                                   'lang'  => true]);
+                                   'lang'  => true));
       }
+
+
       asort($this->tag_descriptions);
    }
 
 }
+?>

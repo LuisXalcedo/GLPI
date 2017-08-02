@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
 */
 
 /** @file
@@ -141,7 +142,7 @@ abstract class FQDNLabel extends CommonDBChild {
     *
     * @return array two arrays (NetworkName and NetworkAlias) of the IDs
     **/
-   static function getIDsByLabelAndFQDNID($label, $fqdns_id, $wildcard_search = false) {
+   static function getIDsByLabelAndFQDNID($label, $fqdns_id, $wildcard_search=false) {
       global $DB;
 
       $label = strtolower($label);
@@ -156,9 +157,9 @@ abstract class FQDNLabel extends CommonDBChild {
          $relation = "= '$label'";
       }
 
-      $IDs = [];
-      foreach (['NetworkName'  => 'glpi_networknames',
-                     'NetworkAlias' => 'glpi_networkaliases'] as $class => $table) {
+      $IDs = array();
+      foreach (array('NetworkName'  => 'glpi_networknames',
+                     'NetworkAlias' => 'glpi_networkaliases') as $class => $table) {
          $query = "SELECT `id`
                    FROM `$table`
                    WHERE `name` $relation ";
@@ -186,13 +187,13 @@ abstract class FQDNLabel extends CommonDBChild {
     * @return (array) each value of the array (corresponding to one NetworkPort) is an array of the
     *                 items from the master item to the NetworkPort
     **/
-   static function getItemsByFQDN($fqdn, $wildcard_search = false) {
+   static function getItemsByFQDN($fqdn, $wildcard_search=false) {
 
-      $FQNDs_with_Items = [];
+      $FQNDs_with_Items = array();
 
       if (!$wildcard_search) {
          if (!FQDN::checkFQDN($fqdn)) {
-            return [];
+            return array();
          }
       }
 
@@ -210,7 +211,7 @@ abstract class FQDNLabel extends CommonDBChild {
             foreach ($IDs as $ID) {
                if ($FQDNlabel->getFromDB($ID)) {
                   $FQNDs_with_Items[] = array_merge(array_reverse($FQDNlabel->recursivelyGetItems()),
-                                                    [clone $FQDNlabel]);
+                                                    array(clone $FQDNlabel));
                }
             }
          }
@@ -251,8 +252,8 @@ abstract class FQDNLabel extends CommonDBChild {
          foreach ($labels_with_items as $items) {
             foreach ($items as $item) {
                if ($item->getEntityID() == $entity) {
-                  $result = ["id"       => $item->getID(),
-                                  "itemtype" => $item->getType()];
+                  $result = array("id"       => $item->getID(),
+                                  "itemtype" => $item->getType());
                   unset($labels_with_items);
                   return $result;
                }
@@ -260,6 +261,7 @@ abstract class FQDNLabel extends CommonDBChild {
          }
       }
 
-      return [];
+      return array();
    }
 }
+?>

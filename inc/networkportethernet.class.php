@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -43,13 +44,13 @@ if (!defined('GLPI_ROOT')) {
 class NetworkPortEthernet extends NetworkPortInstantiation {
 
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return __('Ethernet port');
    }
 
 
    function getNetworkCardInterestingFields() {
-      return ['link.`mac`' => 'mac'];
+      return array('link.`mac`' => 'mac');
    }
 
 
@@ -78,7 +79,7 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
    }
 
 
-   function showInstantiationForm(NetworkPort $netport, $options, $recursiveItems) {
+   function showInstantiationForm(NetworkPort $netport, $options=array(), $recursiveItems) {
 
       if (!$options['several']) {
          echo "<tr class='tab_bg_1'>";
@@ -90,7 +91,7 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
       echo "<tr class='tab_bg_1'>";
       echo "<td>" . __('Ethernet port type') . "</td><td>\n";
       Dropdown::showFromArray('type', self::getPortTypeName(),
-                              ['value' => $this->fields['type']]);
+                              array('value' => $this->fields['type']));
       echo "</td>";
       echo "<td>" . __('Ethernet port speed') . "</td><td>\n";
 
@@ -103,8 +104,8 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
       }
 
       Dropdown::showFromArray('speed', $standard_speeds,
-                              ['value' => $this->fields['speed'],
-                                    'other' => $speed]);
+                              array('value' => $this->fields['speed'],
+                                    'other' => $speed));
       echo "</td>";
       echo "</tr>\n";
 
@@ -115,16 +116,16 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
       self::showConnection($netport, true);
       echo "</td>";
       echo "</tr>\n";
-   }
+  }
 
 
    /**
     * @see NetworkPortInstantiation::getInstantiationHTMLTableHeaders
    **/
    function getInstantiationHTMLTableHeaders(HTMLTableGroup $group, HTMLTableSuperHeader $super,
-                                             HTMLTableSuperHeader $internet_super = null,
-                                             HTMLTableHeader $father = null,
-                                             array $options = []) {
+                                             HTMLTableSuperHeader $internet_super=NULL,
+                                             HTMLTableHeader $father=NULL,
+                                             array $options=array()) {
 
       $display_options = &$options['display_options'];
       $header          = $group->addHeader('Connected', __('Connected to'), $super);
@@ -141,15 +142,15 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
 
       parent::getInstantiationHTMLTableHeaders($group, $super, $internet_super, $header, $options);
       return $header;
-   }
+  }
 
 
    /**
     * @see NetworkPortInstantiation::getPeerInstantiationHTMLTable()
    **/
    protected function getPeerInstantiationHTMLTable(NetworkPort $netport, HTMLTableRow $row,
-                                                    HTMLTableCell $father = null,
-                                                    array $options = []) {
+                                                    HTMLTableCell $father=NULL,
+                                                    array $options=array()) {
 
       DeviceNetworkCard::getHTMLTableCellsForItem($row, $this, $father, $options);
 
@@ -169,52 +170,41 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
    }
 
 
-   /**
-    * @see NetworkPortInstantiation::getInstantiationHTMLTable()
-   **/
+  /**
+   * @see NetworkPortInstantiation::getInstantiationHTMLTable()
+  **/
    function getInstantiationHTMLTable(NetworkPort $netport, HTMLTableRow $row,
-                                      HTMLTableCell $father = null, array $options = []) {
+                                      HTMLTableCell $father=NULL, array $options=array()) {
 
       return parent::getInstantiationHTMLTableWithPeer($netport, $row, $father, $options);
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
+      $tab                      = array();
+      $tab['common']            = __('Characteristics');
 
-      $tab[] = [
-         'id'                 => '10',
-         'table'              => $this->getTable(),
-         'field'              => 'mac',
-         'datatype'           => 'mac',
-         'name'               => __('MAC'),
-         'massiveaction'      => false
-      ];
+      $tab[10]['table']         = $this->getTable();
+      $tab[10]['field']         = 'mac';
+      $tab[10]['datatype']      = 'mac';
+      $tab[10]['name']          = __('MAC');
+      $tab[10]['massiveaction'] = false;
 
-      $tab[] = [
-         'id'                 => '11',
-         'table'              => $this->getTable(),
-         'field'              => 'type',
-         'name'               => __('Ethernet port type'),
-         'massiveaction'      => false,
-         'datatype'           => 'specific'
-      ];
+      $tab[11]['table']         = $this->getTable();
+      $tab[11]['field']         = 'type';
+      $tab[11]['name']          = __('Ethernet port type');
+      $tab[11]['massiveaction'] = false;
+      $tab[11]['datatype']      = 'specific';
 
-      $tab[] = [
-         'id'                 => '12',
-         'table'              => $this->getTable(),
-         'field'              => 'speed',
-         'name'               => __('Ethernet port speed'),
-         'massiveaction'      => false,
-         'datatype'           => 'specific'
-      ];
+      $tab[12]['table']         = $this->getTable();
+      $tab[12]['field']         = 'speed';
+      $tab[12]['name']          = __('Ethernet port speed');
+      $tab[12]['massiveaction'] = false;
+      $tab[12]['datatype']      = 'specific';
 
       return $tab;
+
    }
 
 
@@ -225,7 +215,7 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
     *
     * @return array or string
    **/
-   static function getPortTypeName($val = null) {
+   static function getPortTypeName($val=NULL) {
 
       $tmp['']   = Dropdown::EMPTY_VALUE;
       $tmp['T']  = __('Twisted pair (RJ-45)');
@@ -294,15 +284,15 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
     *
     * @return array or string
    **/
-   static function getPortSpeed($val = null) {
+   static function getPortSpeed($val=NULL) {
 
-      $tmp = [0     => '',
+      $tmp = array(0     => '',
                    //TRANS: %d is the speed
-                   10    => sprintf(__('%d Mbit/s'), 10),
-                   100   => sprintf(__('%d Mbit/s'), 100),
+                   10    => sprintf(__('%d Mbit/s'),10),
+                   100   => sprintf(__('%d Mbit/s'),100),
                    //TRANS: %d is the speed
-                   1000  => sprintf(__('%d Gbit/s'), 1),
-                   10000 => sprintf(__('%d Gbit/s'), 10)];
+                   1000  => sprintf(__('%d Gbit/s'),1),
+                   10000 => sprintf(__('%d Gbit/s'),10));
 
       if (is_null($val)) {
          return $tmp;
@@ -319,10 +309,10 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
     * @param $values
     * @param $options   array
    **/
-   static function getSpecificValueToDisplay($field, $values, array $options = []) {
+   static function getSpecificValueToDisplay($field, $values, array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       switch ($field) {
          case 'type':
@@ -341,10 +331,10 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
     * @param $values          (defaul '')
     * @param $options   array
     */
-   static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = []) {
+   static function getSpecificValueToSelect($field, $name='', $values='', array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       $options['display'] = false;
 
@@ -364,24 +354,22 @@ class NetworkPortEthernet extends NetworkPortInstantiation {
    /**
     * @param $tab         array
     * @param $joinparams  array
+    * @param $itemtype
    **/
-   static function getSearchOptionsToAddForInstantiation(array &$tab, array $joinparams) {
-      $tab[] = [
-         'id'                 => '22',
-         'table'              => 'glpi_netpoints',
-         'field'              => 'name',
-         'datatype'           => 'dropdown',
-          'name'              => __('Ethernet outlet'),
-         'forcegroupby'       => true,
-         'massiveaction'      => false,
-         'joinparams'         => [
-            'jointype'           => 'standard',
-            'beforejoin'         => [
-               'table'              => 'glpi_networkportethernets',
-               'joinparams'         => $joinparams
-            ]
-         ]
-      ];
+   static function getSearchOptionsToAddForInstantiation(array &$tab, array $joinparams,
+                                                         $itemtype) {
+
+      $tab[22]['table']         = 'glpi_netpoints';
+      $tab[22]['field']         = 'name';
+      $tab[22]['datatype']      = 'dropdown';
+      $tab[22]['name']          = __('Ethernet outlet');
+      $tab[22]['forcegroupby']  = true;
+      $tab[22]['massiveaction'] = false;
+      $tab[22]['joinparams']    = array('jointype'   => 'standard',
+                                        'beforejoin' => array('table' => 'glpi_networkportethernets',
+                                                              'joinparams'
+                                                                      => $joinparams));
    }
 
 }
+?>

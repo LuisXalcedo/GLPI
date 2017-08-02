@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -51,7 +52,7 @@ class SoftwareVersion extends CommonDBChild {
    static public $items_id  = 'softwares_id';
 
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Version', 'Versions', $nb);
    }
 
@@ -64,12 +65,12 @@ class SoftwareVersion extends CommonDBChild {
    }
 
 
-   function defineTabs($options = []) {
+   function defineTabs($options=array()) {
 
-      $ong = [];
+      $ong = array();
       $this->addDefaultFormTab($ong);
-      $this->addStandardTab('Computer_SoftwareVersion', $ong, $options);
-      $this->addStandardTab('Log', $ong, $options);
+      $this->addStandardTab('Computer_SoftwareVersion',$ong, $options);
+      $this->addStandardTab('Log',$ong, $options);
 
       return $ong;
    }
@@ -101,7 +102,7 @@ class SoftwareVersion extends CommonDBChild {
     * @return true if displayed  false if item not found or not right to display
     *
    **/
-   function showForm($ID, $options = []) {
+   function showForm($ID, $options=array()) {
       global $CFG_GLPI;
 
       if ($ID > 0) {
@@ -129,17 +130,17 @@ class SoftwareVersion extends CommonDBChild {
 
       echo "<tr class='tab_bg_1'><td>".__('Name')."</td>";
       echo "<td>";
-      Html::autocompletionTextField($this, "name");
+      Html::autocompletionTextField($this,"name");
       echo "</td></tr>\n";
 
       echo "<tr class='tab_bg_1'><td>" . __('Operating system') . "</td><td>";
-      OperatingSystem::dropdown(['value' => $this->fields["operatingsystems_id"]]);
+      OperatingSystem::dropdown(array('value' => $this->fields["operatingsystems_id"]));
       echo "</td></tr>\n";
 
       echo "<tr class='tab_bg_1'><td>" . __('Status') . "</td><td>";
-      State::dropdown(['value'     => $this->fields["states_id"],
+      State::dropdown(array('value'     => $this->fields["states_id"],
                             'entity'    => $this->fields["entities_id"],
-                            'condition' => "`is_visible_softwareversion`"]);
+                            'condition' => "`is_visible_softwareversion`"));
       echo "</td></tr>\n";
 
       // Only count softwareversions_id_buy (don't care of softwareversions_id_use if no installation)
@@ -154,55 +155,37 @@ class SoftwareVersion extends CommonDBChild {
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
+      $tab                 = array();
+      $tab['common']       = __('Characteristics');
 
-      $tab[] = [
-         'id'                 => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'name',
-         'name'               => __('Name'),
-         'datatype'           => 'string'
-      ];
+      $tab[2]['table']     = $this->getTable();
+      $tab[2]['field']     = 'name';
+      $tab[2]['name']      = __('Name');
+      $tab[2]['datatype']  = 'string';
 
-      $tab[] = [
-         'id'                 => '4',
-         'table'              => 'glpi_operatingsystems',
-         'field'              => 'name',
-         'name'               => __('Operating system'),
-         'datatype'           => 'dropdown'
-      ];
+      $tab[4]['table']     = 'glpi_operatingsystems';
+      $tab[4]['field']     = 'name';
+      $tab[4]['name']      = __('Operating system');
+      $tab[4]['datatype']  = 'dropdown';
 
-      $tab[] = [
-         'id'                 => '16',
-         'table'              => $this->getTable(),
-         'field'              => 'comment',
-         'name'               => __('Comments'),
-         'datatype'           => 'text'
-      ];
+      $tab[16]['table']    = $this->getTable();
+      $tab[16]['field']    = 'comment';
+      $tab[16]['name']     = __('Comments');
+      $tab[16]['datatype'] = 'text';
 
-      $tab[] = [
-         'id'                 => '31',
-         'table'              => 'glpi_states',
-         'field'              => 'completename',
-         'name'               => __('Status'),
-         'datatype'           => 'dropdown',
-         'condition'          => '`is_visible_softwareversion`'
-      ];
+      $tab[31]['table']     = 'glpi_states';
+      $tab[31]['field']     = 'completename';
+      $tab[31]['name']      = __('Status');
+      $tab[31]['datatype']  = 'dropdown';
+      $tab[31]['condition'] = "`is_visible_softwareversion`";
 
-      $tab[] = [
-         'id'                 => '121',
-         'table'              => $this->getTable(),
-         'field'              => 'date_creation',
-         'name'               => __('Creation date'),
-         'datatype'           => 'datetime',
-         'massiveaction'      => false
-      ];
+      $tab[121]['table']          = $this->getTable();
+      $tab[121]['field']          = 'date_creation';
+      $tab[121]['name']           = __('Creation date');
+      $tab[121]['datatype']       = 'datetime';
+      $tab[121]['massiveaction']  = false;
 
       return $tab;
    }
@@ -219,14 +202,14 @@ class SoftwareVersion extends CommonDBChild {
     *
     * @return nothing (print out an HTML select box)
    **/
-   static function dropdownForOneSoftware($options = []) {
+   static function dropdownForOneSoftware($options=array()) {
       global $CFG_GLPI, $DB;
 
       //$softwares_id,$value=0
       $p['softwares_id']          = 0;
       $p['value']                 = 0;
       $p['name']                  = 'softwareversions_id';
-      $p['used']                  = [];
+      $p['used']                  = array();
       $p['display_emptychoice']   = true;
 
       if (is_array($options) && count($options)) {
@@ -237,7 +220,7 @@ class SoftwareVersion extends CommonDBChild {
 
       $where = '';
       if (count($p['used'])) {
-         $where = " AND `glpi_softwareversions`.`id` NOT IN (".implode(",", $p['used']).")";
+         $where = " AND `glpi_softwareversions`.`id` NOT IN (".implode(",",$p['used']).")";
       }
       // Make a select box
       $query = "SELECT DISTINCT `glpi_softwareversions`.*,
@@ -249,8 +232,8 @@ class SoftwareVersion extends CommonDBChild {
                 ORDER BY `name`";
       $result = $DB->query($query);
       $number = $DB->numrows($result);
-      $values = [];
-
+      $values = array();
+      
       if ($number) {
          while ($data = $DB->fetch_assoc($result)) {
             $ID     = $data['id'];
@@ -318,8 +301,8 @@ class SoftwareVersion extends CommonDBChild {
             echo "<th>".__('Comments')."</th>";
             echo "</tr>\n";
 
-            for ($tot=$nb=0; $data=$DB->fetch_assoc($result); $tot+=$nb) {
-               Session::addToNavigateListItems('SoftwareVersion', $data['id']);
+            for ($tot=$nb=0 ; $data=$DB->fetch_assoc($result) ; $tot+=$nb) {
+               Session::addToNavigateListItems('SoftwareVersion',$data['id']);
                $nb = Computer_SoftwareVersion::countForVersion($data['id']);
 
                echo "<tr class='tab_bg_2'>";
@@ -348,14 +331,14 @@ class SoftwareVersion extends CommonDBChild {
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       if (!$withtemplate) {
          $nb = 0;
          switch ($item->getType()) {
             case 'Software' :
                if ($_SESSION['glpishow_count_on_tabs']) {
-                  $nb = countElementsInTable($this->getTable(), ['softwares_id' => $item->getID()]);
+                  $nb = countElementsInTable($this->getTable(), "softwares_id = '".$item->getID()."'");
                }
                return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
          }
@@ -364,7 +347,7 @@ class SoftwareVersion extends CommonDBChild {
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       if ($item->getType() == 'Software') {
          self::showForSoftware($item);
@@ -373,3 +356,4 @@ class SoftwareVersion extends CommonDBChild {
    }
 
 }
+?>

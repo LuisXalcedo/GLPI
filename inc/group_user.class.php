@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -56,10 +57,10 @@ class Group_User extends CommonDBRelation{
     * @param $users_id
     * @param $condition    (default '')
    **/
-   static function getUserGroups($users_id, $condition = '') {
+   static function getUserGroups($users_id, $condition='') {
       global $DB;
 
-      $groups = [];
+      $groups = array();
       $query  = "SELECT `glpi_groups`.*,
                         `glpi_groups_users`.`id` AS IDD,
                         `glpi_groups_users`.`id` AS linkID,
@@ -87,10 +88,10 @@ class Group_User extends CommonDBRelation{
     * @param $groups_id
     * @param $condition    (default '')
    **/
-   static function getGroupUsers($groups_id, $condition = '') {
+   static function getGroupUsers($groups_id, $condition='') {
       global $DB;
 
-      $users = [];
+      $users = array();
       $query = "SELECT `glpi_users`.*,
                        `glpi_groups_users`.`id` AS IDD,
                        `glpi_groups_users`.`id` AS linkID,
@@ -130,7 +131,7 @@ class Group_User extends CommonDBRelation{
       $rand    = mt_rand();
 
       $groups  = self::getUserGroups($ID);
-      $used    = [];
+      $used    = array();
       if (!empty($groups)) {
          foreach ($groups as $data) {
             $used[$data["id"]] = $data["id"];
@@ -159,9 +160,9 @@ class Group_User extends CommonDBRelation{
 
          $nb = countElementsInTableForEntity("glpi_groups", $strict_entities, '`is_usergroup`');
          if ($nb > count($used)) {
-            Group::dropdown(['entity'    => $strict_entities,
+            Group::dropdown(array('entity'    => $strict_entities,
                                   'used'      => $used,
-                                  'condition' => '`is_usergroup`']);
+                                  'condition' => '`is_usergroup`'));
             echo "</td><td>".__('Manager')."</td><td>";
             Dropdown::showYesNo('is_manager');
 
@@ -169,11 +170,11 @@ class Group_User extends CommonDBRelation{
             Dropdown::showYesNo('is_userdelegate');
 
             echo "</td><td class='tab_bg_2 center'>";
-            echo "<input type='submit' name='addgroup' value=\""._sx('button', 'Add')."\"
+            echo "<input type='submit' name='addgroup' value=\""._sx('button','Add')."\"
                    class='submit'>";
 
          } else {
-            echo __('None');
+            _e('None');
          }
 
          echo "</td></tr>";
@@ -187,8 +188,8 @@ class Group_User extends CommonDBRelation{
          $rand = mt_rand();
          Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
          echo "<input type='hidden' name='users_id' value='".$user->fields['id']."'>";
-         $massiveactionparams = ['num_displayed' => min($_SESSION['glpilist_limit'], count($used)),
-                           'container'     => 'mass'.__CLASS__.$rand];
+         $massiveactionparams = array('num_displayed' => min($_SESSION['glpilist_limit'], count($used)),
+                           'container'     => 'mass'.__CLASS__.$rand);
          Html::showMassiveActions($massiveactionparams);
       }
       echo "<table class='tab_cadre_fixehov'>";
@@ -288,7 +289,7 @@ class Group_User extends CommonDBRelation{
 
       $rand = mt_rand();
       $res  = User::getSqlSearchResult (true, "all", $entityrestrict, 0, $used_ids);
-      $nb   = ($res ? $DB->result($res, 0, "CPT") : 0);
+      $nb   = ($res ? $DB->result($res,0,"CPT") : 0);
 
       if ($nb) {
          echo "<form name='groupuser_form$rand' id='groupuser_form$rand' method='post'
@@ -300,9 +301,9 @@ class Group_User extends CommonDBRelation{
          echo "<tr class='tab_bg_1'><th colspan='6'>".__('Add a user')."</th></tr>";
          echo "<tr class='tab_bg_2'><td class='center'>";
 
-         User::dropdown(['right'  => "all",
+         User::dropdown(array('right'  => "all",
                               'entity' => $entityrestrict,
-                              'used'   => $used_ids]);
+                              'used'   => $used_ids));
 
          echo "</td><td>".__('Manager')."</td><td>";
          Dropdown::showYesNo('is_manager', (($crit == 'is_manager') ? 1 : 0));
@@ -312,7 +313,7 @@ class Group_User extends CommonDBRelation{
 
          echo "</td><td class='tab_bg_2 center'>";
          echo "<input type='hidden' name'is_dynamic' value='0'>";
-         echo "<input type='submit' name='add' value=\""._sx('button', 'Add')."\" class='submit'>";
+         echo "<input type='submit' name='add' value=\""._sx('button','Add')."\" class='submit'>";
          echo "</td></tr>";
          echo "</table></div>";
          Html::closeForm();
@@ -333,7 +334,7 @@ class Group_User extends CommonDBRelation{
     *
     * @return String tab of entity for restriction
    **/
-   static function getDataForGroup(Group $group, &$members, &$ids, $crit = '', $tree = 0) {
+   static function getDataForGroup(Group $group, &$members, &$ids, $crit='', $tree=0) {
       global $DB;
 
       // Entity restriction for this group, according to user allowed entities
@@ -415,8 +416,8 @@ class Group_User extends CommonDBRelation{
       $user    = new User();
       $crit    = Session::getSavedOption(__CLASS__, 'criterion', '');
       $tree    = Session::getSavedOption(__CLASS__, 'tree', 0);
-      $used    = [];
-      $ids     = [];
+      $used    = array();
+      $ids     = array();
 
       // Retrieve member list
       $entityrestrict = self::getDataForGroup($group, $used, $ids, $crit, $tree);
@@ -430,16 +431,16 @@ class Group_User extends CommonDBRelation{
       echo "<tr class='tab_bg_1'><th colspan='2'>".User::getTypeName(Session::getPluralNumber())."</th></tr>";
       echo "<tr class='tab_bg_1'><td class='center'>";
       echo _n('Criterion', 'Criteria', 1)."&nbsp;";
-      $crits = ['is_manager'      => __('Manager'),
-                     'is_userdelegate' => __('Delegatee')];
+      $crits = array('is_manager'      => __('Manager'),
+                     'is_userdelegate' => __('Delegatee'));
       Dropdown::showFromArray('crit', $crits,
-                              ['value'               => $crit,
+                              array('value'               => $crit,
                                     'on_change'           => 'reloadTab("start=0&criterion="+this.value)',
-                                    'display_emptychoice' => true]);
+                                    'display_emptychoice' => true));
       if ($group->haveChildren()) {
          echo "</td><td class='center'>".__('Child groups');
          Dropdown::showYesNo('tree', $tree, -1,
-                             ['on_change' => 'reloadTab("start=0&tree="+this.value)']);
+                             array('on_change' => 'reloadTab("start=0&tree="+this.value)'));
       } else {
          $tree = 0;
       }
@@ -465,9 +466,9 @@ class Group_User extends CommonDBRelation{
 
          if ($canedit) {
             Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
-            $massiveactionparams = ['num_displayed'    => min($number-$start,
+            $massiveactionparams = array('num_displayed'    => min($number-$start,
                                                                    $_SESSION['glpilist_limit']),
-                                         'container'        => 'mass'.__CLASS__.$rand];
+                                         'container'        => 'mass'.__CLASS__.$rand);
             Html::showMassiveActions($massiveactionparams);
          }
 
@@ -486,7 +487,7 @@ class Group_User extends CommonDBRelation{
          }
          $header_end .= "<th>".User::getTypeName(1)."</th>";
          if ($tree) {
-            $header_end .= "<th>".Group::getTypeName(1)."</th>";
+           $header_end .= "<th>".Group::getTypeName(1)."</th>";
          }
          $header_end .= "<th>".__('Dynamic')."</th>";
          $header_end .= "<th>".__('Manager')."</th>";
@@ -496,7 +497,7 @@ class Group_User extends CommonDBRelation{
 
          $tmpgrp = new Group();
 
-         for ($i=$start, $j=0; ($i < $number) && ($j < $_SESSION['glpilist_limit']); $i++, $j++) {
+         for ($i=$start, $j=0 ; ($i < $number) && ($j < $_SESSION['glpilist_limit']) ; $i++, $j++) {
             $data = $used[$i];
             $user->getFromDB($data["id"]);
             Session::addToNavigateListItems('User', $data["id"]);
@@ -511,7 +512,7 @@ class Group_User extends CommonDBRelation{
             if ($tree) {
                echo "</td><td>";
                if ($tmpgrp->getFromDB($data['groups_id'])) {
-                  echo $tmpgrp->getLink(['comments' => true]);
+                  echo $tmpgrp->getLink(array('comments' => true));
                }
             }
             echo "</td><td class='center'>";
@@ -564,8 +565,8 @@ class Group_User extends CommonDBRelation{
 
       $specificities                           = parent::getRelationMassiveActionsSpecificities();
 
-      $specificities['select_items_options_1'] = ['right'     => 'all'];
-      $specificities['select_items_options_2'] = ['condition' => '`is_usergroup`'];
+      $specificities['select_items_options_1'] = array('right'     => 'all');
+      $specificities['select_items_options_2'] = array('condition' => '`is_usergroup`');
 
       // Define normalized action for add_item and remove_item
       $specificities['normalized']['add'][]    = 'add_supervisor';
@@ -589,81 +590,60 @@ class Group_User extends CommonDBRelation{
                                                                  array $ids, array $input) {
       switch ($action) {
          case 'add_supervisor' :
-            return ['is_manager' => 1];
+            return array('is_manager' => 1);
 
          case 'add_delegatee' :
-            return ['is_userdelegate' => 1];
+            return array('is_userdelegate' => 1);
       }
 
-      return [];
+      return array();
    }
 
 
-   /**
+  /**
     * Get search function for the class
     *
     * @return array of search option
    **/
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
+      $tab                       = array();
+      $tab['common']             = __('Characteristics');
 
-      $tab[] = [
-         'id'                 => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'id',
-         'name'               => __('ID'),
-         'massiveaction'      => false,
-         'datatype'           => 'number'
-      ];
+      $tab[2]['table']           = $this->getTable();
+      $tab[2]['field']           = 'id';
+      $tab[2]['name']            = __('ID');
+      $tab[2]['massiveaction']   = false;
+      $tab[2]['datatype']        = 'number';
 
-      $tab[] = [
-         'id'                 => '3',
-         'table'              => $this->getTable(),
-         'field'              => 'is_dynamic',
-         'name'               => __('Dynamic'),
-         'datatype'           => 'bool',
-         'massiveaction'      => false
-      ];
+      $tab[3]['table']           = $this->getTable();
+      $tab[3]['field']           = 'is_dynamic';
+      $tab[3]['name']            = __('Dynamic');
+      $tab[3]['datatype']        = 'bool';
+      $tab[3]['massiveaction']   = false;
 
-      $tab[] = [
-         'id'                 => '4',
-         'table'              => 'glpi_groups',
-         'field'              => 'completename',
-         'name'               => __('Group'),
-         'massiveaction'      => false,
-         'datatype'           => 'dropdown'
-      ];
+      $tab[4]['table']           = 'glpi_groups';
+      $tab[4]['field']           = 'completename';
+      $tab[4]['name']            = __('Group');
+      $tab[4]['massiveaction']   = false;
+      $tab[4]['datatype']        = 'dropdown';
 
-      $tab[] = [
-         'id'                 => '5',
-         'table'              => 'glpi_users',
-         'field'              => 'name',
-         'name'               => __('User'),
-         'massiveaction'      => false,
-         'datatype'           => 'dropdown',
-         'right'              => 'all'
-      ];
+      $tab[5]['table']           = 'glpi_users';
+      $tab[5]['field']           = 'name';
+      $tab[5]['name']            = __('User');
+      $tab[5]['massiveaction']   = false;
+      $tab[5]['datatype']        = 'dropdown';
+      $tab[5]['right']           = 'all';
 
-      $tab[] = [
-         'id'                 => '6',
-         'table'              => $this->getTable(),
-         'field'              => 'is_manager',
-         'name'               => __('Manager'),
-         'datatype'           => 'bool'
-      ];
+      $tab[6]['table']           = $this->getTable();
+      $tab[6]['field']           = 'is_manager';
+      $tab[6]['name']            = __('Manager');
+      $tab[6]['datatype']        = 'bool';
 
-      $tab[] = [
-         'id'                 => '7',
-         'table'              => $this->getTable(),
-         'field'              => 'is_userdelegate',
-         'name'               => __('Delegatee'),
-         'datatype'           => 'bool'
-      ];
+      $tab[7]['table']           = $this->getTable();
+      $tab[7]['field']           = 'is_userdelegate';
+      $tab[7]['name']            = __('Delegatee');
+      $tab[7]['datatype']        = 'bool';
 
       return $tab;
    }
@@ -673,7 +653,7 @@ class Group_User extends CommonDBRelation{
     * @param $user_ID
     * @param $only_dynamic (false by default
    **/
-   static function deleteGroups($user_ID, $only_dynamic = false) {
+   static function deleteGroups($user_ID, $only_dynamic=false) {
       global $DB;
 
       $crit['users_id'] = $user_ID;
@@ -685,7 +665,7 @@ class Group_User extends CommonDBRelation{
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       if (!$withtemplate) {
          $nb = 0;
@@ -694,7 +674,7 @@ class Group_User extends CommonDBRelation{
                if (Group::canView()) {
                   if ($_SESSION['glpishow_count_on_tabs']) {
                      $nb = countElementsInTable($this->getTable(),
-                                               ['users_id' => $item->getID()]);
+                                                "users_id = '".$item->getID()."'");
                   }
                   return self::createTabEntry(Group::getTypeName(Session::getPluralNumber()), $nb);
                }
@@ -704,7 +684,7 @@ class Group_User extends CommonDBRelation{
                if (User::canView()) {
                   if ($_SESSION['glpishow_count_on_tabs']) {
                      $nb = countElementsInTable("glpi_groups_users",
-                                               ['groups_id' => $item->getID()]);
+                                                "`groups_id` = '".$item->getID()."'" );
                   }
                   return self::createTabEntry(User::getTypeName(Session::getPluralNumber()), $nb);
                }
@@ -715,7 +695,7 @@ class Group_User extends CommonDBRelation{
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       switch ($item->getType()) {
          case 'User' :
@@ -731,3 +711,4 @@ class Group_User extends CommonDBRelation{
 
 
 }
+?>

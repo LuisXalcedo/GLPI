@@ -8,35 +8,46 @@ before_script:
   - sed -e '/"php":/d' -i composer.json
   - rm -f composer.lock
   - composer install --optimize-autoloader
-  # cannot disable mcrypt on travis...
-  - sed -e "s/return extension_loaded('mcrypt');/return false;/" -i vendor/ircmaxell/random-lib/lib/RandomLib/AbstractMcryptMixer.php
   - mysql -u root -e 'create database glpitest;'
   - php tools/cliinstall.php --db=glpitest --user=root --tests
-  - php tools/cliupdate.php --config-dir=../tests |grep -q "No migration needed." || (echo "tools/cliupdate.php FAILED" && exit 1)
   - php -S localhost:8088 tests/router.php &>/dev/null &
-  # ldap disabled, fails with ubuntu precise env
-  # - phpenv config-add tests/enable-ldap.ini 
 
 script:
   - mysql -u root -e 'select version();'
-  - vendor/bin/atoum --debug --bootstrap-file tests/bootstrap.php --no-code-coverage --max-children-number 1 -d tests/units
-  - vendor/bin/atoum --debug --bootstrap-file tests/bootstrap.php --no-code-coverage --max-children-number 1 -d tests/api
-  - if [[ "$CS" == "true" ]]; then vendor/bin/phpcs -p --standard=vendor/glpi-project/coding-standard/GlpiStandard/ --ignore=/vendor/,/plugins/,/files/,/lib/,/config/,/tests/config ./; fi
+  - vendor/bin/phpunit --verbose
 
-#note: default maria version is 5.5 for all main php versions list exept nightly
 matrix:
   include:
+    - php: 5.4
+      addons:
+        mariadb: 5.5
+    - php: 5.5
+      addons:
+        mariadb: 5.5
     - php: 5.6
+      addons:
+        mariadb: 5.5
+    - php: 5.6
+      addons:
+        mariadb: 10.0
+    - php: 5.6
+      addons:
+        mariadb: 10.1
     - php: 7.0
+      addons:
+        mariadb: 10.0
+    - php: 7.0
+      addons:
+        mariadb: 10.1
     - php: 7.1
       addons:
         mariadb: 10.0
     - php: 7.1
       addons:
         mariadb: 10.1
-    - php: 7.1
-      env: CS=true
     - php: nightly
+      addons:
+        mariadb: 10.1
   allow_failures:
     - php: nightly
 

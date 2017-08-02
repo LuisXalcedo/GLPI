@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -53,8 +54,6 @@ class Ticket_Ticket extends CommonDBRelation {
    // Ticket links
    const LINK_TO        = 1;
    const DUPLICATE_WITH = 2;
-   const SON_OF         = 3;
-   const PARENT_OF      = 4;
 
 
    /**
@@ -71,7 +70,7 @@ class Ticket_Ticket extends CommonDBRelation {
             echo "&nbsp;<input type='text' name='tickets_id_1' value='' size='10'>\n";
             echo "<br><br>";
             echo "<br><br><input type='submit' name='massiveaction' class='submit' value='".
-                           _sx('button', 'Post')."'>";
+                           _sx('button','Post')."'>";
             return true;
       }
       return parent::showMassiveActionsSubForm($ma);
@@ -94,7 +93,7 @@ class Ticket_Ticket extends CommonDBRelation {
                 && isset($input['tickets_id_1'])) {
                if ($item->getFromDB($input['tickets_id_1'])) {
                   foreach ($ids as $id) {
-                     $input2                          = [];
+                     $input2                          = array();
                      $input2['id']                    = $input['tickets_id_1'];
                      $input2['_link']['tickets_id_1'] = $input['tickets_id_1'];
                      $input2['_link']['link']         = $input['link'];
@@ -107,8 +106,8 @@ class Ticket_Ticket extends CommonDBRelation {
                            $ma->addMessage($item->getErrorMessage(ERROR_ON_ACTION));
                         }
                      } else {
-                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
-                         $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
+                      $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_NORIGHT);
+                      $ma->addMessage($item->getErrorMessage(ERROR_RIGHT));
                      }
                   }
                }
@@ -139,16 +138,15 @@ class Ticket_Ticket extends CommonDBRelation {
               WHERE `tickets_id_1` = '$ID'
                     OR `tickets_id_2` = '$ID'";
 
-      $tickets = [];
+      $tickets = array();
 
       foreach ($DB->request($sql) as $data) {
          if ($data['tickets_id_1'] != $ID) {
-            $tickets[$data['id']] = ['link'         => $data['link'],
-                                     'tickets_id_1' => $data['tickets_id_1'],
-                                     'tickets_id'   => $data['tickets_id_1']];
+            $tickets[$data['id']] = array('link'       => $data['link'],
+                                          'tickets_id' => $data['tickets_id_1']);
          } else {
-            $tickets[$data['id']] = ['link'       => $data['link'],
-                                          'tickets_id' => $data['tickets_id_2']];
+            $tickets[$data['id']] = array('link'       => $data['link'],
+                                          'tickets_id' => $data['tickets_id_2']);
          }
       }
 
@@ -183,14 +181,13 @@ class Ticket_Ticket extends CommonDBRelation {
                       && ($tick->fields['status'] != CommonITILObject::CLOSED)) {
                      $icons .= '&nbsp;'.Html::getSimpleForm(static::getFormURL(), 'purge',
                                                             _x('button', 'Delete permanently'),
-                                                         ['id'         => $linkID,
-                                                          'tickets_id' => $ID],
-                                                         'fa-times-circle');
+                                                            array('id'         => $linkID,
+                                                                  'tickets_id' => $ID),
+                                                            $CFG_GLPI["root_doc"]."/pics/delete.png");
                   }
                }
-               $inverted = (isset($data['tickets_id_1']));
-               $text = sprintf(__('%1$s %2$s'), self::getLinkName($data['link'], $inverted),
-                               $ticket->getLink(['forceid' => true]));
+               $text = sprintf(__('%1$s %2$s'), self::getLinkName($data['link']),
+                               $ticket->getLink(array('forceid' => true)));
                printf(__('%1$s %2$s'), $text, $icons);
 
             }
@@ -203,41 +200,26 @@ class Ticket_Ticket extends CommonDBRelation {
    /**
     * Dropdown for links between tickets
     *
-    * @param string  $myname select name
-    * @param integer $value  default value (default self::LINK_TO)
-    *
-    * @return void
+    * @param $myname    select name
+    * @param $value     default value (default self::LINK_TO)
    **/
-   static function dropdownLinks($myname, $value = self::LINK_TO) {
+   static function dropdownLinks($myname, $value=self::LINK_TO) {
 
       $tmp[self::LINK_TO]        = __('Linked to');
       $tmp[self::DUPLICATE_WITH] = __('Duplicates');
-      $tmp[self::SON_OF]         = __('Son of');
-      $tmp[self::PARENT_OF]      = __('Parent of');
-      Dropdown::showFromArray($myname, $tmp, ['value' => $value]);
+      Dropdown::showFromArray($myname, $tmp, array('value' => $value));
    }
 
 
    /**
     * Get Link Name
     *
-    * @param integer $value    Current value
-    * @param boolean $inverted Whether to invert label
-    *
-    * @return string
+    * @param $value default value
    **/
-   static function getLinkName($value, $inverted = false) {
-      $tmp = [];
+   static function getLinkName($value) {
 
-      if (!$inverted) {
-         $tmp[self::LINK_TO]        = __('Linked to');
-         $tmp[self::DUPLICATE_WITH] = __('Duplicates');
-         $tmp[self::SON_OF]         = __('Son of');
-      } else {
-         $tmp[self::LINK_TO]        = __('Linked to');
-         $tmp[self::DUPLICATE_WITH] = __('Duplicated by');
-         $tmp[self::SON_OF]         = __('Parent of');
-      }
+      $tmp[self::LINK_TO]        = __('Linked to');
+      $tmp[self::DUPLICATE_WITH] = __('Duplicates');
 
       if (isset($tmp[$value])) {
          return $tmp[$value];
@@ -260,8 +242,6 @@ class Ticket_Ticket extends CommonDBRelation {
          $input['link'] = self::LINK_TO;
       }
 
-      $this->checkParentSon($input);
-
       // No multiple links
       $tickets = self::getLinkedTicketsTo($input['tickets_id_1']);
       if (count($tickets)) {
@@ -271,7 +251,7 @@ class Ticket_Ticket extends CommonDBRelation {
                if (($input['link'] == self::DUPLICATE_WITH)
                    && ($t['link'] == self::LINK_TO)) {
                   $tt = new Ticket_Ticket();
-                  $tt->delete(["id" => $key]);
+                  $tt->delete(array("id" => $key));
                } else { // No duplicate link
                   return false;
                }
@@ -283,31 +263,6 @@ class Ticket_Ticket extends CommonDBRelation {
    }
 
 
-   function prepareInputForUpdate($input) {
-      $this->checkParentSon($input);
-      return parent::prepareInputForAdd($input);
-   }
-
-
-   /**
-    * Check for parent relation (inverse of son)
-    *
-    * @param array $input Input
-    *
-    * @return void
-    */
-   public function checkParentSon(&$input) {
-      if (isset($input['link']) && $input['link'] == Ticket_Ticket::PARENT_OF) {
-         //a PARENT_OF relation is an inverted SON_OF one :)
-         $id1 = $input['tickets_id_2'];
-         $id2 = $input['tickets_id_1'];
-         $input['tickets_id_1'] = $id1;
-         $input['tickets_id_2'] = $id2;
-         $input['link']         = Ticket_Ticket::SON_OF;
-      }
-   }
-
-
    function post_deleteFromDB() {
       global $CFG_GLPI;
 
@@ -316,7 +271,7 @@ class Ticket_Ticket extends CommonDBRelation {
       $t->updateDateMod($this->fields['tickets_id_2']);
       parent::post_deleteFromDB();
 
-      $donotif = !isset($this->input['_disablenotif']) && $CFG_GLPI["use_notifications"];
+      $donotif = !isset($this->input['_disablenotif']) && $CFG_GLPI["use_mailing"];
       if ($donotif) {
          $t->getFromDB($this->fields['tickets_id_1']);
          NotificationEvent::raiseEvent("update", $t);
@@ -334,7 +289,7 @@ class Ticket_Ticket extends CommonDBRelation {
       $t->updateDateMod($this->fields['tickets_id_2']);
       parent::post_addItem();
 
-      $donotif = !isset($this->input['_disablenotif']) && $CFG_GLPI["use_notifications"];
+      $donotif = !isset($this->input['_disablenotif']) && $CFG_GLPI["use_mailing"];
       if ($donotif) {
          $t->getFromDB($this->fields['tickets_id_1']);
          NotificationEvent::raiseEvent("update", $t);
@@ -345,28 +300,7 @@ class Ticket_Ticket extends CommonDBRelation {
    }
 
 
-   /**
-    * Count number of open children for a parent
-    *
-    * @param integer $pid Parent ID
-    *
-    * @return integer
-    */
-   public function countOpenChildren($pid) {
-      global $DB;
-
-      $query = "SELECT COUNT(1) AS cpt FROM " . $this->getTable() . " links " .
-         "INNER JOIN " . Ticket::getTable() . " tickets ON " .
-         "links.tickets_id_1=tickets.id " .
-         "WHERE links.link='" . self::SON_OF . "' AND links.tickets_id_2=$pid " .
-         "AND tickets.status NOT IN ('" . Ticket::SOLVED . "', '" . Ticket::CLOSED . "')";
-      $results = $DB->query($query);
-      $result = $results->fetch_assoc();
-      return (int)$result['cpt'];
-   }
-
-
-   /**
+  /**
     * Affect the same solution for duplicates tickets
     *
     * @param $ID ID of the ticket id
@@ -396,3 +330,4 @@ class Ticket_Ticket extends CommonDBRelation {
       }
    }
 }
+?>

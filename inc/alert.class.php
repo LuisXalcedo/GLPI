@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -51,6 +52,7 @@ class Alert extends CommonDBTM {
    const ACTION      = 5;
    const PERIODICITY = 6;
 
+
    function prepareInputForAdd($input) {
 
       if (!isset($input['date']) || empty($input['date'])) {
@@ -63,15 +65,21 @@ class Alert extends CommonDBTM {
    /**
     * Clear all alerts of an alert type for an item
     *
-    *@param string  $itemtype   ID of the type to clear
-    *@param string  $ID         ID of the item to clear
-    *@param integer $alert_type ID of the alert type to clear
+    *@param $itemtype   ID of the type to clear
+    *@param $ID         ID of the item to clear
+    *@param $alert_type ID of the alert type to clear
     *
-    *@return void
-    */
+    *@return nothing
+   **/
    function clear($itemtype, $ID, $alert_type) {
+      global $DB;
 
-      return $this->deleteByCriteria(['itemtype' => $itemtype, 'items_id' => $ID, 'type' => $alert_type], 1);
+      $query = "DELETE
+                FROM `".$this->getTable()."`
+                WHERE `itemtype` = '$itemtype'
+                      AND `items_id` = '$ID'
+                      AND `type` = '$alert_type'";
+      $DB->query($query);
    }
 
 
@@ -80,19 +88,27 @@ class Alert extends CommonDBTM {
     *
     * @since version 0.84
     *
-    * @param string  $itemtype ID of the type to clear
-    * @param integer $ID       ID of the item to clear
+    * @param $itemtype   ID of the type to clear
+    * @param $ID         ID of the item to clear
     *
-    * @return boolean
-    */
+    * @return nothing
+   **/
    function cleanDBonItemDelete($itemtype, $ID) {
+      global $DB;
 
-      return $this->deleteByCriteria(['itemtype' => $itemtype, 'items_id' => $ID], 1);
+      $query = "DELETE
+                FROM `".$this->getTable()."`
+                WHERE `itemtype` = '$itemtype'
+                      AND `items_id` = '$ID'";
+      $DB->query($query);
    }
 
-   static function dropdown($options = []) {
 
-      $p = [];
+   /**
+    * @param $options array
+   **/
+   static function dropdown($options=array()) {
+
       $p['name']           = 'alert';
       $p['value']          = 0;
       $p['display']        = true;
@@ -118,13 +134,9 @@ class Alert extends CommonDBTM {
 
 
    /**
-    * Builds a Yes/No dropdown
-    *
-    * @param array $options Display options
-    *
-    * @return void|string (see $options['display'])
-    */
-   static function dropdownYesNo($options = []) {
+    * @param $options array
+   **/
+   static function dropdownYesNo($options = array()) {
 
       $p['name']           = 'alert';
       $p['value']          = 0;
@@ -149,20 +161,16 @@ class Alert extends CommonDBTM {
 
 
    /**
-    * ?
-    *
-    * @param string $name    Dropdown name
-    * @param string $value   Dropdown selected value
-    * @param array  $options Display options
-    *
-    * @return void|string (see $options['display'])
-    */
-   static function dropdownIntegerNever($name, $value, $options = []) {
+    * @param $name
+    * @param $value
+    * @param $options array
+   **/
+   static function dropdownIntegerNever($name, $value, $options=array()) {
 
       $p['min']      = 1;
       $p['max']      = 100;
       $p['step']     = 1;
-      $p['toadd']    = [];
+      $p['toadd']    = array();
       $p['display']  = true;
 
       if (isset($options['inherit_parent']) && $options['inherit_parent']) {
@@ -189,69 +197,71 @@ class Alert extends CommonDBTM {
 
 
    /**
-    * Does alert exists
-    *
-    * @param string  $itemtype (default '')
-    * @param integer $items_id (default '')
-    * @param integer $type     (default '')
-    *
-    * @return integer|boolean
-    */
-   static function alertExists($itemtype = '', $items_id = '', $type = '') {
+    * @param $itemtype  (default '')
+    * @param $items_id  (default '')
+    * @param $type      (default '')
+   **/
+   static function alertExists($itemtype='', $items_id='', $type='') {
       global $DB;
 
-      $iter = $DB->request(self::getTable(), ['itemtype' => $itemtype, 'items_id' => $items_id, 'type' => $type]);
-      if ($row = $iter->next()) {
-         return $row['id'];
+      $query = "SELECT `id`
+                FROM `glpi_alerts`
+                WHERE `itemtype` = '$itemtype'
+                      AND `type` = '$type'
+                      AND `items_id` = '$items_id'";
+      $result = $DB->query($query);
+      if ($DB->numrows($result)) {
+         return $DB->result($result,0,'id');
       }
       return false;
    }
 
 
    /**
-    * Get date of alert
-    *
     * @since version 0.84
     *
-    * @param string  $itemtype (default '')
-    * @param integer $items_id (default '')
-    * @param integer $type     (default '')
-    *
-    * @return mixed|boolean
-    */
-   static function getAlertDate($itemtype = '', $items_id = '', $type = '') {
+    * @param $itemtype  (default '')
+    * @param $items_id  (default '')
+    * @param $type      (default '')
+   **/
+   static function getAlertDate($itemtype='', $items_id='', $type='') {
       global $DB;
 
-      $iter = $DB->request(self::getTable(), ['itemtype' => $itemtype, 'items_id' => $items_id, 'type' => $type]);
-      if ($row = $iter->next()) {
-         return $row['date'];
+      $query = "SELECT `date`
+                FROM `glpi_alerts`
+                WHERE `itemtype` = '$itemtype'
+                      AND `type` = '$type'
+                      AND `items_id` = '$items_id'";
+      $result = $DB->query($query);
+      if ($DB->numrows($result)) {
+         return $DB->result($result,0,'date');
       }
       return false;
    }
 
 
    /**
-    * Display last alert
-    *
-    * @param string  $itemtype Item type
-    * @param integer $items_id Item ID
-    *
-    * @return void
-    */
+    * @param $itemtype
+    * @param $items_id
+   **/
    static function displayLastAlert($itemtype, $items_id) {
       global $DB;
 
       if ($items_id) {
-         $iter = $DB->request(self::getTable(), ['FIELDS'   => 'date',
-                                                 'ORDER'    => 'date DESC',
-                                                 'LIMIT'    => 1,
-                                                 'itemtype' => $itemtype,
-                                                 'items_id' => $items_id]);
-         if ($row = $iter->next()) {
+         $query = "SELECT `date`
+                   FROM `glpi_alerts`
+                   WHERE `itemtype` = '$itemtype'
+                         AND `items_id` = '$items_id'
+                   ORDER BY `date` DESC
+                   LIMIT 1";
+         $result = $DB->query($query);
+         if ($DB->numrows($result) > 0) {
             //TRANS: %s is the date
-            echo sprintf(__('Alert sent on %s'), Html::convDateTime($row['date']));
+            echo sprintf(__('Alert sent on %s'),
+                         Html::convDateTime($DB->result($result, 0, 'date')));
          }
       }
    }
 
 }
+?>

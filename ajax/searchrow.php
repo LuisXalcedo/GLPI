@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -36,7 +37,7 @@
 */
 
 // Direct access to file
-if (strpos($_SERVER['PHP_SELF'], "searchrow.php")) {
+if (strpos($_SERVER['PHP_SELF'],"searchrow.php")) {
    include ('../inc/includes.php');
    header("Content-Type: text/html; charset=UTF-8");
    Html::header_nocache();
@@ -92,7 +93,7 @@ if (isset($_POST["itemtype"])
       }
 
       // Instanciate an object to access method
-      $item = null;
+      $item = NULL;
       if ($_POST["itemtype"] != 'AllAssets') {
          $item = getItemForItemtype($_POST["itemtype"]);
       }
@@ -105,7 +106,7 @@ if (isset($_POST["itemtype"])
              Html::jsGetElementbyID($rowid).".remove();\">&nbsp;&nbsp;";
    }
 
-   $criteria = [];
+   $criteria = array();
 
    if (isset($_SESSION['glpisearch'][$_POST["itemtype"]]['criteria'][$_POST["num"]])
        && is_array($_SESSION['glpisearch'][$_POST["itemtype"]]['criteria'][$_POST["num"]])) {
@@ -127,11 +128,11 @@ if (isset($_POST["itemtype"])
       }
       Dropdown::showFromArray("criteria[".$_POST["num"]."][link]",
                               Search::getLogicalOperators(),
-                              ['value' => $value]);
+                              array('value' => $value));
    }
 
    $selected = $first = '';
-   $values   = [];
+   $values   = array();
    // display select box to define search item
    if ($CFG_GLPI['allow_search_view'] == 2) {
       $values['view'] = __('Items seen');
@@ -144,8 +145,6 @@ if (isset($_POST["itemtype"])
       // print groups
       if (!is_array($val)) {
          $group = $val;
-      } else if (count($val) == 1) {
-         $group = $val['name'];
       } else {
          if (!isset($val['nosearch']) || ($val['nosearch'] == false)) {
             $values[$group][$key] = $val["name"];
@@ -162,10 +161,10 @@ if (isset($_POST["itemtype"])
 
    if (isset($criteria['field'])) {
       $value = $criteria['field'];
-   }
+   } 
 
    $rand     = Dropdown::showFromArray("criteria[".$_POST["num"]."][field]", $values,
-                                       ['value' => $value]);
+                                       array('value' => $value));
    $field_id = Html::cleanId("dropdown_criteria[".$_POST["num"]."][field]$rand");
    echo "</td><td class='left'>";
    $spanid= 'SearchSpan'.$_POST["itemtype"].$_POST["num"];
@@ -185,14 +184,15 @@ if (isset($_POST["itemtype"])
    include (GLPI_ROOT."/ajax/searchoption.php");
    echo "</div>\n";
 
-   $params = ['field'      => '__VALUE__',
+   $params = array('field'      => '__VALUE__',
                    'itemtype'   => $used_itemtype,
                    'num'        => $_POST["num"],
                    'value'      => $_POST["value"],
-                   'searchtype' => $_POST["searchtype"]];
+                   'searchtype' => $_POST["searchtype"]);
 
    Ajax::updateItemOnSelectEvent($field_id, $spanid,
                                  $CFG_GLPI["root_doc"]."/ajax/searchoption.php", $params);
 
    echo "</td></tr>\n";
 }
+?>

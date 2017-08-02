@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -69,7 +69,7 @@ class DisplayPreference extends CommonDBTM {
                       AND `users_id` = '".$input["users_id"]."'";
       $result = $DB->query($query);
 
-      $input["rank"] = $DB->result($result, 0, 0)+1;
+      $input["rank"] = $DB->result($result,0,0)+1;
 
       return $input;
    }
@@ -91,8 +91,8 @@ class DisplayPreference extends CommonDBTM {
                $user->getFromDB($input['users_id']);
                foreach ($ids as $id) {
                   if ($input['users_id'] == Session::getLoginUserID()) {
-                     if ($item->deleteByCriteria(['users_id' => $input['users_id'],
-                                                       'itemtype' => $id])) {
+                     if ($item->deleteByCriteria(array('users_id' => $input['users_id'],
+                                                       'itemtype' => $id))) {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                      } else {
                         $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
@@ -128,8 +128,8 @@ class DisplayPreference extends CommonDBTM {
                 ORDER BY `users_id`, `rank`";
       $result = $DB->query($query);
 
-      $default_prefs = [];
-      $user_prefs = [];
+      $default_prefs = array();
+      $user_prefs = array();
 
       while ($data = $DB->fetch_assoc($result)) {
          if ($data["users_id"] != 0) {
@@ -264,7 +264,7 @@ class DisplayPreference extends CommonDBTM {
          return false;
       }
 
-      $item = null;
+      $item = NULL;
       if ($itemtype != 'AllAssets') {
          $item = getItemForItemtype($itemtype);
       }
@@ -314,14 +314,13 @@ class DisplayPreference extends CommonDBTM {
          echo "<input type='hidden' name='itemtype' value='$itemtype'>";
          echo "<input type='hidden' name='users_id' value='$IDuser'>";
          $group  = '';
-         $values = [];
+         $values = array();
          foreach ($searchopt as $key => $val) {
             if (!is_array($val)) {
                $group = $val;
-            } else if (count($val) === 1) {
-               $group = $val['name'];
-            } else if ($key != 1
-                       && !in_array($key, $already_added)
+
+            } else if (($key != 1)
+                       && !in_array($key,$already_added)
                        && (!isset($val['nodisplay']) || !$val['nodisplay'])) {
                $values[$group][$key] = $val["name"];
             }
@@ -340,6 +339,7 @@ class DisplayPreference extends CommonDBTM {
          echo "<td class='center' width='50%'>".$searchopt[1]["name"]."</td>";
          echo "<td colspan='3'>&nbsp;</td>";
          echo "</tr>";
+
 
          // print entity
          if (Session::isMultiEntitiesMode()
@@ -368,9 +368,9 @@ class DisplayPreference extends CommonDBTM {
                      echo "<input type='hidden' name='id' value='".$data["id"]."'>";
                      echo "<input type='hidden' name='users_id' value='$IDuser'>";
                      echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-                     echo "<button type='submit' name='up'".
-                         " title=\"".__s('Bring up')."\"".
-                         " class='unstyled pointer'><i class='fa fa-arrow-up'></i></button>";
+                     echo "<input type='image' name='up' value=\"".__s('Bring up')."\" src='".
+                            $CFG_GLPI["root_doc"]."/pics/puce-up.png' alt=\"".
+                            __s('Bring up')."\" title=\"".__s('Bring up')."\">";
                      Html::closeForm();
                      echo "</td>\n";
 
@@ -384,9 +384,9 @@ class DisplayPreference extends CommonDBTM {
                      echo "<input type='hidden' name='id' value='".$data["id"]."'>";
                      echo "<input type='hidden' name='users_id' value='$IDuser'>";
                      echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-                     echo "<button type='submit' name='down'".
-                         " title=\"".__s('Bring down')."\"".
-                         " class='unstyled pointer'><i class='fa fa-arrow-down'></i></button>";
+                     echo "<input type='image' name='down' value=\"".__s('Bring down')."\" src='".
+                            $CFG_GLPI["root_doc"]."/pics/puce-down.png' alt=\"".
+                            __s('Bring down')."\" title=\"".__s('Bring down')."\">";
                      Html::closeForm();
                      echo "</td>\n";
 
@@ -399,9 +399,11 @@ class DisplayPreference extends CommonDBTM {
                   echo "<input type='hidden' name='id' value='".$data["id"]."'>";
                   echo "<input type='hidden' name='users_id' value='$IDuser'>";
                   echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-                  echo "<button type='submit' name='purge'".
-                         " title=\""._sx('button', 'Delete permanently')."\"".
-                         " class='unstyled pointer'><i class='fa fa-times-circle'></i></button>";
+                  echo "<input type='image' name='purge' value=\"".
+                         _sx('button', 'Delete permanently')."\" src='".
+                         $CFG_GLPI["root_doc"]."/pics/delete.png' alt=\"".
+                         _sx('button', 'Delete permanently')."\" title=\"".
+                         _sx('button', 'Delete permanently')."\">";
                   Html::closeForm();
                   echo "</td>\n";
                   echo "</tr>";
@@ -426,13 +428,13 @@ class DisplayPreference extends CommonDBTM {
    function showFormGlobal($target, $itemtype) {
       global $CFG_GLPI, $DB;
 
-      $searchopt = Search::getCleanedOptions($itemtype);
+      $searchopt = Search::getOptions($itemtype);
       if (!is_array($searchopt)) {
          return false;
       }
       $IDuser = 0;
 
-      $item = null;
+      $item = NULL;
       if ($itemtype != 'AllAssets') {
          $item = getItemForItemtype($itemtype);
       }
@@ -460,14 +462,13 @@ class DisplayPreference extends CommonDBTM {
          echo "<input type='hidden' name='itemtype' value='$itemtype'>";
          echo "<input type='hidden' name='users_id' value='$IDuser'>";
          $group  = '';
-         $values = [];
+         $values = array();
+         $searchopt   = Search::getCleanedOptions($itemtype);
          foreach ($searchopt as $key => $val) {
             if (!is_array($val)) {
                $group = $val;
-            } else if (count($val) === 1) {
-               $group = $val['name'];
-            } else if ($key != 1
-                       && !in_array($key, $already_added)
+            } else if (($key != 1)
+                       && !in_array($key,$already_added)
                        && (!isset($val['nodisplay']) || !$val['nodisplay'])) {
                $values[$group][$key] = $val["name"];
             }
@@ -523,9 +524,9 @@ class DisplayPreference extends CommonDBTM {
                      echo "<input type='hidden' name='id' value='".$data["id"]."'>";
                      echo "<input type='hidden' name='users_id' value='$IDuser'>";
                      echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-                     echo "<button type='submit' name='up'".
-                         " title=\"".__s('Bring up')."\"".
-                         " class='unstyled pointer'><i class='fa fa-arrow-up'></i></button>";
+                     echo "<input type='image' name='up' value=\"".__s('Bring up')."\" src='".
+                            $CFG_GLPI["root_doc"]."/pics/puce-up.png' alt=\"".
+                            __s('Bring up')."\"  title=\"".__s('Bring up')."\" class='pointer'>";
                      Html::closeForm();
                      echo "</td>";
 
@@ -539,9 +540,9 @@ class DisplayPreference extends CommonDBTM {
                      echo "<input type='hidden' name='id' value='".$data["id"]."'>";
                      echo "<input type='hidden' name='users_id' value='$IDuser'>";
                      echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-                     echo "<button type='submit' name='down'".
-                         " title=\"".__s('Bring down')."\"".
-                         " class='unstyled pointer'><i class='fa fa-arrow-down'></i></button>";
+                     echo "<input type='image' name='down' value=\"".__s('Bring down')."\" src='".
+                            $CFG_GLPI["root_doc"]."/pics/puce-down.png' alt=\"".
+                            __s('Bring down')."\" title=\"".__s('Bring down')."\" class='pointer'>";
                      Html::closeForm();
                      echo "</td>";
 
@@ -554,9 +555,10 @@ class DisplayPreference extends CommonDBTM {
                   echo "<input type='hidden' name='id' value='".$data["id"]."'>";
                   echo "<input type='hidden' name='users_id' value='$IDuser'>";
                   echo "<input type='hidden' name='itemtype' value='$itemtype'>";
-                  echo "<button type='submit' name='purge'".
-                         " title=\""._sx('button', 'Delete permanently')."\"".
-                         " class='unstyled pointer'><i class='fa fa-times-circle'></i></button>";
+                  echo "<input type='image' name='purge' value=\"".
+                         _sx('button', 'Delete permanently')."\" src='".
+                         $CFG_GLPI["root_doc"]."/pics/delete.png' alt=\"".
+                         __s('Delete permanently')."\" title=\"". __s('Delete permanently')."\"  class='pointer'>";
                   Html::closeForm();
                   echo "</td>\n";
                }
@@ -592,17 +594,17 @@ class DisplayPreference extends CommonDBTM {
          $rand = mt_rand();
          echo "<div class='spaced'>";
          Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
-         $massiveactionparams = ['width'            => 400,
+         $massiveactionparams = array('width'            => 400,
                            'height'           => 200,
                            'container'        => 'mass'.__CLASS__.$rand,
-                           'specific_actions' => [__CLASS__.MassiveAction::CLASS_ACTION_SEPARATOR.'delete_for_user'
-                                                       => _x('button', 'Delete permanently')],
-                           'extraparams'      => ['massive_action_fields' => ['users_id']]];
+                           'specific_actions' => array(__CLASS__.MassiveAction::CLASS_ACTION_SEPARATOR.'delete_for_user'
+                                                       => _x('button', 'Delete permanently')),
+                           'extraparams'      => array('massive_action_fields' => array('users_id')));
 
          Html::showMassiveActions($massiveactionparams);
 
-         echo Html::hidden('users_id', ['value'                 => $users_id,
-                                             'data-glpicore-ma-tags' => 'common']);
+         echo Html::hidden('users_id', array('value'                 => $users_id,
+                                             'data-glpicore-ma-tags' => 'common'));
          echo "<table class='tab_cadre_fixe'>";
          echo "<tr>";
          echo "<th width='10'>";
@@ -645,16 +647,16 @@ class DisplayPreference extends CommonDBTM {
    }
 
 
-   function defineTabs($options = []) {
+   function defineTabs($options=array()) {
 
-      $ong = [];
+      $ong = array();
       $this->addStandardTab(__CLASS__, $ong, $options);
       $ong['no_all_tab'] = true;
       return $ong;
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       switch ($item->getType()) {
          case 'Preference' :
@@ -664,7 +666,7 @@ class DisplayPreference extends CommonDBTM {
             break;
 
          case __CLASS__:
-            $ong = [];
+            $ong = array();
             $ong[1] = __('Global View');
             if (Session::haveRight(self::$rightname, self::PERSONAL)) {
                $ong[2] = __('Personal View');
@@ -675,7 +677,7 @@ class DisplayPreference extends CommonDBTM {
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       switch ($item->getType()) {
          case 'Preference' :
@@ -703,14 +705,14 @@ class DisplayPreference extends CommonDBTM {
     *
     * @see commonDBTM::getRights()
    **/
-   function getRights($interface = 'central') {
+   function getRights($interface='central') {
 
       //TRANS: short for : Search result user display
-      $values[self::PERSONAL]  = ['short' => __('User display'),
-                                       'long'  => __('Search result user display')];
+      $values[self::PERSONAL]  = array('short' => __('User display'),
+                                       'long'  => __('Search result user display'));
       //TRANS: short for : Search result default display
-      $values[self::GENERAL]  =  ['short' => __('Default display'),
-                                       'long'  => __('Search result default display')];
+      $values[self::GENERAL]  =  array('short' => __('Default display'),
+                                       'long'  => __('Search result default display'));
 
       return $values;
    }

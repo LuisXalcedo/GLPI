@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -44,8 +45,8 @@ if (!isset($_POST["itemtype"]) || !($item = getItemForItemtype($_POST['itemtype'
 }
 
 if (InfoCom::canApplyOn($_POST["itemtype"])) {
-   Session::checkSeveralRightsOr([$_POST["itemtype"] => UPDATE,
-                                       "infocom"          => UPDATE]);
+   Session::checkSeveralRightsOr(array($_POST["itemtype"] => UPDATE,
+                                       "infocom"          => UPDATE));
 } else {
    $item->checkGlobal(UPDATE);
 }
@@ -54,7 +55,7 @@ $inline = false;
 if (isset($_POST['inline']) && $_POST['inline']) {
    $inline = true;
 }
-$submitname = _sx('button', 'Post');
+$submitname = _sx('button','Post');
 if (isset($_POST['submitname']) && $_POST['submitname']) {
    $submitname= stripslashes($_POST['submitname']);
 }
@@ -80,8 +81,8 @@ if (isset($_POST["itemtype"])
       // Specific for plugin which add link to core object
        || ($plug = isPluginItemType(getItemTypeForTable($search['table'])))) {
       $plugdisplay = Plugin::doOneHook($plug['plugin'], 'MassiveActionsFieldsDisplay',
-                                       ['itemtype' => $_POST["itemtype"],
-                                             'options'  => $search]);
+                                       array('itemtype' => $_POST["itemtype"],
+                                             'options'  => $search));
    }
 
    $fieldname = '';
@@ -93,8 +94,8 @@ if (isset($_POST["itemtype"])
       $fieldname = $search["linkfield"];
    }
    if (!$plugdisplay) {
-      $options = [];
-      $values  = [];
+      $options = array();
+      $values  = array();
       // For ticket template or aditional options of massive actions
       if (isset($_POST['options'])) {
          $options = $_POST['options'];
@@ -120,3 +121,4 @@ if (isset($_POST["itemtype"])
    }
 
 }
+?>

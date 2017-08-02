@@ -2,7 +2,7 @@
 
 To run the GLPI test suite you need
 
-* [atoum](http://atoum.org/)
+* [PHPunit](https://phpunit.de/) version 4.8 or greater
 
 Installing composer development dependencies
 ----------------------
@@ -36,7 +36,7 @@ Use the **CliInstall** script to create a new database,
 only used for the test suite, using the `--tests` option:
 
 ```bash
-$ php tools/cliinstall.php --db=glpitests --user=root --pass=xxxx --tests
+$ php tools/cliinstall.php --db=glpitests --user=root --pass=xxxx --lang=en_US --tests
 Connect to the DB...
 Create the DB...
 Save configuration file...
@@ -55,41 +55,36 @@ If you need to recreate the database (e.g. for a new schema), you need to run
 Changing database configuration
 -------------------------------
 
-Using the same database than the web application is not recommended. Use the `tests/config_db.php` file to adjust connection settings.
+If you prefer to use the another test configuration file, 
+Copy the `phpunit.xml.dist` file to `phpunit.xml` and change 
+the `GLPI_CONFIG_DIR` option.
+
+Using the same database than the web application is not recommended.
+
 
 Running the test suite
 ----------------------
 
-There are two directories for tests:
-- `tests/units` for main core tests;
-- `tests/api` for API tests.
-
-You can choose to run tests on a whole directory, or on any file. You have to specify a bootstrap file each time:
+Run the **phpunit** command in the top of GLPI tree:
 
 ```bash
-$ atoum -bf tests/bootstrap.php -mcn 1 -d tests/units/
-[...]
-$ atoum -bf tests/bootstrap.php -f tests/units/Html.php
+$ phpunit
+
+Loading GLPI dataset version 2
++++++++++++++++++
+Done
+
+PHPUnit 5.3.4 by Sebastian Bergmann and contributors.
+
+Runtime:       PHP 5.6.21
+Configuration: /work/GLPI/master/phpunit.xml.dist
+
+.........................................................         57 / 57 (100%)
+
+Time: 419 ms, Memory: 41.00MB
+
+OK (57 tests, 630 assertions)
 ```
 
-If you want to run the API tests suite, you need to run a development server:
-
-```bash
-php -S localhost:8088 tests/router.php &>/dev/null &
-```
-
-Running `atoum` without any arguments will show you the possible options. Most important are:
-- `-bf` to set bootstrap file,
-- `-d` to run tests located in a whole directory,
-- `-f` to run tests on a standalone file,
-- `--debug` to get extra informations when something goes wrong,
-- `-mcn` limit number of concurrent runs. This is unfortunately mandatory running the whole test suite right now :/,
-- `-ncc` do not generate code coverage,
-- `--php` to change PHP executable to use,
-- `-l` loop mode.
-
-Note that if you do not use the `-ncc` switch; coverage will be generated in the `tests/code-coverage/` directory.
-
-On first run, additional data are loaded into the test database. On following run, this step is skipped. Note that if the test dataset version changes; you'll have to reset your database using the **CliInstall** script again.
-
-Note: you may see a skipped tests regarding missing extension `event`; this is expected ;)
+On first run, additional data are loaded into the test database.
+On following run, this step is skipped.

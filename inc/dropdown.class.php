@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -79,7 +79,7 @@ class Dropdown {
     *
     * @return boolean : false if error and random id if OK
    **/
-   static function show($itemtype, $options = []) {
+   static function show($itemtype, $options=array()) {
       global $DB, $CFG_GLPI;
 
       if ($itemtype && !($item = getItemForItemtype($itemtype))) {
@@ -95,12 +95,12 @@ class Dropdown {
       $params['entity_sons']          = false;
       $params['toupdate']             = '';
       $params['width']                = '';
-      $params['used']                 = [];
-      $params['toadd']                = [];
+      $params['used']                 = array();
+      $params['toadd']                = array();
       $params['on_change']            = '';
       $params['condition']            = '';
       $params['rand']                 = mt_rand();
-      $params['displaywith']          = [];
+      $params['displaywith']          = array();
       //Parameters about choice 0
       //Empty choice's label
       $params['emptylabel']           = self::EMPTY_VALUE;
@@ -109,8 +109,9 @@ class Dropdown {
       $params['display']              = true;
       $params['permit_select_parent'] = false;
       $params['addicon']              = true;
-      $params['specific_tags']        = [];
-      $params['url']                  = $CFG_GLPI['root_doc']."/ajax/getDropdownValue.php";
+      $params['specific_tags']        = array();
+      $params['url']                  = $CFG_GLPI['root_doc']."/ajax/getDropdownValue.php" ;
+
 
       if (is_array($options) && count($options)) {
          foreach ($options as $key => $val) {
@@ -146,21 +147,22 @@ class Dropdown {
             // translation not needed - only for debug
             $output .= "entity_sons options is not available with entity option as array";
          } else {
-            $params['entity'] = getSonsOf('glpi_entities', $params['entity']);
+            $params['entity'] = getSonsOf('glpi_entities',$params['entity']);
          }
       }
+
 
       $field_id = Html::cleanId("dropdown_".$params['name'].$params['rand']);
 
       // Manage condition
       if (!empty($params['condition'])) {
-         $params['condition'] = static::addNewCondition($params['condition']);
+        $params['condition'] = static::addNewCondition($params['condition']);
       }
 
       if (!$item instanceof CommonTreeDropdown) {
          $name = Toolbox::unclean_cross_side_scripting_deep($name);
       }
-      $p = ['value'                => $params['value'],
+      $p = array('value'                => $params['value'],
                  'valuename'            => $name,
                  'width'                => $params['width'],
                  'itemtype'             => $itemtype,
@@ -174,7 +176,7 @@ class Dropdown {
                  'on_change'            => $params['on_change'],
                  'permit_select_parent' => $params['permit_select_parent'],
                  'specific_tags'        => $params['specific_tags'],
-                ];
+                );
 
       $output = "<span class='no-wrap'>";
       $output.= Html::jsAjaxDropdown($params['name'], $field_id,
@@ -184,13 +186,12 @@ class Dropdown {
       if ($params['comments']) {
          $comment_id      = Html::cleanId("comment_".$params['name'].$params['rand']);
          $link_id         = Html::cleanId("comment_link_".$params['name'].$params['rand']);
-         $kblink_id       = Html::cleanId("kb_link_".$params['name'].$params['rand']);
-         $options_tooltip = ['contentid' => $comment_id,
+         $options_tooltip = array('contentid' => $comment_id,
                                   'linkid'    => $link_id,
-                                  'display'   => false];
+                                  'display'   => false);
 
          if ($item->canView()) {
-            if ($params['value']
+             if ($params['value']
                  && $item->getFromDB($params['value'])
                  && $item->canViewItem()) {
                $options_tooltip['link']       = $item->getLinkURL();
@@ -199,27 +200,19 @@ class Dropdown {
             }
          }
 
-         if (empty($comment)) {
-            $comment = sprintf(
-               __('Show %1$s'),
-               mb_strtolower(
-                  $item::getTypeName(Session::getPluralNumber())
-               )
-            );
-         }
-         $output .= "&nbsp;".Html::showToolTip($comment, $options_tooltip);
+         $output .= "&nbsp;".Html::showToolTip($comment,$options_tooltip);
 
          if (($item instanceof CommonDropdown)
              && $item->canCreate()
              && !isset($_REQUEST['_in_modal'])
              && $params['addicon']) {
 
-               $output .= "<span class='fa fa-plus-circle pointer' title=\"".__s('Add')."\"
-                            onClick=\"".Html::jsGetElementbyID('add_dropdown'.$params['rand']).".dialog('open');\"
-                           ><span class='sr-only'>" . __s('Add') . "</span></span>";
+               $output .= "<img alt='' title=\"".__s('Add')."\" src='".$CFG_GLPI["root_doc"].
+                            "/pics/add_dropdown.png' style='cursor:pointer; margin-left:2px;'
+                            onClick=\"".Html::jsGetElementbyID('add_dropdown'.$params['rand']).".dialog('open');\">";
                $output .= Ajax::createIframeModalWindow('add_dropdown'.$params['rand'],
                                                         $item->getFormURL(),
-                                                        ['display' => false]);
+                                                        array('display' => false));
          }
          // Display specific Links
          if ($itemtype == "Supplier") {
@@ -228,22 +221,15 @@ class Dropdown {
             }
          }
 
-         $paramscomment = ['value' => '__VALUE__',
-                                'table' => $table];
-         if ($item->isField('knowbaseitemcategories_id')
+         if (($itemtype == 'ITILCategory')
              && Session::haveRight('knowbase', READ)) {
 
-            if (method_exists($item, 'getLinks')) {
-               $output .= "<span id='$kblink_id'>";
+            if ($params['value'] && $item->getFromDB($params['value'])) {
                $output .= '&nbsp;'.$item->getLinks();
-               $output .= "</span>";
-               $paramscomment['withlink'] = $kblink_id;
-               $output .= Ajax::updateItemOnSelectEvent($field_id, $kblink_id,
-                                                        $CFG_GLPI["root_doc"]."/ajax/kblink.php",
-                                                        $paramscomment, false);
             }
          }
-
+         $paramscomment = array('value' => '__VALUE__',
+                                'table' => $table);
          if ($item->canView()) {
             $paramscomment['withlink'] = $link_id;
          }
@@ -261,12 +247,12 @@ class Dropdown {
       return $output;
    }
 
-   static function addNewCondition($condition) {
-       $condition = Toolbox::cleanNewLines($condition);
-       $sha1=sha1($condition);
-       $_SESSION['glpicondition'][$sha1] = $condition;
-       return $sha1;
-   }
+    static function addNewCondition($condition) {
+        $condition = Toolbox::cleanNewLines($condition);
+        $sha1=sha1($condition);
+        $_SESSION['glpicondition'][$sha1] = $condition;
+        return $sha1;
+    }
 
    /**
     * Get the value of a dropdown
@@ -281,13 +267,13 @@ class Dropdown {
     *
     * @return string the value of the dropdown or &nbsp; if not exists
    **/
-   static function getDropdownName($table, $id, $withcomment = 0, $translate = true, $tooltip = true) {
+   static function getDropdownName($table, $id, $withcomment=0, $translate=true, $tooltip=true) {
       global $DB, $CFG_GLPI;
 
       $item = getItemForItemtype(getItemTypeForTable($table));
 
       if ($item instanceof CommonTreeDropdown) {
-         return getTreeValueCompleteName($table, $id, $withcomment, $translate, $tooltip);
+         return getTreeValueCompleteName($table,$id,$withcomment, $translate, $tooltip);
       }
 
       $name    = "";
@@ -297,7 +283,7 @@ class Dropdown {
          $SELECTNAME    = "'' AS transname";
          $SELECTCOMMENT = "'' AS transcomment";
          $JOIN          = '';
-         if ($translate) {
+         if  ($translate) {
             if (Session::haveTranslations(getItemTypeForTable($table), 'name')) {
                $SELECTNAME = "`namet`.`value` AS transname";
                $JOIN       .= " LEFT JOIN `glpi_dropdowntranslations` AS namet
@@ -335,7 +321,7 @@ class Dropdown {
                if ($translate && !empty($data['transname'])) {
                   $name = $data['transname'];
                } else {
-                  $name = $data[$item->getNameField()];
+                  $name = $data["name"];
                }
                if (isset($data["comment"])) {
                   if ($translate && !empty($data['transcomment'])) {
@@ -382,7 +368,7 @@ class Dropdown {
                      break;
 
                   case "glpi_suppliers" :
-                     if ($tooltip) {
+                     if( $tooltip ) {
                         if (!empty($data["phonenumber"])) {
                            $comment .= "<br>".sprintf(__('%1$s: %2$s'), "<span class='b'>".__('Phone'),
                                                       "</span>".$data['phonenumber']);
@@ -405,7 +391,7 @@ class Dropdown {
                      break;
 
                   case "glpi_budgets" :
-                     if ($tooltip) {
+                     if( $tooltip ) {
                         if (!empty($data['locations_id'])) {
                            $comment .= "<br>".sprintf(__('%1$s: %2$s'),
                                                       "<span class='b'>".__('Location')."</span>",
@@ -425,6 +411,7 @@ class Dropdown {
                                                       "<span class='b'>".__('Start date')."</span>",
                                                       Html::convDateTime($data["begin_date"]));
 
+
                         }
                         if (!empty($data['end_date'])) {
                            $comment .= "<br>".sprintf(__('%1$s: %2$s'),
@@ -440,15 +427,15 @@ class Dropdown {
       if (empty($name)) {
          $name = "&nbsp;";
       }
-      /*
+/*
       if (!$item instanceof CommonTreeDropdown) {
          $search  = array("/\&lt;/","/\&gt;/");
          $replace = array("<",">");
          $name    = preg_replace($search, $replace, $name);
       }*/
       if ($withcomment) {
-         return ['name'     => $name,
-                      'comment'  => $comment];
+         return array('name'     => $name,
+                      'comment'  => $comment);
       }
 
       return $name;
@@ -466,7 +453,7 @@ class Dropdown {
    static function getDropdownArrayNames($table, $ids) {
       global $DB, $CFG_GLPI;
 
-      $tabs = [];
+      $tabs = array();
 
       if (count($ids)) {
          $itemtype = getItemTypeForTable($table);
@@ -478,7 +465,7 @@ class Dropdown {
 
             $query = "SELECT `id`, `$field`
                       FROM `$table`
-                      WHERE `id` IN (".implode(',', $ids).")";
+                      WHERE `id` IN (".implode(',',$ids).")";
 
             if ($result = $DB->query($query)) {
                while ($data = $DB->fetch_assoc($result)) {
@@ -507,11 +494,11 @@ class Dropdown {
     *
     * @return nothing (print out an HTML select box)
    **/
-   static function showItemTypes($name, $types = [], $options = []) {
+   static function showItemTypes($name, $types=array(), $options=array()) {
       global $CFG_GLPI;
 
       $params['value']               = '';
-      $params['used']                = [];
+      $params['used']                = array();
       $params['emptylabel']          = self::EMPTY_VALUE;
       $params['display']             = true;
       $params['width']               = '80%';
@@ -524,7 +511,7 @@ class Dropdown {
          }
       }
 
-      $values = [];
+      $values = array();
       if (count($types)) {
          foreach ($types as $type) {
             if ($item = getItemForItemtype($type)) {
@@ -548,7 +535,7 @@ class Dropdown {
     *
     * @return nothing (print out an HTML select box)
    **/
-   static function dropdownUsedItemTypes($name, $itemtype_ref, $options = []) {
+   static function dropdownUsedItemTypes($name, $itemtype_ref, $options=array()) {
       global $DB;
 
       $p['value'] = 0;
@@ -563,13 +550,13 @@ class Dropdown {
       $query = "SELECT DISTINCT `".$p['field']."`
                 FROM `".getTableForItemType($itemtype_ref)."`";
 
-      $tabs = [];
+      $tabs = array();
       if ($result = $DB->query($query)) {
          while ($data = $DB->fetch_assoc($result)) {
             $tabs[$data[$p['field']]] = $data[$p['field']];
          }
       }
-      return self::showItemTypes($name, $tabs, ['value' => $p['value']]);
+      return self::showItemTypes($name, $tabs, array('value' => $p['value']));
    }
 
 
@@ -583,12 +570,12 @@ class Dropdown {
     *
     * @return nothing (print out an HTML select box)
    **/
-   static function dropdownIcons($myname, $value, $store_path, $display = true) {
+   static function dropdownIcons($myname, $value, $store_path, $display=true) {
 
       $output = '';
       if (is_dir($store_path)) {
          if ($dh = opendir($store_path)) {
-            $files = [];
+            $files = array();
 
             while (($file = readdir($dh)) !== false) {
                $files[] = $file;
@@ -598,13 +585,13 @@ class Dropdown {
             sort($files);
 
             foreach ($files as $file) {
-               if (preg_match("/\.png$/i", $file)) {
+               if (preg_match("/\.png$/i",$file)) {
                   $values[$file] = $file;
                }
             }
             Dropdown::showFromArray($myname, $values,
-                                    ['value'               => $value,
-                                          'display_emptychoice' => true]);
+                                    array('value'               => $value,
+                                          'display_emptychoice' => true));
 
          } else {
             //TRANS: %s is the store path
@@ -629,13 +616,13 @@ class Dropdown {
     * @param $name   select name
     * @param $value  default value (default '')
    **/
-   static function showGMT($name, $value = '') {
+   static function showGMT($name, $value='') {
 
-      $elements = [-12, -11, -10, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0,
+      $elements = array(-12, -11, -10, -9, -8, -7, -6, -5, -4, -3.5, -3, -2, -1, 0,
                         '+1', '+2', '+3', '+3.5', '+4', '+4.5', '+5', '+5.5', '+6', '+6.5', '+7',
-                        '+8', '+9', '+9.5', '+10', '+11', '+12', '+13'];
+                        '+8', '+9', '+9.5', '+10', '+11', '+12', '+13');
 
-      $values = [];
+      $values = array();
       foreach ($elements as $element) {
          if ($element != 0) {
             $values[$element*HOUR_TIMESTAMP] = sprintf(__('%1$s %2$s'), __('GMT'),
@@ -646,7 +633,7 @@ class Dropdown {
             $values[$element*HOUR_TIMESTAMP] = __('GMT');
          }
       }
-      Dropdown::showFromArray($name, $values, ['value' => $value]);
+      Dropdown::showFromArray($name, $values, array('value' => $value));
    }
 
 
@@ -661,11 +648,11 @@ class Dropdown {
     *
     * @return rand value
    **/
-   static function showYesNo($name, $value = 0, $restrict_to = -1, $params = []) {
+   static function showYesNo($name, $value=0, $restrict_to=-1, $params=array()) {
 
-      if (!array_key_exists ('use_checkbox', $params)) {
-         // TODO: switch to true when Html::showCheckbox() is validated
-         $params['use_checkbox'] = false;
+     if (!array_key_exists ('use_checkbox', $params)) {
+        // TODO: switch to true when Html::showCheckbox() is validated
+        $params['use_checkbox'] = false;
       }
       if ($params['use_checkbox']) {
 
@@ -675,8 +662,8 @@ class Dropdown {
             $rand = mt_rand();
          }
 
-         $options = ['name' => $name,
-                          'id'   => Html::cleanId("dropdown_".$name.$rand)];
+         $options = array('name' => $name,
+                          'id'   => Html::cleanId("dropdown_".$name.$rand));
 
          switch ($restrict_to) {
             case 0 :
@@ -695,13 +682,8 @@ class Dropdown {
                break;
          }
 
-         $output = Html::getCheckbox($options);
-         if (!isset($options['display']) || $options['display'] == 'true') {
-            echo $output;
-            return $rand;
-         } else {
-            return $output;
-         }
+         Html::showCheckbox($options);
+         return $rand;
       }
 
       if ($restrict_to != 0) {
@@ -721,7 +703,7 @@ class Dropdown {
    /**
     * Get Yes No string
     *
-    * @param mixed $value Yes No value
+    * @param $value Yes No value
     *
     * @return string
    **/
@@ -741,19 +723,19 @@ class Dropdown {
    **/
    static function getDeviceItemTypes() {
       global $CFG_GLPI;
-      static $optgroup = null;
+      static $optgroup = NULL;
 
-      if (!Session::haveRight('device', READ)) {
-         return [];
+      if (!Session::haveRightsOr('device', array(CREATE, UPDATE, PURGE))) {
+         return array();
       }
 
       if (is_null($optgroup)) {
-         $devices = [];
+         $devices = array();
          foreach (CommonDevice::getDeviceTypes() as $device_type) {
             $devices[$device_type] = $device_type::getTypeName(Session::getPluralNumber());
          }
          asort($devices);
-         $optgroup = [_n('Component', 'Components', Session::getPluralNumber()) => $devices];
+         $optgroup = array(_n('Component', 'Components', Session::getPluralNumber()) => $devices);
       }
       return $optgroup;
    }
@@ -766,279 +748,211 @@ class Dropdown {
    **/
    static function getStandardDropdownItemTypes() {
       global $CFG_GLPI;
-      static $optgroup = null;
+      static $optgroup = NULL;
 
       if (is_null($optgroup)) {
-         $optgroup = [
-             __('Common') => [
-                 'Location'               => _n('Location', 'Locations',
-                                                Session::getPluralNumber()),
-                 'State'                  => _n('Status of items',
-                                                'Statuses of items',
-                                                Session::getPluralNumber()),
-                 'Manufacturer'           => _n('Manufacturer', 'Manufacturers',
-                                                Session::getPluralNumber()),
-                 'Blacklist'              => _n('Blacklist', 'Blacklists',
-                                                Session::getPluralNumber()),
-                 'BlacklistedMailContent' => __('Blacklisted mail content')
-             ],
+         $optgroup
+            = array(__('Common')
+                        => array('Location'               => _n('Location', 'Locations',
+                                                                Session::getPluralNumber()),
+                                 'State'                  => _n('Status of items',
+                                                                'Statuses of items',
+                                                                 Session::getPluralNumber()),
+                                 'Manufacturer'           => _n('Manufacturer', 'Manufacturers',
+                                                                Session::getPluralNumber()),
+                                 'Blacklist'              => _n('Blacklist','Blacklists',
+                                                                Session::getPluralNumber()),
+                                 'BlacklistedMailContent' => __('Blacklisted mail content')
+                                ),
 
-             __('Assistance') => [
-                 'ITILCategory'        => _n('Ticket category',
-                                             'Ticket categories',
-                                             Session::getPluralNumber()),
-                 'TaskCategory'        => _n('Task category', 'Task categories',
-                                             Session::getPluralNumber()),
-                 'TaskTemplate'        => _n('Task template', 'Task templates',
-                                             Session::getPluralNumber()),
-                 'SolutionType'        => _n('Solution type', 'Solution types',
-                                             Session::getPluralNumber()),
-                 'RequestType'         => _n('Request source', 'Request sources',
-                                             Session::getPluralNumber()),
-                 'SolutionTemplate'    => _n('Solution template',
-                                             'Solution templates',
-                                             Session::getPluralNumber()),
-                 'ProjectState'        => _n('Project state', 'Project states',
-                                             Session::getPluralNumber()),
-                 'ProjectType'         => _n('Project type', 'Project types',
-                                             Session::getPluralNumber()),
-                 'ProjectTaskType'     => _n('Project tasks type',
-                                             'Project tasks types',
-                                             Session::getPluralNumber()),
-                 'ProjectTaskTemplate' => _n('Project task template', 'Project task templates',
-                                             Session::getPluralNumber()),
-             ],
+                    __('Assistance')
+                        => array('ITILCategory'     => _n('Ticket category', 'Ticket categories',
+                                                          Session::getPluralNumber()),
+                                 'TaskCategory'     => _n('Task category','Task categories',
+                                                          Session::getPluralNumber()),
+                                 'TaskTemplate'     => _n('Task template','Task templates',
+                                                          Session::getPluralNumber()),
+                                 'SolutionType'     => _n('Solution type', 'Solution types',
+                                                          Session::getPluralNumber()),
+                                 'RequestType'      => _n('Request source', 'Request sources',
+                                                          Session::getPluralNumber()),
+                                 'SolutionTemplate' => _n('Solution template', 'Solution templates',
+                                                          Session::getPluralNumber()),
+                                 'ProjectState'     => _n('Project state', 'Project states',
+                                                          Session::getPluralNumber()),
+                                 'ProjectType'      => _n('Project type', 'Project types',
+                                                          Session::getPluralNumber()),
+                                 'ProjectTaskType'  => _n('Project tasks type', 'Project tasks types',
+                                                          Session::getPluralNumber()),
+                                ),
 
-             _n('Type', 'Types', Session::getPluralNumber()) => [
-                 'ComputerType'         => _n('Computer type',
-                                              'Computers types',
-                                              Session::getPluralNumber()),
-                 'NetworkEquipmentType' => _n('Networking equipment type',
-                                              'Networking equipment types',
-                                              Session::getPluralNumber()),
-                 'PrinterType'          => _n('Printer type', 'Printer types',
-                                              Session::getPluralNumber()),
-                 'MonitorType'          => _n('Monitor type', 'Monitor types',
-                                              Session::getPluralNumber()),
-                 'PeripheralType'       => _n('Devices type', 'Devices types',
-                                              Session::getPluralNumber()),
-                 'PhoneType'            => _n('Phone type', 'Phones types',
-                                              Session::getPluralNumber()),
-                 'SoftwareLicenseType'  => _n('License type', 'License types',
-                                              Session::getPluralNumber()),
-                 'CartridgeItemType'    => _n('Cartridge type',
-                                              'Cartridge types',
-                                              Session::getPluralNumber()),
-                 'ConsumableItemType'   => _n('Consumable type',
-                                              'Consumable types',
-                                              Session::getPluralNumber()),
-                 'ContractType'         => _n('Contract type', 'Contract types',
-                                              Session::getPluralNumber()),
-                 'ContactType'          => _n('Contact type', 'Contact types',
-                                              Session::getPluralNumber()),
-                 'DeviceGenericType'    => _n('Generic device type', 'Generic device types',
-                                              Session::getPluralNumber()),
-                 'DeviceSensorType'     => _n('Sensor type', 'Sensors types',
-                                              Session::getPluralNumber()),
-                 'DeviceMemoryType'     => _n('Memory type', 'Memory types',
-                                              Session::getPluralNumber()),
-                 'SupplierType'         => _n('Third party type',
-                                              'Third party types',
-                                              Session::getPluralNumber()),
-                 'InterfaceType'        => _n('Interface type (Hard drive...)',
-                                              'Interface types (Hard drive...)',
-                                              Session::getPluralNumber()) ,
-                 'DeviceCaseType'       => _n('Case type', 'Case types',
-                                              Session::getPluralNumber()),
-                 'PhonePowerSupply'     => _n('Phone power supply type',
-                                              'Phones power supply types',
-                                              Session::getPluralNumber()),
-                 'Filesystem'           => _n('File system', 'File systems',
-                                              Session::getPluralNumber()),
-                 'CertificateType'      => _n('Certificate type', 'Certificate types',
-                                               Session::getPluralNumber()),
-                 'BudgetType'           => _n('Budget type', 'Budget types',
-                                              Session::getPluralNumber()),
-                 'DeviceSimcardType'    => _n('Simcard type', 'Simcard types',
-                                              Session::getPluralNumber()),
-                 'LineType'             => _n('Line type', 'Line types',
-                                             Session::getPluralNumber()),
-             ],
+                    _n('Type', 'Types', Session::getPluralNumber())
+                        => array('ComputerType'         => _n('Computer type', 'Computers types',
+                                                              Session::getPluralNumber()),
+                                 'NetworkEquipmentType' => _n('Networking equipment type',
+                                                              'Networking equipment types',
+                                                              Session::getPluralNumber()),
+                                 'PrinterType'          => _n('Printer type', 'Printer types',
+                                                              Session::getPluralNumber()),
+                                 'MonitorType'          => _n('Monitor type', 'Monitor types',
+                                                              Session::getPluralNumber()),
+                                 'PeripheralType'       => _n('Devices type', 'Devices types',
+                                                              Session::getPluralNumber()),
+                                 'PhoneType'            => _n('Phone type', 'Phones types',
+                                                              Session::getPluralNumber()),
+                                 'SoftwareLicenseType'  => _n('License type', 'License types',
+                                                              Session::getPluralNumber()),
+                                 'CartridgeItemType'    => _n('Cartridge type', 'Cartridge types',
+                                                              Session::getPluralNumber()),
+                                 'ConsumableItemType'   => _n('Consumable type', 'Consumable types',
+                                                              Session::getPluralNumber()),
+                                 'ContractType'         => _n('Contract type', 'Contract types',
+                                                              Session::getPluralNumber()),
+                                 'ContactType'          => _n('Contact type', 'Contact types',
+                                                              Session::getPluralNumber()),
+                                 'DeviceMemoryType'     => _n('Memory type', 'Memory types',
+                                                              Session::getPluralNumber()),
+                                 'SupplierType'         => _n('Third party type', 'Third party types',
+                                                              Session::getPluralNumber()),
+                                 'InterfaceType'        => _n('Interface type (Hard drive...)',
+                                                              'Interface types (Hard drive...)',
+                                                              Session::getPluralNumber()) ,
+                                 'DeviceCaseType'       => _n('Case type', 'Case types',
+                                                              Session::getPluralNumber()),
+                                 'PhonePowerSupply'     => _n('Phone power supply type',
+                                                              'Phones power supply types',
+                                                              Session::getPluralNumber()),
+                                 'Filesystem'           => _n('File system', 'File systems',
+                                                              Session::getPluralNumber()),
+                                 'BudgetType'           => _n('Budget type', 'Budget types',
+                                                              Session::getPluralNumber())
+                                ),
 
-             __('Model') => [
-                 'ComputerModel'         => _n('Computer model',
-                                               'Computer models',
-                                               Session::getPluralNumber()),
-                 'NetworkEquipmentModel' => _n('Networking equipment model',
-                                               'Networking equipment models',
-                                               Session::getPluralNumber()),
-                 'PrinterModel'          => _n('Printer model',
-                                               'Printer models',
-                                               Session::getPluralNumber()),
-                 'MonitorModel'          => _n('Monitor model',
-                                               'Monitor models',
-                                               Session::getPluralNumber()),
-                 'PeripheralModel'       => _n('Peripheral model',
-                                               'Peripheral models',
-                                               Session::getPluralNumber()),
-                 'PhoneModel'            =>  _n('Phone model', 'Phone models',
-                                                Session::getPluralNumber()),
+                    __('Model')
+                        => array('ComputerModel'         => _n('Computer model', 'Computer models',
+                                                               Session::getPluralNumber()),
+                                 'NetworkEquipmentModel' => _n('Networking equipment model',
+                                                               'Networking equipment models',
+                                                               Session::getPluralNumber()),
+                                 'PrinterModel'          => _n('Printer model', 'Printer models',
+                                                               Session::getPluralNumber()),
+                                 'MonitorModel'          => _n('Monitor model', 'Monitor models',
+                                                               Session::getPluralNumber()),
+                                 'PeripheralModel'       => _n('Peripheral model',
+                                                               'Peripheral models',
+                                                               Session::getPluralNumber()),
+                                 'PhoneModel'            =>  _n('Phone model', 'Phone models',
+                                                                Session::getPluralNumber())
+                                ),
 
-                  // Devices models :
-                  'DeviceCaseModel'          => _n('Device case model',
-                                                   'Device case models', Session::getPluralNumber()),
-                  'DeviceControlModel'       => _n('Device control model',
-                                                   'Device control models', Session::getPluralNumber()),
-                  'DeviceDriveModel'         => _n('Device drive model',
-                                                   'Device drive models', Session::getPluralNumber()),
-                  'DeviceGenericModel'       => _n('Device generic model',
-                                                   'Device generic models', Session::getPluralNumber()),
-                  'DeviceGraphicCardModel'   => _n('Device graphic card model',
-                                                   'Device graphic card models', Session::getPluralNumber()),
-                  'DeviceHardDriveModel'     => _n('Device hard drive model',
-                                                   'Device hard drive models', Session::getPluralNumber()),
-                  'DeviceMemoryModel'        => _n('Device memory model',
-                                                   'Device memory models', Session::getPluralNumber()),
-                  'DeviceMotherBoardModel'   => _n('Device mother board model',
-                                                   'Device mother board models', Session::getPluralNumber()),
-                  'DeviceNetworkCardModel'   => _n('Device network card model',
-                                                   'Device network card models', Session::getPluralNumber()),
-                  'DevicePciModel'           => _n('Other component model',
-                                                   'Other component models', Session::getPluralNumber()),
-                  'DevicePowerSupplyModel'   => _n('Device power supply model',
-                                                   'Device power supply models', Session::getPluralNumber()),
-                  'DeviceProcessorModel'     => _n('Device processor model',
-                                                   'Device processor models', Session::getPluralNumber()),
-                  'DeviceSoundCardModel'     => _n('Device sound card model',
-                                                   'Device sound card models', Session::getPluralNumber()),
-                  'DeviceSensorModel'        => _n('Device sensor model',
-                                                   'Device sensor models', Session::getPluralNumber()),
-             ],
+                    _n('Virtual machine', 'Virtual machines', Session::getPluralNumber())
+                        => array('VirtualMachineType'   => _n('Virtualization system',
+                                                              'Virtualization systems',
+                                                              Session::getPluralNumber()),
+                                 'VirtualMachineSystem' => _n('Virtualization model',
+                                                              'Virtualization models',
+                                                              Session::getPluralNumber()),
+                                 'VirtualMachineState'  => _n('State of the virtual machine',
+                                                              'States of the virtual machine',
+                                                              Session::getPluralNumber())
+                                ),
 
-             _n('Virtual machine', 'Virtual machines', Session::getPluralNumber()) => [
-                 'VirtualMachineType'   => _n('Virtualization system',
-                                              'Virtualization systems',
-                                              Session::getPluralNumber()),
-                 'VirtualMachineSystem' => _n('Virtualization model',
-                                              'Virtualization models',
-                                             Session::getPluralNumber()),
-                 'VirtualMachineState'  => _n('State of the virtual machine',
-                                              'States of the virtual machine',
-                                              Session::getPluralNumber())
-             ],
+                    __('Management')
+                        => array('DocumentCategory' => _n('Document heading', 'Document headings',
+                                                          Session::getPluralNumber()),
+                                 'DocumentType'     => _n('Document type', 'Document types',
+                                                          Session::getPluralNumber())
+                                ),
 
-             __('Management') => [
-                 'DocumentCategory' => _n('Document heading',
-                                          'Document headings',
-                                          Session::getPluralNumber()),
-                 'DocumentType'     => _n('Document type', 'Document types',
-                                          Session::getPluralNumber()),
-                 'BusinessCriticity' => _n('Business criticity', 'Business criticities',
-                                          Session::getPluralNumber())
+                    __('Tools')
+                        => array('KnowbaseItemCategory' => _n('Knowledge base category',
+                                                              'Knowledge base categories',
+                                                              Session::getPluralNumber())
+                                ),
 
-             ],
-
-             __('Tools') => [
-                 'KnowbaseItemCategory' => _n('Knowledge base category',
-                                              'Knowledge base categories',
-                                              Session::getPluralNumber())
-             ],
-
-             __('Calendar') => [
-                 'Calendar' => _n('Calendar', 'Calendars',
-                                  Session::getPluralNumber()),
-                 'Holiday'  => _n('Close time', 'Close times',
-                                  Session::getPluralNumber())
-             ],
-
-             _n('Operating system', 'Operating systems', Session::getPluralNumber()) => [
-                 'OperatingSystem'    => _n('Operating system',
-                                            'Operating systems',
-                                            Session::getPluralNumber()),
-                 'OperatingSystemVersion'
-                                      => _n('Version',
-                                            'Versions',
-                                            Session::getPluralNumber()),
-                 'OperatingSystemServicePack'
-                                      => _n('Service pack', 'Service packs',
-                                            Session::getPluralNumber()),
-                 'OperatingSystemArchitecture'
-                                      => _n('Architecture',
-                                            'Architectures',
-                                            Session::getPluralNumber()),
-                 'OperatingSystemEdition'
-                                      => _n('Edition',
-                                            'Editions',
-                                             Session::getPluralNumber()),
-                 'OperatingSystemKernel'
-                                      => _n('Kernel',
-                                            'Kernels',
-                                            Session::getPluralNumber()),
-                 'OperatingSystemKernelVersion'
-                                      => _n('Kernel version',
-                                            'Kernel versions',
-                                            Session::getPluralNumber()),
-                 'AutoUpdateSystem'   => _n('Update source', 'Update sources',
-                                            Session::getPluralNumber())
-             ],
-
-             __('Networking') => [
-                 'NetworkInterface'         => _n('Network interface',
-                                                  'Network interfaces',
+                    __('Calendar')
+                        => array('Calendar' => _n('Calendar', 'Calendars',
                                                   Session::getPluralNumber()),
-                 'Netpoint'                 => _n('Network outlet', 'Network outlets',
-                                                  Session::getPluralNumber()),
-                 'Domain'                   => _n('Domain', 'Domains',
-                                                  Session::getPluralNumber()),
-                 'Network'                  => _n('Network', 'Networks',
-                                                  Session::getPluralNumber()),
-                 'Vlan'                     => __('VLAN'),
-                 'LineOperator'             => _n('Line operator', 'Line operators',
+                                 'Holiday'  => _n('Close time', 'Close times',
                                                   Session::getPluralNumber())
-             ],
+                                ),
 
-             __('Internet') => [
-                 'IPNetwork'    => _n('IP network', 'IP networks',
-                                      Session::getPluralNumber()),
-                 'FQDN'         => _n('Internet domain', 'Internet domains',
-                                      Session::getPluralNumber()),
-                 'WifiNetwork'  => _n('Wifi network', 'Wifi networks',
-                                      Session::getPluralNumber()),
-                 'NetworkName'  => _n('Network name', 'Network names',
-                                      Session::getPluralNumber())
-             ],
+                    _n('Operating system', 'Operating systems', Session::getPluralNumber())
+                        => array('OperatingSystem'     => _n('Operating system',
+                                                             'Operating systems',
+                                                             Session::getPluralNumber()),
+                                 'OperatingSystemVersion'
+                                                      => _n('Version of the operating system',
+                                                            'Versions of the operating system',
+                                                            Session::getPluralNumber()),
+                                 'OperatingSystemServicePack'
+                                                      => _n('Service pack', 'Service packs',
+                                                            Session::getPluralNumber()),
+                                 'OperatingSystemArchitecture'
+                                                      => _n('Operating system architecture',
+                                                            'Operating system architectures',
+                                                            Session::getPluralNumber()),
+                                 'AutoUpdateSystem'   => _n('Update source', 'Update sources',
+                                                            Session::getPluralNumber())
+                                ),
 
-             _n('Software', 'Software', 1) => [
-                 'SoftwareCategory' => _n('Software category',
-                                          'Software categories',
-                                          Session::getPluralNumber())
-             ],
+                    __('Networking')
+                        => array('NetworkInterface'         => _n('Network interface',
+                                                                  'Network interfaces',
+                                                                  Session::getPluralNumber()),
+                                 'NetworkEquipmentFirmware' => _n('Firmware', 'Firmware',
+                                                                  Session::getPluralNumber()),
+                                 'Netpoint'                 => _n('Network outlet', 'Network outlets',
+                                                                  Session::getPluralNumber()),
+                                 'Domain'                   => _n('Domain', 'Domains',
+                                                                  Session::getPluralNumber()),
+                                 'Network'                  => _n('Network', 'Networks',
+                                                                  Session::getPluralNumber()),
+                                 'Vlan'                     => __('VLAN')
+                                ),
 
-             __('User') => [
-                 'UserTitle'     => _n('User title', 'Users titles',
-                                       Session::getPluralNumber()),
-                 'UserCategory'  => _n('User category', 'User categories',
-                                       Session::getPluralNumber())
-             ],
+                    __('Internet')
+                        => array('IPNetwork'    => _n('IP network', 'IP networks',
+                                                      Session::getPluralNumber()),
+                                 'FQDN'         => _n('Internet domain', 'Internet domains',
+                                                      Session::getPluralNumber()),
+                                 'WifiNetwork'  => _n('Wifi network', 'Wifi networks',
+                                                      Session::getPluralNumber()),
+                                 'NetworkName'  => _n('Network name', 'Network names',
+                                                      Session::getPluralNumber())
+                                ),
 
-             __('Authorizations assignment rules') => [
-                 'RuleRightParameter' => _n('LDAP criterion', 'LDAP criteria',
-                                            Session::getPluralNumber())
-             ],
+                    _n('Software', 'Software', 1)
+                        => array('SoftwareCategory' => _n('Software category', 'Software categories',
+                                                          Session::getPluralNumber())
+                                ),
 
-             __('Fields unicity') => [
-                 'Fieldblacklist' => _n('Ignored value for the unicity',
-                                        'Ignored values for the unicity',
-                                        Session::getPluralNumber())
-             ],
+                    __('User')
+                        => array('UserTitle'     => _n('User title', 'Users titles',
+                                                       Session::getPluralNumber()),
+                                 'UserCategory'  => _n('User category', 'User categories',
+                                                       Session::getPluralNumber())
+                                ),
 
-             __('External authentications') => [
-                 'SsoVariable' => _n('Field storage of the login in the HTTP request',
-                                     'Fields storage of the login in the HTTP request',
-                                     Session::getPluralNumber())
-             ]
+                    __('Authorizations assignment rules')
+                        => array('RuleRightParameter' => _n('LDAP criterion', 'LDAP criteria',
+                                                            Session::getPluralNumber())
+                                ),
 
-         ]; //end $opt
+                    __('Fields unicity')
+                        => array('Fieldblacklist' => _n('Ignored value for the unicity',
+                                                        'Ignored values for the unicity',
+                                                        Session::getPluralNumber())
+                                ),
+
+                    __('External authentications')
+                        => array('SsoVariable' => _n('Field storage of the login in the HTTP request',
+                                                     'Fields storage of the login in the HTTP request',
+                                                     Session::getPluralNumber())
+                                )
+
+
+                 ); //end $opt
 
          $plugdrop = Plugin::getDropdowns();
 
@@ -1074,7 +988,7 @@ class Dropdown {
     * @param $optgroup  array    (group of dropdown) of array (itemtype => localized name)
     * @param $value     string   URL of selected current value (default '')
    **/
-   static function showItemTypeMenu($title, $optgroup, $value = '') {
+   static function showItemTypeMenu($title, $optgroup, $value='') {
 
       echo "<table class='tab_cadre' width='50%'>";
       echo "<tr class='tab_bg_1'><td class='b'>&nbsp;".$title."&nbsp; ";
@@ -1091,10 +1005,10 @@ class Dropdown {
          }
       }
       Dropdown::showFromArray('dpmenu', $values,
-                              ['on_change'
+                              array('on_change'
                                        => "var _value = this.options[this.selectedIndex].value; if (_value != 0) {window.location.href=_value;}",
                                     'value'               => $selected,
-                                    'display_emptychoice' => true]);
+                                    'display_emptychoice' => true));
 
       echo "</td></tr>";
       echo "</table><br>";
@@ -1149,10 +1063,10 @@ class Dropdown {
     *    - display_emptychoice : allow selection of no language
     *    - emptylabel          : specific string to empty label if display_emptychoice is true
    **/
-   static function showLanguages($myname, $options = []) {
+   static function showLanguages($myname, $options=array()) {
       global $CFG_GLPI;
 
-      $values = [];
+      $values = array();
       if (isset($options['display_emptychoice']) && ($options['display_emptychoice'])) {
          if (isset($options['emptylabel'])) {
             $values[''] = $options['emptylabel'];
@@ -1202,7 +1116,7 @@ class Dropdown {
     * @since 0.85 update prototype
     *@return Nothing (display)
     **/
-   static function showHours($name, $options = []) {
+   static function showHours($name, $options=array()) {
       global $CFG_GLPI;
 
       $p['value']          = '';
@@ -1240,17 +1154,17 @@ class Dropdown {
          $end        = (int) $plan_end[0];
       }
 
-      $values   = [];
+      $values   = array();
       $selected = '';
 
-      for ($i=$begin; $i<$end; $i++) {
+      for ($i=$begin ; $i<$end ; $i++) {
          if ($i < 10) {
             $tmp = "0".$i;
          } else {
             $tmp = $i;
          }
 
-         for ($j=0; $j<60; $j+=$p['step']) {
+         for ($j=0 ; $j<60 ; $j+=$p['step']) {
             if ($j < 10) {
                $val = $tmp.":0$j";
             } else {
@@ -1288,7 +1202,7 @@ class Dropdown {
     *
     * @return integer rand for select id
    **/
-   static function showItemType($types = '', $options = []) {
+   static function showItemType($types='', $options=array()) {
       global $CFG_GLPI;
 
       $params['name']                = 'itemtype';
@@ -1313,7 +1227,7 @@ class Dropdown {
       if (!is_array($types)) {
          $types = $CFG_GLPI["state_types"];
       }
-      $options = [];
+      $options = array();
 
       foreach ($types as $type) {
          if ($item = getItemForItemtype($type)) {
@@ -1327,11 +1241,11 @@ class Dropdown {
 
       if (count($options)) {
          return Dropdown::showFromArray($params['name'], $options,
-                                        ['value'               => $params['value'],
+                                        array('value'               => $params['value'],
                                               'on_change'           => $params['on_change'],
                                               'toupdate'            => $params['toupdate'],
                                               'display_emptychoice' => $params['display_emptychoice'],
-                                              'emptylabel'          => $params['emptylabel']]);
+                                              'emptylabel'          => $params['emptylabel']));
       }
       return 0;
    }
@@ -1340,7 +1254,7 @@ class Dropdown {
    /**
     * Make a select box for all items
     *
-    * @deprecated 0.85 use Dropdown::showSelectItemFromItemtypes()
+    * @deprecated since version 0.85, replaced by self::showSelectItemFromItemtypes()
     *
     * @param $myname          select name
     * @param $value_type      default value for the device type (default 0)
@@ -1353,11 +1267,9 @@ class Dropdown {
     *
     * @return nothing (print out an HTML select box)
    **/
-   static function showAllItems($myname, $value_type = 0, $value = 0, $entity_restrict = -1, $types = '',
-                                $onlyglobal = false, $checkright = false, $itemtypename = 'itemtype') {
-
-      Toolbox::logDebug('showAllItems() method is deprecated');
-      $options = [];
+   static function showAllItems($myname, $value_type=0, $value=0, $entity_restrict=-1, $types='',
+                                $onlyglobal=false, $checkright=false, $itemtypename = 'itemtype') {
+      $options = array();
       $options['itemtype_name']   = $itemtypename;
       $options['items_id_name']   = $myname;
       $options['itemtypes']       = $types;
@@ -1395,10 +1307,10 @@ class Dropdown {
     *
     * @return randomized value used to generate HTML IDs
    **/
-   static function showSelectItemFromItemtypes(array $options = []) {
+   static function showSelectItemFromItemtypes(array $options=array()) {
       global $CFG_GLPI;
 
-      $params = [];
+      $params = array();
       $params['itemtype_name']       = 'itemtype';
       $params['items_id_name']       = 'items_id';
       $params['itemtypes']           = '';
@@ -1408,7 +1320,7 @@ class Dropdown {
       $params['checkright']          = false;
       $params['showItemSpecificity'] = '';
       $params['emptylabel']          = self::EMPTY_VALUE;
-      $params['used']                = [];
+      $params['used']                = array();
 
       if (is_array($options) && count($options)) {
          foreach ($options as $key => $val) {
@@ -1417,15 +1329,15 @@ class Dropdown {
       }
 
       $rand = self::showItemType($params['itemtypes'],
-                                 ['checkright' => $params['checkright'],
+                                 array('checkright' => $params['checkright'],
                                        'name'       => $params['itemtype_name'],
-                                       'emptylabel' => $params['emptylabel']]);
+                                       'emptylabel' => $params['emptylabel']));
 
       if ($rand) {
-         $p = ['idtable'             => '__VALUE__',
+         $p = array('idtable'             => '__VALUE__',
                     'name'                => $params['items_id_name'],
                     'entity_restrict'     => $params['entity_restrict'],
-                    'showItemSpecificity' => $params['showItemSpecificity']];
+                    'showItemSpecificity' => $params['showItemSpecificity']);
 
          // manage condition
          if ($params['onlyglobal']) {
@@ -1447,9 +1359,8 @@ class Dropdown {
          // default itemtype and the default value can be '' thus empty won't be valid !
          if (array_key_exists ('default_itemtype', $options)) {
             echo "<script type='text/javascript' >\n";
-            echo "$(function() {";
             echo Html::jsSetDropdownValue($field_id, $params['default_itemtype']);
-            echo "});</script>\n";
+            echo "</script>\n";
 
             $p["idtable"] = $params['default_itemtype'];
             Ajax::updateItem($show_id, $CFG_GLPI["root_doc"]. "/ajax/dropdownAllItems.php", $p);
@@ -1478,7 +1389,7 @@ class Dropdown {
     *     - on_change string / value to transmit to "onChange"
     *     - used      array / Already used items ID: not to display in dropdown (default empty)
    **/
-   static function showNumber($myname, $options = []) {
+   static function showNumber($myname, $options=array()) {
       global $CFG_GLPI;
 
       $p['value']     = 0;
@@ -1486,12 +1397,12 @@ class Dropdown {
       $p['min']       = 0;
       $p['max']       = 100;
       $p['step']      = 1;
-      $p['toadd']     = [];
+      $p['toadd']     = array();
       $p['unit']      = '';
       $p['display']   = true;
       $p['width']     = '';
       $p['on_change'] = '';
-      $p['used']      = [];
+      $p['used']      = array();
 
       if (is_array($options) && count($options)) {
          foreach ($options as $key => $val) {
@@ -1504,11 +1415,11 @@ class Dropdown {
 
       $field_id = Html::cleanId("dropdown_".$myname.$p['rand']);
       if (!isset($p['toadd'][$p['value']])) {
-         $valuename = self::getValueWithUnit($p['value'], $p['unit']);
+         $valuename = self::getValueWithUnit($p['value'],$p['unit']);
       } else {
          $valuename = $p['toadd'][$p['value']];
       }
-      $param = ['value'               => $p['value'],
+      $param = array('value'               => $p['value'],
                      'valuename'           => $valuename,
                      'width'               => $p['width'],
                      'on_change'           => $p['on_change'],
@@ -1517,7 +1428,7 @@ class Dropdown {
                      'min'                 => $p['min'],
                      'max'                 => $p['max'],
                      'step'                => $p['step'],
-                     'toadd'               => $p['toadd']];
+                     'toadd'               => $p['toadd']);
 
       $out   = Html::jsAjaxDropdown($myname, $field_id,
                                     $CFG_GLPI['root_doc']."/ajax/getDropdownNumber.php",
@@ -1574,16 +1485,44 @@ class Dropdown {
             //TRANS: %d is a number of milliseconds
             return sprintf(_n('%d millisecond', '%d milliseconds', $value), $value);
 
-         case 'auto':
-               $value = str_replace([' ', '&nbsp;'], ['', ''], $value); // unformat value
-               return Toolbox::getSize($value*1024*1024);
-
          case '%' :
             return sprintf(__('%d%%'), $value);
 
          default :
             return sprintf(__('%1$s %2$s'), $value, $unit);
       }
+   }
+
+
+   /**
+    * Dropdown integers
+    *
+    * @param $myname          select name
+    * @param $value           default value
+    * @param $min             min value (default 0)
+    * @param $max             max value (default 100)
+    * @param $step            step used (default 1)
+    * @param $toadd     array of values to add at the beginning
+    * @param $options   array of additionnal options :
+    *                            - unit : string unit to used
+    *                            - display : boolean if false get string
+    * \deprecated since 0.84 use Dropdown::showNumber instead
+   **/
+   static function showInteger($myname, $value, $min=0, $max=100, $step=1, $toadd=array(),
+                               $options=array()) {
+
+      $opt = array('value' => $value,
+                   'min'   => $min,
+                   'max'   => $max,
+                   'step'  => $step,
+                   'toadd' => $toadd);
+      if (count($options)) {
+         foreach ($options as $key => $val) {
+            $opt[$key] = $val;
+         }
+      }
+      return self::showNumber($myname,$opt);
+
    }
 
 
@@ -1604,7 +1543,7 @@ class Dropdown {
     *    - display         : boolean / display or return string
     *    - width           : string / display width of the item
    **/
-   static function showTimeStamp($myname, $options = []) {
+   static function showTimeStamp($myname, $options=array()) {
       global $CFG_GLPI;
 
       $params['value']               = 0;
@@ -1614,11 +1553,12 @@ class Dropdown {
       $params['step']                = $CFG_GLPI["time_step"]*MINUTE_TIMESTAMP;
       $params['emptylabel']          = self::EMPTY_VALUE;
       $params['addfirstminutes']     = false;
-      $params['toadd']               = [];
+      $params['toadd']               = array();
       $params['inhours']             = false;
       $params['display']             = true;
       $params['display_emptychoice'] = true;
       $params['width']               = '80%';
+
 
       if (is_array($options) && count($options)) {
          foreach ($options as $key => $val) {
@@ -1646,7 +1586,7 @@ class Dropdown {
          $params['value'] = floor(($params['value'])/$params['step'])*$params['step'];
       }
 
-      $values = [];
+      $values = array();
 
       if ($params['value']) {
          $values[$params['value']] = '';
@@ -1658,7 +1598,7 @@ class Dropdown {
          }
       }
 
-      for ($i = $params['min']; $i <= $params['max']; $i+=$params['step']) {
+      for ($i = $params['min'] ; $i <= $params['max']; $i+=$params['step']) {
          $values[$i] = '';
       }
 
@@ -1691,10 +1631,10 @@ class Dropdown {
 
                   //TRANS: %1$d is the number of days, %2$d the number of hours,
                   //       %3$s the number of minutes : display 1 day 3h15
-                  $values[$i] = sprintf(_n('%1$d day %2$dh%3$s', '%1$d days %2$dh%3$s', $day),
+                  $values[$i] = sprintf(_n('%1$d day %2$dh%3$s','%1$d days %2$dh%3$s', $day),
                                        $day, $hour, $minute);
                } else {
-                  $values[$i] = sprintf(_n('%d day', '%d days', $day), $day);
+                  $values[$i] = sprintf(_n('%d day','%d days',$day), $day);
                }
 
             } else if ($hour > 0 || $minute > 0) {
@@ -1708,12 +1648,12 @@ class Dropdown {
          }
       }
       return Dropdown::showFromArray($myname, $values,
-                                     ['value'                => $params['value'],
+                                     array('value'                => $params['value'],
                                             'display'             => $params['display'],
                                             'width'               => $params['width'],
                                             'display_emptychoice' => $params['display_emptychoice'],
                                             'rand'                => $params['rand'],
-                                            'emptylabel'          => $params['emptylabel']]);
+                                            'emptylabel'          => $params['emptylabel']));
    }
 
 
@@ -1731,10 +1671,10 @@ class Dropdown {
       echo "<script type='text/javascript' >\n";
       echo "function setPrivate$rand() {\n";
 
-         $params = ['is_private'   => 1,
+         $params = array('is_private'   => 1,
                          'is_recursive' => $is_recursive,
                          'entities_id'  => $entity,
-                         'rand'         => $rand];
+                         'rand'         => $rand);
 
          Ajax::updateItemJsCode('private_switch'.$rand,
                                 $CFG_GLPI["root_doc"]."/ajax/private_public.php", $params);
@@ -1742,10 +1682,10 @@ class Dropdown {
 
       echo "function setPublic$rand() {\n";
 
-         $params = ['is_private'   => 0,
+         $params = array('is_private'   => 0,
                          'is_recursive' => $is_recursive,
                          'entities_id'  => $entity,
-                         'rand'         => $rand];
+                         'rand'         => $rand);
          Ajax::updateItemJsCode('private_switch'.$rand,
                                 $CFG_GLPI["root_doc"]."/ajax/private_public.php", $params);
       echo "};";
@@ -1767,19 +1707,19 @@ class Dropdown {
     *
     * @param $enabled (default 0)
    **/
-   static function showAdvanceDateRestrictionSwitch($enabled = 0) {
+   static function showAdvanceDateRestrictionSwitch($enabled=0) {
       global $CFG_GLPI;
 
       $rand = mt_rand();
       $url  = $CFG_GLPI["root_doc"]."/ajax/ldapdaterestriction.php";
       echo "<script type='text/javascript' >\n";
       echo "function activateRestriction() {\n";
-         $params = ['enabled'=> 1];
+         $params = array('enabled'=> 1);
          Ajax::updateItemJsCode('date_restriction', $url, $params);
       echo "};";
 
       echo "function deactivateRestriction() {\n";
-         $params = ['enabled' => 0];
+         $params = array('enabled' => 0);
          Ajax::updateItemJsCode('date_restriction', $url, $params);
       echo "};";
       echo "</script>";
@@ -1821,13 +1761,13 @@ class Dropdown {
     *       'optgroupname2' => array('key3' => 'val3',
     *                                'key4' => 'val4'))
    **/
-   static function showFromArray($name, array $elements, $options = []) {
+   static function showFromArray($name, array $elements, $options=array()) {
 
       $param['value']               = '';
-      $param['values']              = [''];
+      $param['values']              = array('');
       $param['tooltip']             = '';
-      $param['option_tooltips']     = [];
-      $param['used']                = [];
+      $param['option_tooltips']     = array();
+      $param['used']                = array();
       $param['readonly']            = false;
       $param['on_change']           = '';
       $param['width']               = '';
@@ -1838,11 +1778,10 @@ class Dropdown {
       $param['rand']                = mt_rand();
       $param['emptylabel']          = self::EMPTY_VALUE;
       $param['display_emptychoice'] = false;
-      $param['disabled']            = false;
 
       if (is_array($options) && count($options)) {
          if (isset($options['value']) && strlen($options['value'])) {
-            $options['values'] = [$options['value']];
+            $options['values'] = array($options['value']);
             unset($options['value']);
          }
          foreach ($options as $key => $val) {
@@ -1857,7 +1796,7 @@ class Dropdown {
          // If $param['other'] is a string, then we must highlight "other" option
          if (is_string($param['other'])) {
             if (!$param["multiple"]) {
-               $param['values'] = [$other_select_option];
+               $param['values'] = array($other_select_option);
             } else {
                $param['values'][] = $other_select_option;
             }
@@ -1867,7 +1806,7 @@ class Dropdown {
       $param['option_tooltips'] = Html::entities_deep($param['option_tooltips']);
 
       if ($param["display_emptychoice"]) {
-         $elements = [ 0 => $param['emptylabel'] ] + $elements;
+         $elements = array( 0 => $param['emptylabel'] ) + $elements ;
       }
 
       if ($param["multiple"]) {
@@ -1880,19 +1819,19 @@ class Dropdown {
       // readonly mode
       $field_id = Html::cleanId("dropdown_".$name.$param['rand']);
       if ($param['readonly']) {
-         $to_display = [];
+         $to_display = array();
          foreach ($param['values'] as $value) {
             $output .= "<input type='hidden' name='$field_name' value='$value'>";
             if (isset($elements[$value])) {
                $to_display[] = $elements[$value];
             }
          }
-         $output .= implode('<br>', $to_display);
+         $output .= implode('<br>',$to_display);
       } else {
 
          $output  .= "<select name='$field_name' id='$field_id'";
 
-         if ($param['tooltip']) {
+         if($param['tooltip']) {
             $output .= ' title="'.Html::entities_deep($param['tooltip']).'"';
          }
 
@@ -1908,10 +1847,6 @@ class Dropdown {
             $output .= " multiple";
          }
 
-         if ($param["disabled"]) {
-            $output .= " disabled='disabled'";
-         }
-
          $output .= '>';
          $max_option_size = 0;
          foreach ($elements as $key => $val) {
@@ -1924,9 +1859,9 @@ class Dropdown {
 
                $output .= "<optgroup label=\"$opt_goup\"";
                $optgroup_tooltips = false;
-               if (isset($param['option_tooltips'][$key])) {
-                  if (is_array($param['option_tooltips'][$key])) {
-                     if (isset($param['option_tooltips'][$key]['__optgroup_label'])) {
+               if(isset($param['option_tooltips'][$key])) {
+                  if(is_array($param['option_tooltips'][$key])) {
+                     if(isset($param['option_tooltips'][$key]['__optgroup_label'])){
                         $output .= ' title="'.$param['option_tooltips'][$key]['__optgroup_label'].'"';
                      }
                      $optgroup_tooltips = $param['option_tooltips'][$key];
@@ -1941,12 +1876,12 @@ class Dropdown {
                      $output .= "<option value='".$key2."'";
                      // Do not use in_array : trouble with 0 and empty value
                      foreach ($param['values'] as $value) {
-                        if (strcmp($key2, $value) === 0) {
+                       if (strcmp($key2,$value) === 0) {
                            $output .= " selected";
                            break;
-                        }
+                       }
                      }
-                     if ($optgroup_tooltips && isset($optgroup_tooltips[$key2])) {
+                     if($optgroup_tooltips && isset($optgroup_tooltips[$key2])) {
                         $output .= ' title="'.$optgroup_tooltips[$key2].'"';
                      }
                      $output .= ">" .  $val2 . "</option>";
@@ -1961,12 +1896,12 @@ class Dropdown {
                   $output .= "<option value='".$key."'";
                   // Do not use in_array : trouble with 0 and empty value
                   foreach ($param['values'] as $value) {
-                     if (strcmp($key, $value)===0) {
+                     if (strcmp($key,$value)===0) {
                         $output .= " selected";
                         break;
                      }
                   }
-                  if (isset($param['option_tooltips'][$key])) {
+                  if(isset($param['option_tooltips'][$key])) {
                      $output .= ' title="'.$param['option_tooltips'][$key].'"';
                   }
                   $output .= ">" .$val . "</option>";
@@ -1998,7 +1933,7 @@ class Dropdown {
       }
 
       // Width set on select
-      $output .= Html::jsAdaptDropdown($field_id, ['width' => $param["width"]]);
+      $output .= Html::jsAdaptDropdown($field_id, array('width' => $param["width"]));
 
       if ($param["multiple"]) {
          // Hack for All / None because select2 does not provide it
@@ -2045,7 +1980,7 @@ class Dropdown {
     * - value value of global state
     * - management_restrict global management restrict mode
    **/
-   static function showGlobalSwitch($ID, $attrs = []) {
+   static function showGlobalSwitch($ID, $attrs=array()) {
       global $CFG_GLPI;
 
       $params['management_restrict'] = 0;
@@ -2061,27 +1996,27 @@ class Dropdown {
 
       if ($params['value']
           && empty($params['withtemplate'])) {
-         echo __('Global management');
+         _e('Global management');
 
          if ($params['management_restrict'] == 2) {
             echo "&nbsp;";
             Html::showSimpleForm($params['target'], 'unglobalize', __('Use unitary management'),
-                                 ['id' => $ID], '', '',
-                                 [__('Do you really want to use unitary management for this item?'),
-                                       __('Duplicate the element as many times as there are connections')]);
+                                 array('id' => $ID), '', '',
+                                 array(__('Do you really want to use unitary management for this item?'),
+                                       __('Duplicate the element as many times as there are connections')));
             echo "&nbsp;";
 
-            echo "<span class='fa fa-info pointer'".
-                 " title=\"".__s('Duplicate the element as many times as there are connections').
-                 "\"><span class='sr-only'>". __s('Duplicate the element as many times as there are connections') . "</span></span>";
+            echo "<img alt=\"".__s('Duplicate the element as many times as there are connections').
+                 "\" title=\"".__s('Duplicate the element as many times as there are connections').
+                 "\" src='".$CFG_GLPI["root_doc"]."/pics/info-small.png' class='pointer'>";
          }
 
       } else {
          if ($params['management_restrict'] == 2) {
             $rand = mt_rand();
-            $values = [MANAGEMENT_UNITARY => __('Unit management'),
-                            MANAGEMENT_GLOBAL  => __('Global management')];
-            Dropdown::showFromArray($params['name'], $values, ['value' => $params['value']]);
+            $values = array(MANAGEMENT_UNITARY => __('Unit management'),
+                            MANAGEMENT_GLOBAL  => __('Global management'));
+            Dropdown::showFromArray($params['name'], $values, array('value' => $params['value']));
          } else {
             // Templates edition
             if (!empty($params['withtemplate'])) {
@@ -2128,8 +2063,8 @@ class Dropdown {
     *
     * @return integer : dropdown id.
    **/
-   static function importExternal($itemtype, $value, $entities_id = -1, $external_params = [],
-                                  $comment = '', $add = true) {
+   static function importExternal($itemtype, $value, $entities_id=-1, $external_params=array(),
+                                  $comment='', $add=true) {
 
       if (!($item = getItemForItemtype($itemtype))) {
          return false;
@@ -2144,7 +2079,7 @@ class Dropdown {
     *
     * @return the label corresponding to it, or ""
    **/
-   static function getGlobalSwitch($value = 0) {
+   static function getGlobalSwitch($value=0) {
 
       switch ($value) {
          case 0 :
@@ -2177,9 +2112,9 @@ class Dropdown {
       $values['-'.Search::CSV_OUTPUT]           = __('All pages in CSV');
 
       Dropdown::showFromArray('display_type', $values);
-      echo "<button type='submit' name='export' class='unstyled pointer' ".
-             " title=\"" . _sx('button', 'Export') . "\">" .
-             "<i class='fa fa-floppy-o'></i><span class='sr-only'>"._sx('button', 'Export')."<span>";
+      echo "<input type='image' name='export' class='pointer' src='".
+             $CFG_GLPI["root_doc"]."/pics/export.png' title=\""._sx('button', 'Export')."\" value=\"".
+             _sx('button', 'Export')."\">";
    }
 
 
@@ -2190,7 +2125,7 @@ class Dropdown {
     *
     * @param $onchange  String   optional, for ajax (default '')
    **/
-   static function showListLimit($onchange = '', $display = true) {
+   static function showListLimit($onchange='') {
       global $CFG_GLPI;
 
       if (isset($_SESSION['glpilist_limit'])) {
@@ -2199,24 +2134,24 @@ class Dropdown {
          $list_limit = $CFG_GLPI['list_limit'];
       }
 
-      $values = [];
+      $values = array();
 
-      for ($i=5; $i<20; $i+=5) {
+      for ($i=5 ; $i<20 ; $i+=5) {
          $values[$i] = $i;
       }
-      for ($i=20; $i<50; $i+=10) {
+      for ($i=20 ; $i<50 ; $i+=10) {
          $values[$i] = $i;
       }
-      for ($i=50; $i<250; $i+=50) {
+      for ($i=50 ; $i<250 ; $i+=50) {
          $values[$i] = $i;
       }
-      for ($i=250; $i<1000; $i+=250) {
+      for ($i=250 ; $i<1000 ; $i+=250) {
          $values[$i] = $i;
       }
-      for ($i=1000; $i<5000; $i+=1000) {
+      for ($i=1000 ; $i<5000 ; $i+=1000) {
          $values[$i] = $i;
       }
-      for ($i=5000; $i<=10000; $i+=5000) {
+      for ($i=5000 ; $i<=10000 ; $i+=5000) {
          $values[$i] = $i;
       }
       $values[9999999] = 9999999;
@@ -2227,9 +2162,9 @@ class Dropdown {
       }
       ksort($values);
       return self::showFromArray('glpilist_limit', $values,
-                                 ['on_change' => $onchange,
-                                       'value'     => $list_limit,
-                                       'display'   => $display]);
+                                 array('on_change' => $onchange,
+                                       'value'     => $list_limit));
    }
 
 }
+?>

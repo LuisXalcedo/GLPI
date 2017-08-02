@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -53,39 +53,39 @@ abstract class CommonTreeDropdown extends CommonDropdown {
    **/
    function getAdditionalFields() {
 
-      return [['name'  => $this->getForeignKeyField(),
+      return array(array('name'  => $this->getForeignKeyField(),
                          'label' => __('As child of'),
                          'type'  => 'parent',
-                         'list'  => false]];
+                         'list'  => false));
    }
 
 
-   function defineTabs($options = []) {
+   function defineTabs($options=array()) {
 
-      $ong = [];
+      $ong = array();
       $this->addDefaultFormTab($ong);
 
       $this->addStandardTab($this->getType(), $ong, $options);
       if ($this->dohistory) {
-         $this->addStandardTab('Log', $ong, $options);
+         $this->addStandardTab('Log',$ong, $options);
       }
 
       if (DropdownTranslation::canBeTranslated($this)) {
-         $this->addStandardTab('DropdownTranslation', $ong, $options);
+         $this->addStandardTab('DropdownTranslation',$ong, $options);
       }
 
       return $ong;
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       if (!$withtemplate
           && ($item->getType() == $this->getType())) {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = countElementsInTable($this->getTable(),
-                                      [$this->getForeignKeyField() => $item->getID()]);
+                                       "`".$this->getForeignKeyField()."` = '".$item->getID()."'");
          }
          return self::createTabEntry($this->getTypeName(Session::getPluralNumber()), $nb);
       }
@@ -93,7 +93,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       if ($item instanceof CommonTreeDropdown) {
          $item->showChildren();
@@ -109,7 +109,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
     * @param $thisName           string item name (need to be addslashes : comes from input)
    **/
    static function getCompleteNameFromParents($parentCompleteName, $thisName) {
-      return addslashes($parentCompleteName). " > ".$thisName;
+     return addslashes($parentCompleteName). " > ".$thisName;
    }
 
 
@@ -131,12 +131,12 @@ abstract class CommonTreeDropdown extends CommonDropdown {
           && $parent->getFromDB($input[$this->getForeignKeyField()])) {
          $input['level']        = $parent->fields['level']+1;
          // Sometimes (internet address), the complete name may be different ...
-         /* if ($input[$this->getForeignKeyField()]==0) { // Root entity case
+/*         if ($input[$this->getForeignKeyField()]==0) { // Root entity case
             $input['completename'] =  $input['name'];
          } else {*/
          $input['completename'] = self::getCompleteNameFromParents($parent->fields['completename'],
                                                                    $input['name']);
-         // }
+//          }
       } else {
          $input[$this->getForeignKeyField()] = 0;
          $input['level']                     = 1;
@@ -147,7 +147,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
 
 
    function prepareInputForAdd($input) {
-      return $this->adaptTreeFieldsFromUpdateOrAdd($input);
+     return $this->adaptTreeFieldsFromUpdateOrAdd($input);
    }
 
 
@@ -163,8 +163,8 @@ abstract class CommonTreeDropdown extends CommonDropdown {
 
       $this->recursiveCleanSonsAboveID($parent);
       $tmp  = clone $this;
-      $crit = ['FIELDS'                    => 'id',
-                    $this->getForeignKeyField() => $this->fields["id"]];
+      $crit = array('FIELDS'                    => 'id',
+                    $this->getForeignKeyField() => $this->fields["id"]);
 
       foreach ($DB->request($this->getTable(), $crit) as $data) {
          $data[$this->getForeignKeyField()] = $parent;
@@ -181,7 +181,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
          // Can't move a parent under a child
          if (in_array($input[$this->getForeignKeyField()],
              getSonsOf($this->getTable(), $input['id']))) {
-             return false;
+         return false;
          }
          // Parent changes => clear ancestors and update its level and completename
          if ($input[$this->getForeignKeyField()] != $this->fields[$this->getForeignKeyField()]) {
@@ -219,14 +219,14 @@ abstract class CommonTreeDropdown extends CommonDropdown {
          $query = "SELECT `id`, `name`
                    FROM `".$this->getTable()."`
                    WHERE `".$this->getForeignKeyField()."` = '$ID'";
-         if (Session::haveTranslations($this->getType(), 'completename')) {
+        if (Session::haveTranslations($this->getType(), 'completename')) {
             DropdownTranslation::regenerateAllCompletenameTranslationsFor($this->getType(), $ID);
-         }
+        }
 
          foreach ($DB->request($query) as $data) {
             $query = "UPDATE `".$this->getTable()."`
                       SET ";
-            $fieldsToUpdate = [];
+            $fieldsToUpdate = array();
 
             if ($updateName || $changeParent) {
                if (isset($currentNodeCompleteName)) {
@@ -244,7 +244,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
                // And we must update the level of the current node ...
                $fieldsToUpdate[] = "`level` = '$nextNodeLevel'";
             }
-            $query .= implode(', ', $fieldsToUpdate)." WHERE `id`= '".$data["id"]."'";
+            $query .= implode(', ',$fieldsToUpdate)." WHERE `id`= '".$data["id"]."'";
             $DB->query($query);
             // Translations :
             if (Session::haveTranslations($this->getType(), 'completename')) {
@@ -294,7 +294,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
    }
 
 
-   function post_updateItem($history = 1) {
+   function post_updateItem($history=1) {
 
       $ID           = $this->getID();
       $changeParent = in_array($this->getForeignKeyField(), $this->updates);
@@ -403,7 +403,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
          echo "<tr><th colspan='3'>".__('New child heading')."</th></tr>";
 
          echo "<tr class='tab_bg_1'><td>".__('Name')."</td><td>";
-         Html::autocompletionTextField($this, "name", ['value' => '']);
+         Html::autocompletionTextField($this, "name", array('value' => ''));
 
          if ($entity_assign
              && ($this->getForeignKeyField() != 'entities_id')) {
@@ -441,8 +441,8 @@ abstract class CommonTreeDropdown extends CommonDropdown {
       echo $header;
 
       $fk   = $this->getForeignKeyField();
-      $crit = [$fk     => $ID,
-                    'ORDER' => 'name'];
+      $crit = array($fk     => $ID,
+                    'ORDER' => 'name');
 
       if ($entity_assign) {
          if ($fk == 'entities_id') {
@@ -498,7 +498,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
    /**
     * @see CommonDBTM::getSpecificMassiveActions()
    **/
-   function getSpecificMassiveActions($checkitem = null) {
+   function getSpecificMassiveActions($checkitem=NULL) {
 
       $isadmin = static::canUpdate();
       $actions = parent::getSpecificMassiveActions($checkitem);
@@ -523,10 +523,10 @@ abstract class CommonTreeDropdown extends CommonDropdown {
       switch ($ma->getAction()) {
          case 'move_under' :
             $itemtype = $ma->getItemType(true);
-            echo __('As child of');
-            Dropdown::show($itemtype, ['name'     => 'parent',
+            _e('As child of');
+            Dropdown::show($itemtype, array('name'     => 'parent',
                                             'comments' => 0,
-                                            'entity'   => $_SESSION['glpiactive_entity']]);
+                                            'entity'   => $_SESSION['glpiactive_entity']));
             echo "<br><br><input type='submit' name='massiveaction' class='submit' value='".
                            _sx('button', 'Move')."'>\n";
             return true;
@@ -560,8 +560,8 @@ abstract class CommonTreeDropdown extends CommonDropdown {
                      // Check if parent is not a child of the original one
                      if (!in_array($parent->getID(), getSonsOf($item->getTable(),
                                                                $item->getID()))) {
-                        if ($item->update(['id' => $id,
-                                                $fk  => $parent->getID()])) {
+                        if ($item->update(array('id' => $id,
+                                                $fk  => $parent->getID()))) {
                            $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                         } else {
                            $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
@@ -591,104 +591,74 @@ abstract class CommonTreeDropdown extends CommonDropdown {
     *
     * @return array of search option
    **/
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'   => 'common',
-         'name' => __('Characteristics')
-      ];
+      $tab                          = array();
+      $tab['common']                = __('Characteristics');
 
-      $tab[] = [
-         'id'                => '1',
-         'table'              => $this->getTable(),
-         'field'              => 'completename',
-         'name'               => __('Complete name'),
-         'datatype'           => 'itemlink',
-         'massiveaction'      => false
-      ];
+      $tab[1]['table']              = $this->getTable();
+      $tab[1]['field']              = 'completename';
+      $tab[1]['name']               = __('Complete name');
+      $tab[1]['datatype']           = 'itemlink';
+      $tab[1]['massiveaction']      = false;
 
-      $tab[] = [
-         'id'                => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'id',
-         'name'               => __('ID'),
-         'massiveaction'      => false,
-         'datatype'           => 'number'
-      ];
+      $tab[2]['table']              = $this->getTable();
+      $tab[2]['field']              = 'id';
+      $tab[2]['name']               = __('ID');
+      $tab[2]['massiveaction']      = false;
+      $tab[2]['datatype']           = 'number';
 
-      $tab[] = [
-         'id'                => '14',
-         'table'             => $this->getTable(),
-         'field'             => 'name',
-         'name'              => __('Name'),
-         'datatype'          => 'itemlink'
-      ];
+      $tab[14]['table']             = $this->getTable();
+      $tab[14]['field']             = 'name';
+      $tab[14]['name']              = __('Name');
+      $tab[14]['datatype']          = 'itemlink';
 
-      $tab[] = [
-         'id'                => '13',
-         'table'             => $this->getTable(),
-         'field'             => 'completename',
-         'name'              => __('Father'),
-         'datatype'          => 'dropdown',
-         'massiveaction'     => false,
-         // Add virtual condition to relink table
-         'joinparams'        => ['condition' => "AND 1=1"]
-      ];
+      $tab[13]['table']             = $this->getTable();
+      $tab[13]['field']             = 'completename';
+      $tab[13]['name']              = __('Father');
+      $tab[13]['datatype']          = 'dropdown';
+      $tab[13]['massiveaction']     = false;
+      // Add virtual condition to relink table
+      $tab[13]['joinparams']        = array('condition' => "AND 1=1");
 
-      $tab[] = [
-         'id'                => '16',
-         'table'             => $this->getTable(),
-         'field'             => 'comment',
-         'name'              => __('Comments'),
-         'datatype'          => 'text'
-      ];
+      $tab[16]['table']             = $this->getTable();
+      $tab[16]['field']             = 'comment';
+      $tab[16]['name']              = __('Comments');
+      $tab[16]['datatype']          = 'text';
 
       if ($this->isEntityAssign()) {
-         $tab[] = [
-            'id'             => '80',
-            'table'          => 'glpi_entities',
-            'field'          => 'completename',
-            'name'           => __('Entity'),
-            'massiveaction'  => false,
-            'datatype'       => 'dropdown'
-         ];
+         $tab[80]['table']          = 'glpi_entities';
+         $tab[80]['field']          = 'completename';
+         $tab[80]['name']           = __('Entity');
+         $tab[80]['massiveaction']  = false;
+         $tab[80]['datatype']       = 'dropdown';
       }
 
       if ($this->maybeRecursive()) {
-         $tab[] = [
-            'id'             => '86',
-            'table'          => $this->getTable(),
-            'field'          => 'is_recursive',
-            'name'           => __('Child entities'),
-            'datatype'       => 'bool'
-         ];
+         $tab[86]['table']          = $this->getTable();
+         $tab[86]['field']          = 'is_recursive';
+         $tab[86]['name']           = __('Child entities');
+         $tab[86]['datatype']       = 'bool';
       }
 
       if ($this->isField('date_mod')) {
-         $tab[] = [
-            'id'             => '19',
-            'table'          => $this->getTable(),
-            'field'          => 'date_mod',
-            'name'           => __('Last update'),
-            'datatype'       => 'datetime',
-            'massiveaction'  => false
-         ];
+         $tab[19]['table']          = $this->getTable();
+         $tab[19]['field']          = 'date_mod';
+         $tab[19]['name']           = __('Last update');
+         $tab[19]['datatype']       = 'datetime';
+         $tab[19]['massiveaction']  = false;
       }
 
       if ($this->isField('date_creation')) {
-         $tab[] = [
-            'id'             => '121',
-            'table'          => $this->getTable(),
-            'field'          => 'date_creation',
-            'name'           => __('Creation date'),
-            'datatype'       => 'datetime',
-            'massiveaction'  => false
-         ];
+         $tab[121]['table']          = $this->getTable();
+         $tab[121]['field']          = 'date_creation';
+         $tab[121]['name']           = __('Creation date');
+         $tab[121]['datatype']       = 'datetime';
+         $tab[121]['massiveaction']  = false;
       }
 
       // add objectlock search options
-      $tab = array_merge($tab, ObjectLock::getSearchOptionsToAddNew(get_class($this)));
+      $tab += ObjectLock::getSearchOptionsToAdd( get_class($this) ) ;
 
       return $tab;
    }
@@ -703,7 +673,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
       $fk = $this->getForeignKeyField();
       $id = $this->fields['id'];
 
-      return (countElementsInTable($this->getTable(), [$fk => $id]) > 0);
+      return (countElementsInTable($this->getTable(), "`$fk`='$id'") > 0);
    }
 
 
@@ -753,9 +723,9 @@ abstract class CommonTreeDropdown extends CommonDropdown {
                                                  $input['entities_id'], $this->maybeRecursive());
          }
          // Check twin :
-         if ($result_twin = $DB->query($query)) {
+         if ($result_twin = $DB->query($query) ) {
             if ($DB->numrows($result_twin) > 0) {
-               return $DB->result($result_twin, 0, "id");
+               return $DB->result($result_twin,0,"id");
             }
          }
 
@@ -773,7 +743,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
          }
 
          // Check twin :
-         if ($result_twin = $DB->query($query)) {
+         if ($result_twin = $DB->query($query) ) {
             if ($DB->numrows($result_twin) > 0) {
                return $DB->result($result_twin, 0, "id");
             }
@@ -801,7 +771,7 @@ abstract class CommonTreeDropdown extends CommonDropdown {
       }
 
       // Import a full tree from completename
-      $names  = explode('>', $input['completename']);
+      $names  = explode('>',$input['completename']);
       $fk     = $this->getForeignKeyField();
       $i      = count($names);
       $parent = 0;

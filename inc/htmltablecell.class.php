@@ -1,37 +1,38 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
-* @brief
+* @brief 
 */
 
 if (!defined('GLPI_ROOT')) {
@@ -51,7 +52,7 @@ class HTMLTableCell extends HTMLTableEntity {
    private $row;
    private $header;
    private $father;
-   private $sons = [];
+   private $sons = array();
    private $item;
 
    // List of rows that have specific attributs
@@ -64,8 +65,8 @@ class HTMLTableCell extends HTMLTableEntity {
     * @param $father    HTMLTableCell object (default NULL)
     * @param $item      CommonDBTM object: The item associated with the current cell (default NULL)
    **/
-   function __construct($row, $header, $content, HTMLTableCell $father = null,
-                        CommonDBTM $item = null) {
+   function __construct($row, $header, $content, HTMLTableCell $father=NULL,
+                        CommonDBTM $item=NULL) {
 
       parent::__construct($content);
       $this->row        = $row;
@@ -75,7 +76,7 @@ class HTMLTableCell extends HTMLTableEntity {
       if (!empty($item)) {
          $this->item = clone $item;
       } else {
-         $this->item = null;
+         $this->item = NULL;
       }
 
       if (!is_null($this->father)) {
@@ -158,7 +159,7 @@ class HTMLTableCell extends HTMLTableEntity {
    function addSon(HTMLTableCell $son, HTMLTableHeader $sons_header) {
 
       if (!isset($this->sons[$sons_header->getName()])) {
-         $this->sons[$sons_header->getName()] = [];
+         $this->sons[$sons_header->getName()] = array();
       }
       $this->sons[$sons_header->getName()][] = $son;
    }
@@ -250,7 +251,7 @@ class HTMLTableCell extends HTMLTableEntity {
     * @param $index
     * @param $options   array
    **/
-   function displayCell($index, array $options = []) {
+   function displayCell($index, array $options=array()) {
 
       if (($index >= $this->start)
           && ($index < ($this->start + $this->numberOfLines))) {
@@ -273,3 +274,4 @@ class HTMLTableCell extends HTMLTableEntity {
       return false;
    }
 }
+?>

@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -44,9 +44,9 @@ if (!defined('GLPI_ROOT')) {
 **/
 class NotificationTargetProblem extends NotificationTargetCommonITILObject {
 
-   public $private_profiles = [];
+   public $private_profiles = array();
 
-   public $html_tags        = ['##problem.solution.description##'];
+   public $html_tags        = array('##problem.solution.description##');
 
 
    /**
@@ -54,99 +54,101 @@ class NotificationTargetProblem extends NotificationTargetCommonITILObject {
    **/
    function getEvents() {
 
-      $events = ['new'            => __('New problem'),
+      $events = array('new'            => __('New problem'),
                       'update'         => __('Update of a problem'),
                       'solved'         => __('Problem solved'),
                       'add_task'       => __('New task'),
                       'update_task'    => __('Update of a task'),
                       'delete_task'    => __('Deletion of a task'),
                       'closed'         => __('Closure of a problem'),
-                      'delete'         => __('Deleting a problem')];
-
-      $events = array_merge($events, parent::getEvents());
+                      'delete'         => __('Deleting a problem'));
       asort($events);
       return $events;
    }
 
 
-   function getDataForObject(CommonDBTM $item, array $options, $simple = false) {
+   /**
+    * @see NotificationTargetCommonITILObject::getDatasForObject()
+   **/
+   function getDatasForObject(CommonDBTM $item, array $options, $simple=false) {
       global $CFG_GLPI;
 
-      // Common ITIL data
-      $data = parent::getDataForObject($item, $options, $simple);
+      // Common ITIL datas
+      $datas                         = parent::getDatasForObject($item, $options, $simple);
 
-      $data["##problem.impacts##"]  = $item->getField('impactcontent');
-      $data["##problem.causes##"]   = $item->getField('causecontent');
-      $data["##problem.symptoms##"] = $item->getField('symptomcontent');
+      $datas["##problem.impacts##"]  = $item->getField('impactcontent');
+      $datas["##problem.causes##"]   = $item->getField('causecontent');
+      $datas["##problem.symptoms##"] = $item->getField('symptomcontent');
 
       // Complex mode
       if (!$simple) {
          $restrict = "`problems_id`='".$item->getField('id')."'";
          $tickets  = getAllDatasFromTable('glpi_problems_tickets', $restrict);
 
-         $data['tickets'] = [];
+         $datas['tickets'] = array();
          if (count($tickets)) {
             $ticket = new Ticket();
-            foreach ($tickets as $row) {
-               if ($ticket->getFromDB($row['tickets_id'])) {
-                  $tmp = [];
+            foreach ($tickets as $data) {
+               if ($ticket->getFromDB($data['tickets_id'])) {
+                  $tmp = array();
 
                   $tmp['##ticket.id##']
-                                    = $row['tickets_id'];
+                                    = $data['tickets_id'];
                   $tmp['##ticket.date##']
                                     = $ticket->getField('date');
                   $tmp['##ticket.title##']
                                     = $ticket->getField('name');
                   $tmp['##ticket.url##']
                                     = $this->formatURL($options['additionnaloption']['usertype'],
-                                                       "Ticket_".$row['tickets_id']);
+                                                       "Ticket_".$data['tickets_id']);
                   $tmp['##ticket.content##']
                                     = $ticket->getField('content');
 
-                  $data['tickets'][] = $tmp;
+                  $datas['tickets'][] = $tmp;
                }
             }
          }
 
-         $data['##problem.numberoftickets##'] = count($data['tickets']);
+         $datas['##problem.numberoftickets##'] = count($datas['tickets']);
+
 
          $restrict = "`problems_id`='".$item->getField('id')."'";
          $changes  = getAllDatasFromTable('glpi_changes_problems', $restrict);
 
-         $data['changes'] = [];
+         $datas['changes'] = array();
          if (count($changes)) {
             $change = new Change();
-            foreach ($changes as $row) {
-               if ($change->getFromDB($row['changes_id'])) {
-                  $tmp = [];
+            foreach ($changes as $data) {
+               if ($change->getFromDB($data['changes_id'])) {
+                  $tmp = array();
                   $tmp['##change.id##']
-                                    = $row['changes_id'];
+                                    = $data['changes_id'];
                   $tmp['##change.date##']
                                     = $change->getField('date');
                   $tmp['##change.title##']
                                     = $change->getField('name');
                   $tmp['##change.url##']
                                     = $this->formatURL($options['additionnaloption']['usertype'],
-                                                       "Change_".$row['changes_id']);
+                                                       "Change_".$data['changes_id']);
                   $tmp['##change.content##']
                                     = $change->getField('content');
 
-                  $data['changes'][] = $tmp;
+                  $datas['changes'][] = $tmp;
                }
             }
          }
 
-         $data['##problem.numberofchanges##'] = count($data['changes']);
+         $datas['##problem.numberofchanges##'] = count($datas['changes']);
 
          $restrict = "`problems_id` = '".$item->getField('id')."'";
-         $items    = getAllDatasFromTable('glpi_items_problems', $restrict);
+         $items    = getAllDatasFromTable('glpi_items_problems',$restrict);
 
-         $data['items'] = [];
+         $datas['items'] = array();
          if (count($items)) {
-            foreach ($items as $row) {
-               if ($item2 = getItemForItemtype($row['itemtype'])) {
-                  if ($item2->getFromDB($row['items_id'])) {
-                     $tmp = [];
+            foreach ($items as $data) {
+               if ($item2 = getItemForItemtype($data['itemtype'])) {
+                  if ($item2->getFromDB($data['items_id'])) {
+                     $tmp = array();
                      $tmp['##item.itemtype##']    = $item2->getTypeName();
                      $tmp['##item.name##']        = $item2->getField('name');
                      $tmp['##item.serial##']      = $item2->getField('serial');
@@ -187,16 +189,16 @@ class NotificationTargetProblem extends NotificationTargetCommonITILObject {
                         $tmp['##item.model##'] = $item2->getField($modelfield);
                      }
 
-                     $data['items'][] = $tmp;
+                     $datas['items'][] = $tmp;
                   }
                }
             }
          }
 
-         $data['##problem.numberofitems##'] = count($data['items']);
+         $datas['##problem.numberofitems##'] = count($datas['items']);
 
       }
-      return $data;
+      return $datas;
    }
 
 
@@ -205,7 +207,7 @@ class NotificationTargetProblem extends NotificationTargetCommonITILObject {
       parent::getTags();
 
       //Locales
-      $tags = ['problem.numberoftickets'   => _x('quantity', 'Number of tickets'),
+      $tags = array('problem.numberoftickets'   => _x('quantity', 'Number of tickets'),
                     'problem.numberofchanges'   => _x('quantity', 'Number of changes'),
                     'problem.impacts'           => __('Impacts'),
                     'problem.causes'            => __('Causes'),
@@ -218,41 +220,41 @@ class NotificationTargetProblem extends NotificationTargetCommonITILObject {
                     'item.contact'              => __('Alternate username'),
                     'item.contactnumber'        => __('Alternate username number'),
                     'item.user'                 => __('User'),
-                    'item.group'                => __('Group'),];
+                    'item.group'                => __('Group'),);
 
       foreach ($tags as $tag => $label) {
-         $this->addTagToList(['tag'    => $tag,
+         $this->addTagToList(array('tag'    => $tag,
                                    'label'  => $label,
                                    'value'  => true,
-                                   'events' => NotificationTarget::TAG_FOR_ALL_EVENTS]);
+                                   'events' => NotificationTarget::TAG_FOR_ALL_EVENTS));
       }
 
       //Foreach global tags
-      $tags = ['tickets'  => _n('Ticket', 'Tickets', Session::getPluralNumber()),
+      $tags = array('tickets'  => _n('Ticket', 'Tickets', Session::getPluralNumber()),
                     'changes'  => _n('Change', 'Changes', Session::getPluralNumber()),
-                    'items'    => _n('Item', 'Items', Session::getPluralNumber())];
+                    'items'    => _n('Item', 'Items', Session::getPluralNumber()));
 
       foreach ($tags as $tag => $label) {
-         $this->addTagToList(['tag'     => $tag,
+         $this->addTagToList(array('tag'     => $tag,
                                    'label'   => $label,
                                    'value'   => false,
-                                   'foreach' => true]);
+                                   'foreach' => true));
       }
 
       //Tags with just lang
-      $tags = ['problem.tickets'  => _n('Ticket', 'Tickets', Session::getPluralNumber()),
+      $tags = array('problem.tickets'  => _n('Ticket', 'Tickets', Session::getPluralNumber()),
                     'problem.changes'  => _n('Change', 'Changes', Session::getPluralNumber()),
-                    'problem.items'    => _n('Item', 'Items', Session::getPluralNumber())];
+                    'problem.items'    => _n('Item', 'Items', Session::getPluralNumber()));
 
       foreach ($tags as $tag => $label) {
-         $this->addTagToList(['tag'   => $tag,
+         $this->addTagToList(array('tag'   => $tag,
                                    'label' => $label,
                                    'value' => false,
-                                   'lang'  => true]);
+                                   'lang'  => true));
       }
 
       //Tags without lang
-      $tags = ['ticket.id'        => sprintf(__('%1$s: %2$s'), __('Ticket'), __('ID')),
+      $tags = array('ticket.id'        => sprintf(__('%1$s: %2$s'), __('Ticket'), __('ID')),
                     'ticket.date'      => sprintf(__('%1$s: %2$s'), __('Ticket'), __('Date')),
                     'ticket.url'       => sprintf(__('%1$s: %2$s'), __('Ticket'), __('URL')),
                     'ticket.title'     => sprintf(__('%1$s: %2$s'), __('Ticket'), __('Title')),
@@ -262,13 +264,13 @@ class NotificationTargetProblem extends NotificationTargetCommonITILObject {
                     'change.url'       => sprintf(__('%1$s: %2$s'), __('Change'), __('URL')),
                     'change.title'     => sprintf(__('%1$s: %2$s'), __('Change'), __('Title')),
                     'change.content'   => sprintf(__('%1$s: %2$s'), __('Change'), __('Description')),
-                    ];
+                    );
 
       foreach ($tags as $tag => $label) {
-         $this->addTagToList(['tag'   => $tag,
+         $this->addTagToList(array('tag'   => $tag,
                                    'label' => $label,
                                    'value' => true,
-                                   'lang'  => false]);
+                                   'lang'  => false));
       }
       asort($this->tag_descriptions);
    }

@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -58,7 +59,7 @@ class RuleAction extends CommonDBChild {
    /**
     * @param $rule_type
    **/
-   function __construct($rule_type = 'Rule') {
+   function __construct($rule_type='Rule') {
       static::$itemtype = $rule_type;
    }
 
@@ -87,7 +88,7 @@ class RuleAction extends CommonDBChild {
     *
     * @return Title of the rule
    **/
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Action', 'Actions', $nb);
    }
 
@@ -114,8 +115,8 @@ class RuleAction extends CommonDBChild {
       parent::post_addItem();
       if (isset($this->input['rules_id'])
           && ($realrule = Rule::getRuleObjectByID($this->input['rules_id']))) {
-         $realrule->update(['id'       => $this->input['rules_id'],
-                                 'date_mod' => $_SESSION['glpi_currenttime']]);
+         $realrule->update(array('id'       => $this->input['rules_id'],
+                                 'date_mod' => $_SESSION['glpi_currenttime']));
       }
    }
 
@@ -130,8 +131,8 @@ class RuleAction extends CommonDBChild {
       parent::post_purgeItem();
       if (isset($this->fields['rules_id'])
           && ($realrule = Rule::getRuleObjectByID($this->fields['rules_id']))) {
-         $realrule->update(['id'       => $this->fields['rules_id'],
-                                 'date_mod' => $_SESSION['glpi_currenttime']]);
+         $realrule->update(array('id'       => $this->fields['rules_id'],
+                                 'date_mod' => $_SESSION['glpi_currenttime']));
       }
    }
 
@@ -148,38 +149,30 @@ class RuleAction extends CommonDBChild {
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => '1',
-         'table'              => $this->getTable(),
-         'field'              => 'action_type',
-         'name'               => self::getTypeName(1),
-         'massiveaction'      => false,
-         'datatype'           => 'specific',
-         'additionalfields'   => ['rules_id']
-      ];
+      $tab                        = array();
 
-      $tab[] = [
-         'id'                 => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'field',
-         'name'               => _n('Field', 'Fields', Session::getPluralNumber()),
-         'massiveaction'      => false,
-         'datatype'           => 'specific',
-         'additionalfields'   => ['rules_id']
-      ];
+      $tab[1]['table']            = $this->getTable();
+      $tab[1]['field']            = 'action_type';
+      $tab[1]['name']             = self::getTypeName(1);
+      $tab[1]['massiveaction']    = false;
+      $tab[1]['datatype']         = 'specific';
+      $tab[1]['additionalfields'] = array('rules_id');
 
-      $tab[] = [
-         'id'                 => '3',
-         'table'              => $this->getTable(),
-         'field'              => 'value',
-         'name'               => __('Value'),
-         'massiveaction'      => false,
-         'datatype'           => 'specific',
-         'additionalfields'   => ['rules_id']
-      ];
+      $tab[2]['table']            = $this->getTable();
+      $tab[2]['field']            = 'field';
+      $tab[2]['name']             = _n('Field', 'Fields', Session::getPluralNumber());
+      $tab[2]['massiveaction']    = false;
+      $tab[2]['datatype']         = 'specific';
+      $tab[2]['additionalfields'] = array('rules_id');
+
+      $tab[3]['table']            = $this->getTable();
+      $tab[3]['field']            = 'value';
+      $tab[3]['name']             = __('Value');
+      $tab[3]['massiveaction']    = false;
+      $tab[3]['datatype']         = 'specific';
+      $tab[3]['additionalfields'] = array('rules_id');
 
       return $tab;
    }
@@ -192,10 +185,10 @@ class RuleAction extends CommonDBChild {
     * @param $values
     * @param $options   array
    **/
-   static function getSpecificValueToDisplay($field, $values, array $options = []) {
+   static function getSpecificValueToDisplay($field, $values, array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       switch ($field) {
          case 'field' :
@@ -239,11 +232,11 @@ class RuleAction extends CommonDBChild {
     * @param $values             (default '')
     * @param $options      array
    **/
-   static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = []) {
+   static function getSpecificValueToSelect($field, $name='', $values='', array $options=array()) {
       global $DB;
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       $options['display'] = false;
       switch ($field) {
@@ -265,11 +258,11 @@ class RuleAction extends CommonDBChild {
             if (isset($values['rules_id'])
                 && !empty($values['rules_id'])
                 && $generic_rule->getFromDB($values['rules_id'])) {
-               return self::dropdownActions(['subtype'     => $generic_rule->fields["sub_type"],
+               return self::dropdownActions(array('subtype'     => $generic_rule->fields["sub_type"],
                                                   'name'        => $name,
                                                   'value'       => $values[$field],
                                                   'alreadyused' => false,
-                                                  'display'     => false]);
+                                                  'display'     => false));
             }
             break;
 
@@ -283,7 +276,7 @@ class RuleAction extends CommonDBChild {
                 && $generic_rule->getFromDB($values['rules_id'])) {
                if ($rule = getItemForItemtype($generic_rule->fields["sub_type"])) {
                   /// TODO review it : need to pass display param and others...
-                  return $rule->displayActionSelectPattern($values);
+                  return $this->displayActionSelectPattern($values);
                }
             }
             break;
@@ -308,7 +301,7 @@ class RuleAction extends CommonDBChild {
               ORDER BY `id`";
       $result = $DB->query($sql);
 
-      $rules_actions = [];
+      $rules_actions = array();
       while ($rule = $DB->fetch_assoc($result)) {
          $tmp             = new self();
          $tmp->fields     = $rule;
@@ -347,7 +340,7 @@ class RuleAction extends CommonDBChild {
     *    - alreadyused
     *    - display
    **/
-   static function dropdownActions($options = []) {
+   static function dropdownActions($options=array()) {
 
       $p['subtype']     = '';
       $p['name']        = '';
@@ -364,7 +357,7 @@ class RuleAction extends CommonDBChild {
 
       if ($rule = getItemForItemtype($p['subtype'])) {
          $actions_options = $rule->getAllActions();
-         $actions         = ["assign"];
+         $actions         = array("assign");
          // Manage permit several.
          $field = $p['field'];
          if ($p['alreadyused']) {
@@ -379,20 +372,20 @@ class RuleAction extends CommonDBChild {
             }
          }
 
-         $elements = [];
+         $elements = array();
          foreach ($actions as $action) {
             $elements[$action] = self::getActionByID($action);
          }
 
-         return Dropdown::showFromArray($p['name'], $elements, ['value'   => $p['value'],
-                                                                     'display' => $p['display']]);
+         return Dropdown::showFromArray($p['name'], $elements, array('value'   => $p['value'],
+                                                                     'display' => $p['display']));
       }
    }
 
 
    static function getActions() {
 
-      return ['assign'              => __('Assign'),
+      return array('assign'              => __('Assign'),
                    'append'              => __('Add'),
                    'regex_result'        => __('Assign the value from regular expression'),
                    'append_regex_result' => __('Add the result of regular expression'),
@@ -403,7 +396,7 @@ class RuleAction extends CommonDBChild {
                    'send'                => __('Send'),
                    'add_validation'      => __('Send'),
                    'fromuser'            => __('Copy from user'),
-                   'fromitem'            => __('Copy from item')];
+                   'fromitem'            => __('Copy from item'));
    }
 
 
@@ -426,7 +419,7 @@ class RuleAction extends CommonDBChild {
    **/
    static function getRegexResultById($action, $regex_result) {
 
-      $results = [];
+      $results = array();
 
       if (count($regex_result) > 0) {
          if (preg_match_all("/#([0-9])/", $action, $results) > 0) {
@@ -451,7 +444,7 @@ class RuleAction extends CommonDBChild {
       if ($rule = getItemForItemtype($sub_type)) {
          $actions_options = $rule->getAllActions();
 
-         $actions = [];
+         $actions = array();
          $res     = $DB->query("SELECT `field`
                                 FROM `".$this->getTable()."`
                                 WHERE `".static::$items_id."` = '".$rules_id."'");
@@ -472,7 +465,7 @@ class RuleAction extends CommonDBChild {
    /**
     * @param $options   array
    **/
-   function displayActionSelectPattern($options = []) {
+   function displayActionSelectPattern($options=array()) {
 
       $display = false;
 
@@ -498,7 +491,7 @@ class RuleAction extends CommonDBChild {
             $actions = Rule::getActionsByType($options["sub_type"]);
             if (isset($actions[$options["field"]]['type'])) {
 
-               switch ($actions[$options["field"]]['type']) {
+               switch($actions[$options["field"]]['type']) {
                   case "dropdown" :
                      $table   = $actions[$options["field"]]['table'];
                      $param['name'] = "value";
@@ -555,7 +548,7 @@ class RuleAction extends CommonDBChild {
                      break;
 
                   case "yesonly" :
-                     Dropdown::showYesNo("value", $param['value'], 0);
+                     Dropdown::showYesNo("value",$param['value'],0);
                      $display = true;
                      break;
 
@@ -573,7 +566,7 @@ class RuleAction extends CommonDBChild {
                      break;
 
                   case "dropdown_users_validate" :
-                     $used = [];
+                     $used = array();
                      if ($item = getItemForItemtype($options["sub_type"])) {
                         $rule_data = getAllDatasFromTable('glpi_ruleactions',
                                                           "`action_type` = 'add_validation'
@@ -586,14 +579,14 @@ class RuleAction extends CommonDBChild {
                         }
                      }
                      $param['name']  = 'value';
-                     $param['right'] = ['validate_incident', 'validate_request'];
+                     $param['right'] = array('validate_incident', 'validate_request');
                      $param['used']  = $used;
                      User::dropdown($param);
                      $display        = true;
                      break;
 
                   case "dropdown_groups_validate" :
-                     $used = [];
+                     $used = array();
                      if ($item = getItemForItemtype($options["sub_type"])) {
                         $rule_data = getAllDatasFromTable('glpi_ruleactions',
                                                           "`action_type` = 'add_validation'
@@ -611,7 +604,7 @@ class RuleAction extends CommonDBChild {
                                     WHERE `groups_id` = `glpi_groups`.`id`)";
                      $param['name']      = 'value';
                      $param['condition'] = $condition;
-                     $param['right']     = ['validate_incident', 'validate_request'];
+                     $param['right']     = array('validate_incident', 'validate_request');
                      $param['used']      = $used;
                      Group::dropdown($param);
                      $display            = true;
@@ -645,7 +638,7 @@ class RuleAction extends CommonDBChild {
     * @param $options array of possible options:
     *     - rule Object : the rule
    **/
-   function showForm($ID, $options = []) {
+   function showForm($ID, $options=array()) {
       global $CFG_GLPI;
 
       // Yllen: you always have parent for action
@@ -674,12 +667,12 @@ class RuleAction extends CommonDBChild {
           && isset($used[$this->fields['field']])) {
          unset($used[$this->fields['field']]);
       }
-      $rand   = $rule->dropdownActions(['value' => $this->fields['field'],
-                                             'used'  => $used]);
-      $params = ['field'                 => '__VALUE__',
+      $rand   = $rule->dropdownActions(array('value' => $this->fields['field'],
+                                             'used'  => $used));
+      $params = array('field'                 => '__VALUE__',
                       'sub_type'              => $rule->getType(),
                       'ruleactions_id'        => $this->getID(),
-                      $rule->getRuleIdField() => $this->fields[static::$items_id]];
+                      $rule->getRuleIdField() => $this->fields[static::$items_id]);
 
       Ajax::updateItemOnSelectEvent("dropdown_field$rand", "action_span",
                                     $CFG_GLPI["root_doc"]."/ajax/ruleaction.php", $params);
@@ -689,11 +682,10 @@ class RuleAction extends CommonDBChild {
          $params['action_type'] = $this->fields['action_type'];
          $params['value']       = $this->fields['value'];
          echo "<script type='text/javascript' >\n";
-         echo "$(function() {";
          Ajax::updateItemJsCode("action_span",
                                  $CFG_GLPI["root_doc"]."/ajax/ruleaction.php",
                                  $params);
-         echo '});</script>';
+         echo '</script>';
       }
       echo "</td></tr>";
       echo "<tr><td colspan='4'><span id='action_span'>\n";
@@ -703,3 +695,4 @@ class RuleAction extends CommonDBChild {
    }
 
 }
+?>

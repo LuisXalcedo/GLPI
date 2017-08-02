@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -92,7 +92,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
       echo "<tr><td class='tab_bg_2 center'>" .
             __('Replay dictionary rules for manufacturers (----- = All)') . "</td>";
       echo "<td class='tab_bg_2 center'>";
-      Manufacturer::dropdown(['name' => 'manufacturer']);
+      Manufacturer::dropdown(array('name' => 'manufacturer'));
       echo "</td></tr>\n";
 
       echo "<tr><td class='tab_bg_2 center' colspan='2'>";
@@ -110,7 +110,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
    /**
     * @see RuleCollection::replayRulesOnExistingDB()
    **/
-   function replayRulesOnExistingDB($offset = 0, $maxtime = 0, $items = [], $params = []) {
+   function replayRulesOnExistingDB($offset=0, $maxtime=0, $items=array(), $params=array()) {
       global $DB;
 
       if (isCommandLine()) {
@@ -161,7 +161,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
             }
 
             //Replay software dictionnary rules
-            $res_rule = $this->processAllRules($input, [], []);
+            $res_rule = $this->processAllRules($input, array(), array());
 
             if ((isset($res_rule["name"]) && (strtolower($res_rule["name"]) != strtolower($input["name"])))
                 || (isset($res_rule["version"]) && ($res_rule["version"] != ''))
@@ -172,7 +172,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
                 || (isset($res_rule['manufacturer'])
                     && ($res_rule['manufacturer'] != $input['manufacturer']))) {
 
-               $IDs = [];
+               $IDs = array();
                //Find all the softwares in the database with the same name and manufacturer
                $sql = "SELECT `id`
                        FROM `glpi_softwares`
@@ -225,11 +225,11 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
     *
     * @return Query result handler
    **/
-   function replayDictionnaryOnSoftwaresByID(array $IDs, $res_rule = []) {
+   function replayDictionnaryOnSoftwaresByID(array $IDs, $res_rule=array()) {
       global $DB;
 
-      $new_softs  = [];
-      $delete_ids = [];
+      $new_softs  = array();
+      $delete_ids = array();
 
       foreach ($IDs as $ID) {
          $res_soft = $DB->query("SELECT `gs`.`id`,
@@ -280,7 +280,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
       $input["entities_id"]  = $entity;
 
       if (empty($res_rule)) {
-         $res_rule = $this->processAllRules($input, [], []);
+         $res_rule = $this->processAllRules($input, array(), array());
       }
       $soft = new Software();
       if (isset($res_rules['_ignore_import']) && ($res_rules['_ignore_import'] == 1)) {
@@ -404,7 +404,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
    function moveVersions($ID, $new_software_id, $version_id, $old_version, $new_version, $entity) {
       global $DB;
 
-      $new_versionID = $this->versionExists($new_software_id, $new_version);
+      $new_versionID = $this->versionExists($new_software_id, $version_id, $new_version);
 
       // Do something if it is not the same version
       if ($new_versionID != $version_id) {
@@ -446,7 +446,7 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
                         WHERE `softwareversions_id_use` = '$version_id'");
             //Delete old version
             $old_version = new SoftwareVersion();
-            $old_version->delete(["id" => $version_id]);
+            $old_version->delete(array("id" => $version_id));
          }
       }
    }
@@ -455,26 +455,18 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
    /**
     * Move licenses from a software to another
     *
-    * @param $old_software_id    old software ID
+    * @param $ID                 old software ID
     * @param $new_software_id    new software ID
-    * @return true if move was successful
    **/
-   function moveLicenses($old_software_id, $new_software_id) {
+   function moveLicenses($ID, $new_software_id) {
       global $DB;
 
-      //Return false if one of the 2 softwares doesn't exists
-      if (!countElementsInTable('glpi_softwares', ['id' => $old_software_id])
-         || !countElementsInTable('glpi_softwares', ['id' => $new_software_id])) {
-         return false;
-      }
-
       //Transfer licenses to new software if needed
-      if ($old_software_id != $new_software_id) {
+      if ($ID != $new_software_id) {
          $DB->query("UPDATE `glpi_softwarelicenses`
                      SET `softwares_id` = '$new_software_id'
-                     WHERE `softwares_id` = '$old_software_id'");
+                     WHERE `softwares_id` = '$ID'");
       }
-      return true;
    }
 
 
@@ -482,9 +474,10 @@ class RuleDictionnarySoftwareCollection extends RuleCollection {
     * Check if a version exists
     *
     * @param $software_id  software ID
+    * @param $version_id   version ID to search
     * @param $version      version name
    **/
-   function versionExists($software_id, $version) {
+   function versionExists($software_id, $version_id, $version) {
       global $DB;
 
       //Check if the version exists

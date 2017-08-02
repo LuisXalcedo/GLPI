@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -74,19 +74,19 @@ class Blacklist extends CommonDropdown {
 
    function getAdditionalFields() {
 
-      return [['name'  => 'value',
+      return array(array('name'  => 'value',
                          'label' => __('Value'),
                          'type'  => 'text',
-                         'list'  => true],
-                   ['name'  => 'type',
-                         'label' => _n('Type', 'Types', 1),
+                         'list'  => true),
+                   array('name'  => 'type',
+                         'label' => _n('Type','Types',1),
                          'type'  => '',
-                         'list'  => true]];
+                         'list'  => true));
    }
 
 
-   static function getTypeName($nb = 0) {
-      return _n('Blacklist', 'Blacklists', $nb);
+   static function getTypeName($nb=0) {
+      return _n('Blacklist','Blacklists',$nb);
    }
 
 
@@ -95,25 +95,20 @@ class Blacklist extends CommonDropdown {
     *
     * @return array of search option
    **/
-   function getSearchOptionsNew() {
-      $tab = parent::getSearchOptionsNew();
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => '11',
-         'table'              => $this->getTable(),
-         'field'              => 'value',
-         'name'               => __('Value'),
-         'datatype'           => 'text'
-      ];
+      $tab                    = parent::getSearchOptions();
 
-      $tab[] = [
-         'id'                 => '12',
-         'table'              => $this->getTable(),
-         'field'              => 'type',
-         'name'               => _n('Type', 'Types', 1),
-         'searchtype'         => ['equals', 'notequals'],
-         'datatype'           => 'specific'
-      ];
+      $tab[11]['table']       = $this->getTable();
+      $tab[11]['field']       = 'value';
+      $tab[11]['name']        = __('Value');
+      $tab[11]['datatype']    = 'text';
+
+      $tab[12]['table']      = $this->getTable();
+      $tab[12]['field']      = 'type';
+      $tab[12]['name']       = _n('Type','Types',1);
+      $tab[12]['searchtype'] = array('equals', 'notequals');
+      $tab[12]['datatype']   = 'specific';
 
       return $tab;
    }
@@ -135,10 +130,10 @@ class Blacklist extends CommonDropdown {
    /**
     * @see CommonDropdown::displaySpecificTypeField()
    **/
-   function displaySpecificTypeField($ID, $field = []) {
+   function displaySpecificTypeField($ID, $field=array()) {
 
       if ($field['name'] == 'type') {
-         self::dropdownType($field['name'], ['value' => $this->fields['type']]);
+         self::dropdownType($field['name'], array('value' => $this->fields['type']));
       }
    }
 
@@ -148,10 +143,10 @@ class Blacklist extends CommonDropdown {
     * @param $values
     * @param $options   array
     */
-   static function getSpecificValueToDisplay($field, $values, array $options = []) {
+   static function getSpecificValueToDisplay($field, $values, array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       switch ($field) {
          case 'type' :
@@ -170,10 +165,10 @@ class Blacklist extends CommonDropdown {
     * @param $values             (default '')
     * @param $options      array
     **/
-   static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = []) {
+   static function getSpecificValueToSelect($field, $name='', $values='', array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       $options['display'] = false;
       switch ($field) {
@@ -197,10 +192,10 @@ class Blacklist extends CommonDropdown {
     *
     * @return string id of the select
    **/
-   static function dropdownType($name, $options = []) {
+   static function dropdownType($name, $options=array()) {
 
       $params['value']       = 0;
-      $params['toadd']       = [];
+      $params['toadd']       = array();
       $params['on_change']   = '';
       $params['display']     = true;
 
@@ -210,7 +205,7 @@ class Blacklist extends CommonDropdown {
          }
       }
 
-      $items = [];
+      $items = array();
       if (count($params['toadd'])>0) {
          $items = $params['toadd'];
       }
@@ -232,7 +227,7 @@ class Blacklist extends CommonDropdown {
       $options[self::MAC]    = __('MAC');
       $options[self::SERIAL] = __('Serial number');
       $options[self::UUID]   = __('UUID');
-      $options[self::EMAIL]  = _n('Email', 'Emails', 1);
+      $options[self::EMAIL]  = _n('Email','Emails',1);
 
       return $options;
    }
@@ -248,7 +243,7 @@ class Blacklist extends CommonDropdown {
    static function getBlacklistedItems($type) {
 
       $datas = getAllDatasFromTable('glpi_blacklists', "type = '$type'");
-      $items = [];
+      $items = array();
       if (count($datas)) {
          foreach ($datas as $val) {
             $items[] = $val['value'];

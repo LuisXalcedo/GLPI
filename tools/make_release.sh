@@ -1,34 +1,31 @@
 #!/bin/bash
-# /**
-#  * ---------------------------------------------------------------------
-#  * GLPI - Gestionnaire Libre de Parc Informatique
-#  * Copyright (C) 2015-2017 Teclib' and contributors.
-#  *
-#  * http://glpi-project.org
-#  *
-#  * based on GLPI - Gestionnaire Libre de Parc Informatique
-#  * Copyright (C) 2003-2014 by the INDEPNET Development Team.
-#  *
-#  * ---------------------------------------------------------------------
-#  *
-#  * LICENSE
-#  *
-#  * This file is part of GLPI.
-#  *
-#  * GLPI is free software; you can redistribute it and/or modify
-#  * it under the terms of the GNU General Public License as published by
-#  * the Free Software Foundation; either version 2 of the License, or
-#  * (at your option) any later version.
-#  *
-#  * GLPI is distributed in the hope that it will be useful,
-#  * but WITHOUT ANY WARRANTY; without even the implied warranty of
-#  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-#  * GNU General Public License for more details.
-#  *
-#  * You should have received a copy of the GNU General Public License
-#  * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
-#  * ---------------------------------------------------------------------
-# */
+
+# ----------------------------------------------------------------------
+# GLPI - Gestionnaire Libre de Parc Informatique
+# Copyright (C) 2003-2006 by the INDEPNET Development Team.
+#
+# http://indepnet.net/   http://glpi-project.org
+# ----------------------------------------------------------------------
+#
+# LICENSE
+#
+#	This file is part of GLPI.
+#
+#    GLPI is free software; you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation; either version 2 of the License, or
+#    (at your option) any later version.
+#
+#    GLPI is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with GLPI; if not, write to the Free Software
+#    Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA  02111-1307  USA
+# ------------------------------------------------------------------------
+
 if [ ! "$#" -eq 2 ]
 then
  echo "Usage $0 glpi_git_dir release";
@@ -59,6 +56,23 @@ git checkout-index -a -f --prefix=/tmp/glpi/
 echo "Move to this directory";
 cd /tmp/glpi;
 
+
+echo "Delete bigdumps and older sql files";
+\rm install/mysql/glpi-0.3*;
+\rm install/mysql/glpi-0.4*;
+\rm install/mysql/glpi-0.5*;
+\rm install/mysql/glpi-0.6*;
+\rm install/mysql/glpi-0.7-*;
+\rm install/mysql/glpi-0.71*;
+\rm install/mysql/glpi-0.72*;
+\rm install/mysql/glpi-0.78*;
+\rm install/mysql/glpi-0.80*;
+\rm install/mysql/glpi-0.83*;
+\rm install/mysql/glpi-0.84*;
+\rm install/mysql/glpi-0.85*;
+\rm install/mysql/glpi-0.90*;
+\rm install/mysql/irm*;
+
 echo "Retrieve PHP vendor"
 composer install --no-dev --optimize-autoloader --prefer-dist --quiet
 
@@ -76,12 +90,6 @@ echo "Clean PHP vendor"
 \find vendor/ -type d -name "example*" -prune -exec rm -rf {} \;
 \find vendor/ -type d -name "design" -prune -exec rm -rf {} \;
 
-echo "Minify stylesheets and javascripts"
-$INIT_PWD/vendor/bin/robo minify --load-from tools
-
-echo "Compile locale files"
-./tools/locale/update_mo.pl
-
 echo "Delete various scripts and directories"
 \rm -rf tools;
 \rm -rf phpunit;
@@ -91,7 +99,6 @@ echo "Delete various scripts and directories"
 \rm -rf phpunit.xml.dist;
 \rm -rf composer.json;
 \rm -rf composer.lock;
-\rm -rf .composer.hash;
 \rm -rf ISSUE_TEMPLATE.md;
 \rm -rf PULL_REQUEST_TEMPLATE.md;
 \rm -rf .tx;

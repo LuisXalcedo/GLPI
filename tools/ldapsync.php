@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -36,11 +37,11 @@
 */
 
 // Ensure current directory when run from crontab
-chdir(__DIR__);
+chdir(dirname($_SERVER["SCRIPT_FILENAME"]));
 
 if (isset($_SERVER['argv'])) {
-   for ($i=1; $i<$_SERVER['argc']; $i++) {
-      $it = explode("=", $_SERVER['argv'][$i], 2);
+   for ($i=1 ; $i<$_SERVER['argc'] ; $i++) {
+      $it = explode("=",$_SERVER['argv'][$i], 2);
       $it[0] = preg_replace('/^--/', '', $it[0]);
 
       $_GET[$it[0]] = (isset($it[1]) ? $it[1] : true);
@@ -93,7 +94,7 @@ function syncEntity ($pid, $data, $server, $prof, $verb, $mail) {
    }
 
    $entity = new Entity();
-   if ($entity->getFromDB($id = $data['id'])) {
+   if ($entity->getFromDB($id=$data['id'])) {
       $tps = microtime(true);
       if ($verb) {
          echo "  $pid: Synchonizing entity '".$entity->getField('completename')."' ($id, mail=$mail)\n";
@@ -114,10 +115,10 @@ function syncEntity ($pid, $data, $server, $prof, $verb, $mail) {
          $sql .= " AND glpi_users.auths_id = $server";
       }
 
-      $users   = [];
-      $results = [AuthLDAP::USER_IMPORTED     => 0,
+      $users   = array();
+      $results = array(AuthLDAP::USER_IMPORTED     => 0,
                        AuthLDAP::USER_SYNCHRONIZED => 0,
-                       AuthLDAP::USER_DELETED_LDAP => 0];
+                       AuthLDAP::USER_DELETED_LDAP => 0);
 
       $req = $DB->request($sql);
       $i   = 0;
@@ -126,8 +127,8 @@ function syncEntity ($pid, $data, $server, $prof, $verb, $mail) {
       foreach ($req as $row) {
          $i++;
 
-         $result = AuthLdap::ldapImportUserByServerId(['method' => AuthLDAP::IDENTIFIER_LOGIN,
-                                                            'value'  => $row['name']],
+         $result = AuthLdap::ldapImportUserByServerId(array('method' => AuthLDAP::IDENTIFIER_LOGIN,
+                                                            'value'  => $row['name']),
                                                       AuthLDAP::ACTION_SYNCHRONIZE,
                                                       $row['auths_id']);
          if ($result) {
@@ -177,7 +178,7 @@ function syncEntity ($pid, $data, $server, $prof, $verb, $mail) {
                        "Date: " . Html::convDateTime($_SESSION['glpi_currenttime']) . "\n " .
                        $report;
             $entdata = new Entity();
-            $mmail   = new NotificationMailing();
+            $mmail   = new NotificationMail();
             $mmail->AddCustomHeader("Auto-Submitted: auto-generated");
             $mmail->From      = $CFG_GLPI["admin_email"];
             $mmail->FromName  = "GLPI";
@@ -220,7 +221,7 @@ function syncEntity ($pid, $data, $server, $prof, $verb, $mail) {
 
 include ('../inc/includes.php');
 
-ini_set('display_errors', 1);
+ini_set('display_errors',1);
 restore_error_handler();
 
 if (isset($_GET['verbose'])) {
@@ -230,15 +231,15 @@ if (isset($_GET['verbose'])) {
 }
 $server = 0;
 if (isset($_GET['entity'])) {
-   $crit = ['id' => $_GET['entity']];
+   $crit = array('id' => $_GET['entity']);
 
 } else if (isset($_GET['server'])) {
    if (is_numeric($_GET['server'])) {
       $server = $_GET['server'];
-      $crit   = ['authldaps_id' => $server];
+      $crit   = array('authldaps_id' => $server);
    } else {
       $server = AuthLdap::getDefault();
-      $crit   = ['authldaps_id' => [0, $server]];
+      $crit   = array('authldaps_id' => array(0, $server));
       if ($verb) {
          printf("+ Use default LDAP server: %d\n", $server);
       }
@@ -267,9 +268,9 @@ if (isset($_GET['mailadmin'])) {
 
 $tps  = microtime(true);
 $nb   = 0;
-$pids = [];
+$pids = array();
 
-$rows = [];
+$rows = array();
 foreach ($DB->request('glpi_entities', $crit) as $row) {
    $rows[] = $row;
 }
@@ -305,7 +306,7 @@ foreach ($rows as $row) {
       if ($verb) {
          echo "+ $pid: started, ".count($pids)." running\n";
       }
-   } else {
+   } else  {
       syncEntity(posix_getpid(), $row, $server, $prof, $verb, $mail);
       exit(0);
    }
@@ -327,8 +328,9 @@ while (count($pids) > 0) {
 $tps = microtime(true)-$tps;
 if ($nbproc == 1) {
    printf("%d users synchronized in %s\n", $nb,
-          Html::clean(Html::timestampToString(round($tps, 0), true)));
+          Html::clean(Html::timestampToString(round($tps,0),true)));
 } else {
    printf("%d entities synchronized in %s\n", $nb,
-          Html::clean(Html::timestampToString(round($tps, 0), true)));
+          Html::clean(Html::timestampToString(round($tps,0),true)));
 }
+?>

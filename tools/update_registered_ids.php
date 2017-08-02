@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -39,8 +40,8 @@ include ('../inc/includes.php');
 
 $registeredid = new RegisteredID();
 $manufacturer = new Manufacturer();
-foreach (['PCI' => 'http://pciids.sourceforge.net/v2.2/pci.ids',
-               'USB' => 'http://www.linux-usb.org/usb.ids'] as $type => $URL) {
+foreach (array('PCI' => 'http://pciids.sourceforge.net/v2.2/pci.ids',
+               'USB' => 'http://www.linux-usb.org/usb.ids') as $type => $URL) {
    echo "Processing : $type\n";
    foreach (file($URL) as $line) {
       if ($line[0] == '#') {
@@ -59,13 +60,13 @@ foreach (['PCI' => 'http://pciids.sourceforge.net/v2.2/pci.ids',
             $manufacturer->getFromDB($registeredid->fields['items_id']);
          } else {
             if (!$manufacturer->getFromDBByQuery("WHERE `name` = '$name'")) {
-               $input = ['name' => $name];
+               $input = array('name' => $name);
                $manufacturer->add($input);
             }
-            $input = ['itemtype'    => $manufacturer->getType(),
+            $input = array('itemtype'    => $manufacturer->getType(),
                            'items_id'    => $manufacturer->getID(),
                            'device_type' => $type,
-                           'name'        => $id];
+                           'name'        => $id);
             $registeredid->add($input);
          }
          continue;
@@ -78,3 +79,4 @@ foreach (['PCI' => 'http://pciids.sourceforge.net/v2.2/pci.ids',
       // }
    }
 }
+?>

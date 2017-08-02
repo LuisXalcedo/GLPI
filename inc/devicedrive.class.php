@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -41,9 +42,9 @@ if (!defined('GLPI_ROOT')) {
 /// Class DeviceDrive
 class DeviceDrive extends CommonDevice {
 
-   static protected $forward_entity_to = ['Item_DeviceDrive', 'Infocom'];
-
-   static function getTypeName($nb = 0) {
+   static protected $forward_entity_to = array('Item_DeviceDrive', 'Infocom');
+   
+   static function getTypeName($nb=0) {
       return _n('Drive', 'Drives', $nb);
    }
 
@@ -51,55 +52,36 @@ class DeviceDrive extends CommonDevice {
    function getAdditionalFields() {
 
       return array_merge(parent::getAdditionalFields(),
-                         [['name'  => 'is_writer',
+                         array(array('name'  => 'is_writer',
                                      'label' => __('Writing ability'),
-                                     'type'  => 'bool'],
-                               ['name'  => 'speed',
+                                     'type'  => 'bool'),
+                               array('name'  => 'speed',
                                      'label' => __('Speed'),
-                                     'type'  => 'text'],
-                               ['name'  => 'interfacetypes_id',
+                                     'type'  => 'text'),
+                               array('name'  => 'interfacetypes_id',
                                      'label' => __('Interface'),
-                                     'type'  => 'dropdownValue'],
-                               ['name'  => 'devicedrivemodels_id',
-                                     'label' => __('Model'),
-                                     'type'  => 'dropdownValue']]);
+                                     'type'  => 'dropdownValue')));
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = parent::getSearchOptionsNew();
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => '12',
-         'table'              => $this->getTable(),
-         'field'              => 'is_writer',
-         'name'               => __('Writing ability'),
-         'datatype'           => 'bool'
-      ];
+      $tab                 = parent::getSearchOptions();
 
-      $tab[] = [
-         'id'                 => '13',
-         'table'              => $this->getTable(),
-         'field'              => 'speed',
-         'name'               => __('Speed'),
-         'datatype'           => 'string'
-      ];
+      $tab[12]['table']    = $this->getTable();
+      $tab[12]['field']    = 'is_writer';
+      $tab[12]['name']     = __('Writing ability');
+      $tab[12]['datatype'] = 'bool';
 
-      $tab[] = [
-         'id'                 => '14',
-         'table'              => 'glpi_interfacetypes',
-         'field'              => 'name',
-         'name'               => __('Interface'),
-         'datatype'           => 'dropdown'
-      ];
+      $tab[13]['table']    = $this->getTable();
+      $tab[13]['field']    = 'speed';
+      $tab[13]['name']     = __('Speed');
+      $tab[13]['datatype'] = 'string';
 
-      $tab[] = [
-         'id'                 => '15',
-         'table'              => 'glpi_devicedrivemodels',
-         'field'              => 'name',
-         'name'               => __('Model'),
-         'datatype'           => 'dropdown'
-      ];
+      $tab[14]['table']    = 'glpi_interfacetypes';
+      $tab[14]['field']    = 'name';
+      $tab[14]['name']     = __('Interface');
+      $tab[14]['datatype'] = 'dropdown';
 
       return $tab;
    }
@@ -111,8 +93,8 @@ class DeviceDrive extends CommonDevice {
     * @see CommonDevice::getHTMLTableHeader()
    **/
    static function getHTMLTableHeader($itemtype, HTMLTableBase $base,
-                                      HTMLTableSuperHeader $super = null,
-                                      HTMLTableHeader $father = null, array $options = []) {
+                                      HTMLTableSuperHeader $super=NULL,
+                                      HTMLTableHeader $father=NULL, array $options=array()) {
 
       $column = parent::getHTMLTableHeader($itemtype, $base, $super, $father, $options);
 
@@ -137,8 +119,8 @@ class DeviceDrive extends CommonDevice {
     *
     * @see CommonDevice::getHTMLTableCellForItem()
    **/
-   function getHTMLTableCellForItem(HTMLTableRow $row = null, CommonDBTM $item = null,
-                                    HTMLTableCell $father = null, array $options = []) {
+   function getHTMLTableCellForItem(HTMLTableRow $row=NULL, CommonDBTM $item=NULL,
+                                    HTMLTableCell $father=NULL, array $options=array()) {
 
       $column = parent::getHTMLTableCellForItem($row, $item, $father, $options);
 
@@ -148,7 +130,7 @@ class DeviceDrive extends CommonDevice {
 
       switch ($item->getType()) {
          case 'Computer' :
-            Manufacturer::getHTMLTableCellsForItem($row, $this, null, $options);
+            Manufacturer::getHTMLTableCellsForItem($row, $this, NULL, $options);
             if ($this->fields["is_writer"]) {
                $row->addCell($row->getHeaderByName('devicedrive_writer'),
                              Dropdown::getYesNo($this->fields["is_writer"]), $father);
@@ -159,7 +141,8 @@ class DeviceDrive extends CommonDevice {
                              $this->fields["speed"], $father);
             }
 
-            InterfaceType::getHTMLTableCellsForItem($row, $this, null, $options);
+
+            InterfaceType::getHTMLTableCellsForItem($row, $this, NULL, $options);
       }
    }
 
@@ -173,9 +156,10 @@ class DeviceDrive extends CommonDevice {
    **/
    function getImportCriteria() {
 
-      return ['designation'       => 'equal',
+      return array('designation'       => 'equal',
                    'manufacturers_id'  => 'equal',
-                   'interfacetypes_id' => 'equal'];
+                   'interfacetypes_id' => 'equal');
    }
 
 }
+?>

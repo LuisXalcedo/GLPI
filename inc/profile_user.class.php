@@ -1,33 +1,33 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -87,9 +87,9 @@ class Profile_User extends CommonDBRelation {
    function canCreateItem() {
 
       $user = new User();
-      return $user->can($this->fields['users_id'], READ)
-             && Profile::currentUserHaveMoreRightThan([$this->fields['profiles_id']
-                                                               => $this->fields['profiles_id']])
+      return $user->can($this->fields['users_id'],READ)
+             && Profile::currentUserHaveMoreRightThan(array($this->fields['profiles_id']
+                                                               => $this->fields['profiles_id']))
              && Session::haveAccessToEntity($this->fields['entities_id']);
    }
 
@@ -122,7 +122,7 @@ class Profile_User extends CommonDBRelation {
 
       $canedit = $user->canEdit($ID);
 
-      $strict_entities = self::getUserEntities($ID, false);
+      $strict_entities = self::getUserEntities($ID,false);
       if (!Session::haveAccessToOneOfEntities($strict_entities)
           && !Session::isViewAllEntities()) {
          $canedit = false;
@@ -140,13 +140,13 @@ class Profile_User extends CommonDBRelation {
 
          echo "<tr class='tab_bg_2'><td class='center'>";
          echo "<input type='hidden' name='users_id' value='$ID'>";
-         Entity::dropdown(['entity' => $_SESSION['glpiactiveentities']]);
+         Entity::dropdown(array('entity' => $_SESSION['glpiactiveentities']));
          echo "</td><td class='center'>".self::getTypeName(1)."</td><td>";
-         Profile::dropdownUnder(['value' => Profile::getDefault()]);
+         Profile::dropdownUnder(array('value' => Profile::getDefault()));
          echo "</td><td>".__('Recursive')."</td><td>";
-         Dropdown::showYesNo("is_recursive", 0);
+         Dropdown::showYesNo("is_recursive",0);
          echo "</td><td class='center'>";
-         echo "<input type='submit' name='add' value=\""._sx('button', 'Add')."\" class='submit'>";
+         echo "<input type='submit' name='add' value=\""._sx('button','Add')."\" class='submit'>";
          echo "</td></tr>";
 
          echo "</table>";
@@ -175,8 +175,8 @@ class Profile_User extends CommonDBRelation {
       Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
 
       if ($canedit && $num) {
-         $massiveactionparams = ['num_displayed' => min($_SESSION['glpilist_limit'], $num),
-                           'container'     => 'mass'.__CLASS__.$rand];
+         $massiveactionparams = array('num_displayed' => min($_SESSION['glpilist_limit'], $num),
+                           'container'     => 'mass'.__CLASS__.$rand);
          Html::showMassiveActions($massiveactionparams);
       }
 
@@ -245,8 +245,8 @@ class Profile_User extends CommonDBRelation {
                }
                $entname = sprintf(__('%1$s%2$s'), $entname, ")</span>");
             }
-            echo "<td>".$entname."</td>";
-            echo "</tr>";
+             echo "<td>".$entname."</td>";
+         echo "</tr>";
          }
          echo $header_begin.$header_bottom.$header_end;
          echo "</table>";
@@ -273,6 +273,7 @@ class Profile_User extends CommonDBRelation {
    static function showForEntity(Entity $entity) {
       global $DB;
 
+
       $ID = $entity->getField('id');
       if (!$entity->can($ID, READ)) {
          return false;
@@ -297,13 +298,13 @@ class Profile_User extends CommonDBRelation {
          echo "<tr class='tab_bg_1'><th colspan='6'>".__('Add an authorization to a user')."</tr>";
          echo "<tr class='tab_bg_1'><td class='tab_bg_2 center'>".__('User')."&nbsp;";
          echo "<input type='hidden' name='entities_id' value='$ID'>";
-         User::dropdown(['right' => 'all']);
+         User::dropdown(array('right' => 'all'));
          echo "</td><td class='tab_bg_2 center'>".self::getTypeName(1)."</td><td>";
-         Profile::dropdownUnder(['value' => Profile::getDefault()]);
+         Profile::dropdownUnder(array('value' => Profile::getDefault()));
          echo "</td><td class='tab_bg_2 center'>".__('Recursive')."</td><td>";
          Dropdown::showYesNo("is_recursive", 0);
          echo "</td><td class='tab_bg_2 center'>";
-         echo "<input type='submit' name='add' value=\""._sx('button', 'Add')."\" class='submit'>";
+         echo "<input type='submit' name='add' value=\""._sx('button','Add')."\" class='submit'>";
          echo "</td></tr>";
          echo "</table>";
          Html::closeForm();
@@ -325,10 +326,10 @@ class Profile_User extends CommonDBRelation {
       if ($canedit && $nb) {
          Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
          $massiveactionparams
-            = ['container'
+            = array('container'
                         => 'mass'.__CLASS__.$rand,
                     'specific_actions'
-                        => ['purge' => _x('button', 'Delete permanently')]];
+                        => array('purge' => _x('button', 'Delete permanently')));
          Html::showMassiveActions($massiveactionparams);
       }
       echo "<table class='tab_cadre_fixehov'>";
@@ -337,6 +338,7 @@ class Profile_User extends CommonDBRelation {
       echo "<th class='noHover' colspan='$headerspan'>";
       printf(__('%1$s (%2$s)'), _n('User', 'Users', Session::getPluralNumber()), __('D=Dynamic, R=Recursive'));
       echo "</th></tr></thead>";
+
 
       if ($nb) {
          Session::initNavigateListItems('User',
@@ -378,7 +380,7 @@ class Profile_User extends CommonDBRelation {
                $i = 0;
 
                while ($data2 = $DB->fetch_assoc($result2)) {
-                  Session::addToNavigateListItems('User', $data2["id"]);
+                  Session::addToNavigateListItems('User',$data2["id"]);
 
                   if (($i%$nb_per_line) == 0) {
                      if ($i  !=0) {
@@ -446,7 +448,7 @@ class Profile_User extends CommonDBRelation {
       global $DB, $CFG_GLPI;
 
       $ID      = $prof->fields['id'];
-      $canedit = Session::haveRightsOr("user", [CREATE, UPDATE, DELETE, PURGE]);
+      $canedit = Session::haveRightsOr("user", array(CREATE, UPDATE, DELETE, PURGE));
       $rand = mt_rand();
       if (!$prof->can($ID, READ)) {
          return false;
@@ -475,8 +477,8 @@ class Profile_User extends CommonDBRelation {
 
       if ($canedit && $nb) {
          Html::openMassiveActionsForm('mass'.__CLASS__.$rand);
-         $massiveactionparams = ['num_displayed' => min($_SESSION['glpilist_limit'], $nb),
-                           'container'     => 'mass'.__CLASS__.$rand];
+         $massiveactionparams = array('num_displayed' => min($_SESSION['glpilist_limit'], $nb),
+                           'container'     => 'mass'.__CLASS__.$rand);
          Html::showMassiveActions($massiveactionparams);
       }
       echo "<table class='tab_cadre_fixe'><tr>";
@@ -520,8 +522,8 @@ class Profile_User extends CommonDBRelation {
                echo "<tr class='tab_bg_2'>";
                echo "<td>";
                echo "<a href=\"javascript:showHideDiv('entity$temp$rand','imgcat$temp', '".
-                        "fa-folder','fa-folder-open');\">";
-               echo "<i id='imgcat$temp' class='fa fa-folder'>&nbsp;";
+                        $CFG_GLPI['root_doc']."/pics/folder.png','".$CFG_GLPI['root_doc']."/pics/folder-open.png');\">";
+               echo "<img alt='' name='imgcat$temp' src=\"".$CFG_GLPI['root_doc']."/pics/folder.png\">&nbsp;";
                echo "<span class='b'>".Dropdown::getDropdownName('glpi_entities', $data["entity"]).
                      "</span>";
                echo "</a>";
@@ -608,7 +610,7 @@ class Profile_User extends CommonDBRelation {
     *
     * @return array of entities ID
    **/
-   static function getUserEntities($user_ID, $is_recursive = true, $default_first = false) {
+   static function getUserEntities($user_ID, $is_recursive=true, $default_first=false) {
       global $DB;
 
       $query = "SELECT DISTINCT `entities_id`, `is_recursive`
@@ -617,7 +619,7 @@ class Profile_User extends CommonDBRelation {
       $result = $DB->query($query);
 
       if ($DB->numrows($result) > 0) {
-         $entities = [];
+         $entities = array();
 
          while ($data = $DB->fetch_assoc($result)) {
             if ($data['is_recursive'] && $is_recursive) {
@@ -642,25 +644,22 @@ class Profile_User extends CommonDBRelation {
          return array_unique($entities);
       }
 
-      return [];
+      return array();
    }
 
 
    /**
     * Get entities for which a user have a right
     *
-    * @since 0.84
-    * @since 9.2  Add $name parameter
+    * @since version 0.84
     *
-    * @param integer $user_ID      user ID
-    * @param string  $rightname    name of the rights to check (CommonDBTM::$rightname)
-    * @param integer $rights       rights to check (may be a OR combinaison of several rights)
-    *                              (exp: CommonDBTM::READ | CommonDBTM::UPDATE ...)
-    * @param boolean $is_recursive check also using recursive rights (true by default)
+    * @param $user_ID         integer   user ID
+    * @param $right                     right to check
+    * @param $is_recursive              check also using recursive rights (true by default)
     *
     * @return array of entities ID
    **/
-   static function getUserEntitiesForRight($user_ID, $rightname, $rights, $is_recursive = true) {
+   static function getUserEntitiesForRight($user_ID, $right, $is_recursive=true) {
       global $DB;
 
       $query = "SELECT DISTINCT `glpi_profiles_users`.`entities_id`,
@@ -671,12 +670,12 @@ class Profile_User extends CommonDBRelation {
                 INNER JOIN `glpi_profilerights`
                   ON (`glpi_profilerights`.`profiles_id` = `glpi_profiles`.`id`)
                 WHERE `glpi_profiles_users`.`users_id` = '$user_ID'
-                  AND `glpi_profilerights`.`name` = '$rightname'
-                  AND `glpi_profilerights`.`rights` & $rights";
+                  AND `glpi_profilerights`.`name` = '$right'
+                  AND `glpi_profilerights`.`rights` & ". (READ | CREATE | UPDATE | DELETE |PURGE);
       $result = $DB->query($query);
 
       if ($DB->numrows($result) > 0) {
-         $entities = [];
+         $entities = array();
 
          while ($data = $DB->fetch_assoc($result)) {
             if ($data['is_recursive'] && $is_recursive) {
@@ -690,7 +689,7 @@ class Profile_User extends CommonDBRelation {
          return array_unique($entities);
       }
 
-      return [];
+      return array();
    }
 
 
@@ -702,7 +701,7 @@ class Profile_User extends CommonDBRelation {
     *
     * @return array of the IDs of the profiles
    **/
-   static function getUserProfiles($user_ID, $sqlfilter = '') {
+   static function getUserProfiles($user_ID, $sqlfilter='') {
       global $DB;
 
       $query = "SELECT DISTINCT `profiles_id`
@@ -711,7 +710,7 @@ class Profile_User extends CommonDBRelation {
                       $sqlfilter";
       $result = $DB->query($query);
 
-      $profiles = [];
+      $profiles = array();
       if ($DB->numrows($result) > 0) {
          while ($data = $DB->fetch_assoc($result)) {
             $profiles[$data['profiles_id']] = $data['profiles_id'];
@@ -732,7 +731,7 @@ class Profile_User extends CommonDBRelation {
     *
     * @return Array of entity ID
    **/
-   static function getEntitiesForProfileByUser($users_id, $profiles_id, $child = false) {
+   static function getEntitiesForProfileByUser($users_id, $profiles_id, $child=false) {
       global $DB;
 
       $query = "SELECT `entities_id`, `is_recursive`
@@ -740,7 +739,7 @@ class Profile_User extends CommonDBRelation {
                 WHERE `users_id` = '$users_id'
                       AND `profiles_id` = '$profiles_id'";
 
-      $entities = [];
+      $entities = array();
       foreach ($DB->request($query) as $data) {
          if ($child
              && $data['is_recursive']) {
@@ -766,14 +765,14 @@ class Profile_User extends CommonDBRelation {
     *
     * @return Array of entity ID
    **/
-   static function getEntitiesForUser($users_id, $child = false) {
+   static function getEntitiesForUser($users_id, $child=false) {
       global $DB;
 
       $query = "SELECT `entities_id`, `is_recursive`
                 FROM `glpi_profiles_users`
                 WHERE `users_id` = '$users_id'";
 
-      $entities = [];
+      $entities = array();
       foreach ($DB->request($query) as $data) {
          if ($child
              && $data['is_recursive']) {
@@ -796,7 +795,7 @@ class Profile_User extends CommonDBRelation {
     *
     * @return array of entities ID
    **/
-   static function getForUser($user_ID, $only_dynamic = false) {
+   static function getForUser($user_ID, $only_dynamic=false) {
       global $DB;
 
       $condition = "`users_id` = '$user_ID'";
@@ -830,7 +829,7 @@ class Profile_User extends CommonDBRelation {
     * @param $user_ID
     * @param $only_dynamic    (false by default)
    **/
-   static function deleteRights($user_ID, $only_dynamic = false) {
+   static function deleteRights($user_ID, $only_dynamic=false) {
 
       $crit['users_id'] = $user_ID;
 
@@ -843,74 +842,54 @@ class Profile_User extends CommonDBRelation {
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
+      $tab                       = array();
+      $tab['common']             = __('Characteristics');
 
-      $tab[] = [
-         'id'                 => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'id',
-         'name'               => __('ID'),
-         'massiveaction'      => false,
-         'datatype'           => 'number'
-      ];
+      $tab[2]['table']           = $this->getTable();
+      $tab[2]['field']           = 'id';
+      $tab[2]['name']            = __('ID');
+      $tab[2]['massiveaction']   = false;
+      $tab[2]['datatype']        = 'number';
 
-      $tab[] = [
-         'id'                 => '3',
-         'table'              => $this->getTable(),
-         'field'              => 'is_dynamic',
-         'name'               => __('Dynamic'),
-         'datatype'           => 'bool',
-         'massiveaction'      => false
-      ];
+      $tab[3]['table']           = $this->getTable();
+      $tab[3]['field']           = 'is_dynamic';
+      $tab[3]['name']            = __('Dynamic');
+      $tab[3]['datatype']        = 'bool';
+      $tab[3]['massiveaction']   = false;
 
-      $tab[] = [
-         'id'                 => '4',
-         'table'              => 'glpi_profiles',
-         'field'              => 'name',
-         'name'               => self::getTypeName(1),
-         'datatype'           => 'dropdown',
-         'massiveaction'      => false
-      ];
+      $tab[4]['table']           = 'glpi_profiles';
+      $tab[4]['field']           = 'name';
+      $tab[4]['name']            = self::getTypeName(1);
+      $tab[4]['datatype']        = 'dropdown';
+      $tab[4]['massiveaction']   = false;
 
-      $tab[] = [
-         'id'                 => '5',
-         'table'              => 'glpi_users',
-         'field'              => 'name',
-         'name'               => __('User'),
-         'massiveaction'      => false,
-         'datatype'           => 'dropdown',
-         'right'              => 'all'
-      ];
+      $tab[5]['table']           = 'glpi_users';
+      $tab[5]['field']           = 'name';
+      $tab[5]['name']            = __('User');
+      $tab[5]['massiveaction']   = false;
+      $tab[5]['datatype']        = 'dropdown';
+      $tab[5]['right']           = 'all';
 
-      $tab[] = [
-         'id'                 => '80',
-         'table'              => 'glpi_entities',
-         'field'              => 'completename',
-         'name'               => __('Entity'),
-         'massiveaction'      => true,
-         'datatype'           => 'dropdown'
-      ];
 
-      $tab[] = [
-         'id'                 => '86',
-         'table'              => $this->getTable(),
-         'field'              => 'is_recursive',
-         'name'               => __('Child entities'),
-         'datatype'           => 'bool',
-         'massiveaction'      => false
-      ];
+      $tab[80]['table']          = 'glpi_entities';
+      $tab[80]['field']          = 'completename';
+      $tab[80]['name']           = __('Entity');
+      $tab[80]['massiveaction']  = true;
+      $tab[80]['datatype']       = 'dropdown';
+
+      $tab[86]['table']          = $this->getTable();
+      $tab[86]['field']          = 'is_recursive';
+      $tab[86]['name']           = __('Child entities');
+      $tab[86]['datatype']       = 'bool';
+      $tab[86]['massiveaction']   = false;
 
       return $tab;
    }
 
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Profile', 'Profiles', $nb);
    }
 
@@ -938,7 +917,7 @@ class Profile_User extends CommonDBRelation {
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
       global $DB;
 
       if (!$withtemplate) {
@@ -981,9 +960,9 @@ class Profile_User extends CommonDBRelation {
             case 'User' :
                if ($_SESSION['glpishow_count_on_tabs']) {
                   $nb = countElementsInTable($this->getTable(),
-                                             ['users_id' => $item->getID()]);
+                                             "users_id = '".$item->getID()."'");
                }
-               return self::createTabEntry(_n('Authorization', 'Authorizations',
+               return self::createTabEntry(_n('Authorization','Authorizations',
                                            Session::getPluralNumber()), $nb);
          }
       }
@@ -991,7 +970,7 @@ class Profile_User extends CommonDBRelation {
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       switch ($item->getType()) {
          case 'Entity' :
@@ -1037,9 +1016,9 @@ class Profile_User extends CommonDBRelation {
       if (($ma->getAction() == 'add')
           && ($peer_number == 2)) {
          echo "<br><br>".sprintf(__('%1$s: %2$s'), _n('Entity', 'Entities', 1), '');
-         Entity::dropdown(['entity' => $_SESSION['glpiactiveentities']]);
+         Entity::dropdown(array('entity' => $_SESSION['glpiactiveentities']));
          echo "<br><br>".sprintf(__('%1$s: %2$s'), __('Recursive'), '');
-         Html::showCheckbox(['name' => 'is_recursive']);
+         Html::showCheckbox(array('name' => 'is_recursive'));
       }
    }
 
@@ -1051,7 +1030,7 @@ class Profile_User extends CommonDBRelation {
    **/
    static function getRelationInputForProcessingOfMassiveActions($action, CommonDBTM $item,
                                                                  array $ids, array $input) {
-      $result = [];
+      $result = array();
       if (isset($input['entities_id'])) {
          $result['entities_id'] = $input['entities_id'];
       }

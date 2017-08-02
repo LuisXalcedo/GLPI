@@ -1,6 +1,5 @@
 /config/config_db*
 /config/config_path.php
-/config/local_define.php
 /tests/config_db*
 /plugins/
 /files/
@@ -16,11 +15,4 @@
 /vendor/
 /nbproject/private/
 phpunit.xml
-/tests/code-coverage/
-/config/based_config.php
-/config/config.php
-/config/define.php
-/nbproject
-.composer.hash
-/css/**/*.min.css
-/js/*.min.js
+/coverage/

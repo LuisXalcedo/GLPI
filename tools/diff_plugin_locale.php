@@ -1,43 +1,44 @@
 #!/usr/bin/php
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
- */
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
 
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
+ */
+ 
 /** @file
 * @brief
 */
 
 $cmd = $_SERVER["argv"][0];
 
-function checkOne ($name, $tab = "") {
+function checkOne ($name, $tab="") {
    global $cmd;
 
    if (empty($tab)) {
@@ -86,15 +87,15 @@ function diffTab ($from, $dest, $name) {
 if (isset($_SERVER["argc"]) && $_SERVER["argc"]==2 && $_SERVER["argv"][1]=="all") {
 
    // For 0.71 plugin only
-   $exception = ["data_injection"  => "DATAINJECTIONLANG",
+   $exception = array("data_injection"  => "DATAINJECTIONLANG",
                       "hole"            => "LANG_HOLE",
                       "backups"         => "LANGBACKUP",
                       "reports"         => "GEDIFFREPORTLANG",
-                      "mass_ocs_import" => "OCSMASSIMPORTLANG"];
+                      "mass_ocs_import" => "OCSMASSIMPORTLANG");
 
    $dir = opendir(".");
    while (($file = readdir($dir)) !== false) {
-      if (is_dir($file) && substr($file, 0, 1)!=".") {
+      if (is_dir($file) && substr($file,0,1)!=".") {
          checkOne($file,
                   (is_file($file."/trunk/hook.php") ? "LANG" : (isset($exception[$file])
                                                                      ? $exception[$file] : "")));
@@ -133,3 +134,4 @@ if (isset($_SERVER["argc"]) && $_SERVER["argc"]==2 && $_SERVER["argv"][1]=="all"
    echo "\nusage $cmd  langue1   langue2   [ nomtableau | LANG ]\n";
    echo "\nusage $cmd  all\n\n";
 }
+?>

@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -53,8 +54,8 @@ if (!$auth->Login('glpi', 'glpi', true)) {
     exit('Authentication failed!');
 }
 
-// unset notifications
-NotificationSetting::disableAll();
+// Force mailing to false
+$CFG_GLPI["use_mailing"] = 0;
 
 $entity_number = 10;
 
@@ -174,7 +175,7 @@ $CONTRACT_PER_ITEM = 1;
 $MAX_DISK = 5;
 
 //Doc cache
-$DOCUMENTS = [];
+$DOCUMENTS = array();
 
 
 foreach ($MAX as $key => $val) {
@@ -182,8 +183,8 @@ foreach ($MAX as $key => $val) {
    $LAST[$key] = 0;
 }
 
-$net_port = [];
-$vlan_loc = [];
+$net_port = array();
+$vlan_loc = array();
 
 generateGlobalDropdowns();
 
@@ -198,24 +199,24 @@ generate_entity(0);
 // Entite
 $added = 0;
 $entity = new Entity ();
-for ($i=0; $i<max(1, pow($entity_number, 1/2))&&$added<$entity_number; $i++) {
+for ($i=0 ; $i<max(1,pow($entity_number,1/2))&&$added<$entity_number ; $i++) {
    $added++;
-   $newID = $entity->add(['name'      => "entity $i",
-                               'comment'   => "comment entity $i"]);
+   $newID = $entity->add(array('name'      => "entity $i",
+                               'comment'   => "comment entity $i"));
    generate_entity($newID);
 
-   for ($j=0; $j<mt_rand(0, pow($entity_number, 1/2))&&$added<$entity_number; $j++) {
+   for ($j=0 ; $j<mt_rand(0,pow($entity_number,1/2))&&$added<$entity_number ; $j++) {
       $added++;
-      $newID2 = $entity->add(['name'         => "s-entity $j",
+      $newID2 = $entity->add(array('name'         => "s-entity $j",
                                    'comment'      => "comment s-entity $j",
-                                   'entities_id'  => $newID]);
+                                   'entities_id'  => $newID));
       generate_entity($newID2);
 
-      for ($k=0; $k<mt_rand(0, pow($entity_number, 1/2))&&$added<$entity_number; $k++) {
+      for ($k=0 ; $k<mt_rand(0,pow($entity_number,1/2))&&$added<$entity_number ; $k++) {
          $added++;
-         $newID3 = $entity->add(['name'         => "ss-entity $k",
+         $newID3 = $entity->add(array('name'         => "ss-entity $k",
                                       'comment'      => "comment ss-entity $k",
-                                      'entities_id'  => $newID2]);
+                                      'entities_id'  => $newID2));
          generate_entity($newID3);
       }
    }

@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -58,8 +59,8 @@ class ProfileRight extends CommonDBChild {
       if (!isset($_SESSION['glpi_all_possible_rights'])
           ||(count($_SESSION['glpi_all_possible_rights']) == 0)) {
 
-         $_SESSION['glpi_all_possible_rights'] = [];
-         $rights = [];
+         $_SESSION['glpi_all_possible_rights'] = array();
+         $rights = array();
          $query  = "SELECT DISTINCT `name`
                     FROM `".self::getTable()."`";
          foreach ($DB->request($query) as $right) {
@@ -75,7 +76,7 @@ class ProfileRight extends CommonDBChild {
     * @param $profiles_id
     * @param $rights         array
    **/
-   static function getProfileRights($profiles_id, array $rights = []) {
+   static function getProfileRights($profiles_id, array $rights=array()) {
       global $DB;
 
       if (count($rights) == 0) {
@@ -88,7 +89,7 @@ class ProfileRight extends CommonDBChild {
                     WHERE `profiles_id` = '$profiles_id'
                           AND `name` IN ('".implode("', '", $rights)."')";
       }
-      $rights = [];
+      $rights = array();
       foreach ($DB->request($query) as $right) {
          $rights[$right['name']] = $right['rights'];
       }
@@ -105,7 +106,7 @@ class ProfileRight extends CommonDBChild {
       global $DB;
 
       $ok = true;
-      $_SESSION['glpi_all_possible_rights'] = [];
+      $_SESSION['glpi_all_possible_rights'] = array();
 
       $query = "SELECT `id`
                 FROM `glpi_profiles`";
@@ -133,7 +134,7 @@ class ProfileRight extends CommonDBChild {
    static function deleteProfileRights(array $rights) {
       global $DB;
 
-      $_SESSION['glpi_all_possible_rights'] = [];
+      $_SESSION['glpi_all_possible_rights'] = array();
       $ok                                   = true;
       foreach ($rights as $name) {
          $query = "DELETE FROM `glpi_profilerights`
@@ -156,7 +157,7 @@ class ProfileRight extends CommonDBChild {
    static function updateProfileRightAsOtherRight($right, $value, $condition) {
       global $DB;
 
-      $profiles = [];
+      $profiles = array();
       $ok       = true;
       foreach ($DB->request('glpi_profilerights', $condition) as $data) {
          $profiles[] = $data['profiles_id'];
@@ -165,7 +166,7 @@ class ProfileRight extends CommonDBChild {
          $query = "UPDATE `glpi_profilerights`
                    SET `rights` = `rights` | " . $value ."
                    WHERE `name` = '$right'
-                         AND `profiles_id` IN ('".implode("', '", $profiles)."')";
+                         AND `profiles_id` IN ('".implode("', '",$profiles)."')";
          if (!$DB->query($query)) {
             $ok = false;
          }
@@ -183,10 +184,10 @@ class ProfileRight extends CommonDBChild {
     *
     * @return boolean
    **/
-   static function updateProfileRightsAsOtherRights($newright, $initialright, $condition = '') {
+   static function updateProfileRightsAsOtherRights($newright, $initialright, $condition='') {
       global $DB;
 
-      $profiles = [];
+      $profiles = array();
       $ok       = true;
       if (empty($condition)) {
          $condition = "`name` = '$initialright'";
@@ -238,7 +239,7 @@ class ProfileRight extends CommonDBChild {
     * @param $profiles_id
     * @param $rights         array
     */
-   public static function updateProfileRights($profiles_id, array $rights = []) {
+   public static function updateProfileRights($profiles_id, array $rights=array()) {
 
       $me = new self();
       foreach ($rights as $name => $right) {
@@ -246,14 +247,14 @@ class ProfileRight extends CommonDBChild {
             if ($me->getFromDBByQuery("WHERE `profiles_id` = '$profiles_id'
                                              AND `name` = '$name'")) {
 
-               $input = ['id'          => $me->getID(),
-                              'rights'      => $right];
+               $input = array('id'          => $me->getID(),
+                              'rights'      => $right);
                $me->update($input);
 
             } else {
-               $input = ['profiles_id' => $profiles_id,
+               $input = array('profiles_id' => $profiles_id,
                               'name'        => $name,
-                              'rights'      => $right];
+                              'rights'      => $right);
                $me->add($input);
             }
          }
@@ -269,7 +270,7 @@ class ProfileRight extends CommonDBChild {
     *
     * @see CommonDBChild::post_updateItem()
    **/
-   function post_updateItem($history = 1) {
+   function post_updateItem($history=1) {
 
       // update current profile
       if (isset($_SESSION['glpiactiveprofile']['id'])
@@ -290,7 +291,7 @@ class ProfileRight extends CommonDBChild {
     * @param $values
     * @param $options   array
    **/
-   static function getSpecificValueToDisplay($field, $values, array $options = []) {
+   static function getSpecificValueToDisplay($field, $values, array $options=array()) {
 
       $itemtype = $options['searchopt']['rightclass'];
       $item     = new $itemtype();
@@ -320,7 +321,8 @@ class ProfileRight extends CommonDBChild {
     * @see CommonDBTM::getLogTypeID()
    **/
    function getLogTypeID() {
-      return ['Profile', $this->fields['profiles_id']];
+      return array('Profile', $this->fields['profiles_id']);
    }
 
 }
+?>

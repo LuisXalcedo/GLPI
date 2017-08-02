@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -35,12 +36,12 @@
 */
 
 // Ensure current directory when run from crontab
-chdir(__DIR__);
+chdir(dirname($_SERVER["SCRIPT_FILENAME"]));
 
 if (isset($_SERVER['argv'])) {
-   for ($i=1; $i<$_SERVER['argc']; $i++) {
+   for ($i=1 ; $i<$_SERVER['argc'] ; $i++) {
       $it    = explode("=", $_SERVER['argv'][$i], 2);
-      $it[0] = preg_replace('/^--/', '', $it[0]);
+      $it[0] = preg_replace('/^--/','',$it[0]);
 
       $_GET[$it[0]] = (isset($it[1]) ? $it[1] : true);
    }
@@ -128,24 +129,24 @@ if (($DB->numrows($result) == 0)
 function import(array $options) {
    global $CFG_GLPI;
 
-   $results = [AuthLDAP::USER_IMPORTED     => 0,
+   $results = array(AuthLDAP::USER_IMPORTED     => 0,
                     AuthLDAP::USER_SYNCHRONIZED => 0,
-                    AuthLDAP::USER_DELETED_LDAP => 0];
+                    AuthLDAP::USER_DELETED_LDAP => 0);
    //The ldap server id is passed in the script url (parameter server_id)
    $limitexceeded = false;
-   $actions_to_do = [];
+   $actions_to_do = array();
 
    switch ($options['action']) {
       case AuthLDAP::ACTION_IMPORT :
-         $actions_to_do = [AuthLDAP::ACTION_IMPORT];
+         $actions_to_do = array(AuthLDAP::ACTION_IMPORT);
         break;
 
       case AuthLDAP::ACTION_SYNCHRONIZE :
-         $actions_to_do = [AuthLDAP::ACTION_SYNCHRONIZE];
+         $actions_to_do = array(AuthLDAP::ACTION_SYNCHRONIZE);
         break;
 
       case AuthLDAP::ACTION_ALL :
-         $actions_to_do = [AuthLDAP::ACTION_IMPORT,AuthLDAP::ACTION_ALL];
+         $actions_to_do = array(AuthLDAP::ACTION_IMPORT,AuthLDAP::ACTION_ALL);
         break;
    }
 
@@ -157,8 +158,8 @@ function import(array $options) {
 
       if (is_array($users)) {
          foreach ($users as $user) {
-            $result = AuthLdap::ldapImportUserByServerId(['method' => AuthLDAP::IDENTIFIER_LOGIN,
-                                                               'value'  => $user["user"]],
+            $result = AuthLdap::ldapImportUserByServerId(array('method' => AuthLDAP::IDENTIFIER_LOGIN,
+                                                               'value'  => $user["user"]),
                                                          $action_to_do,
                                                          $options['ldapservers_id']);
             if ($result) {
@@ -187,3 +188,4 @@ function import(array $options) {
    }
    echo "\n\n";
 }
+?>

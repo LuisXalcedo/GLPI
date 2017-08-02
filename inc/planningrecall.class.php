@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -46,7 +47,7 @@ class PlanningRecall extends CommonDBChild {
    static public $itemtype        = 'itemtype';
    static public $items_id        = 'items_id';
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Planning reminder', 'Planning reminders', $nb);
    }
 
@@ -77,12 +78,12 @@ class PlanningRecall extends CommonDBChild {
       }
 
       $_SESSION['glpiplanningreminder_isavailable'] = 0;
-      if ($CFG_GLPI["use_notifications"]) {
+      if ($CFG_GLPI["use_mailing"]) {
          $task = new Crontask();
-         if ($task->getFromDBbyName('PlanningRecall', 'planningrecall')) {
+         if ($task->getFromDBbyName('PlanningRecall','planningrecall')) {
             // Only disabled by config
             if ($task->isDisabled() != 1) {
-               if (Session::haveRightsOr("planning", [Planning::READMY, Planning::READGROUP],
+               if (Session::haveRightsOr("planning", array(Planning::READMY, Planning::READGROUP),
                                                            Planning::READALL)) {
                   $_SESSION['glpiplanningreminder_isavailable'] = 1;
                }
@@ -114,7 +115,7 @@ class PlanningRecall extends CommonDBChild {
    /**
     * @see CommonDBTM::post_updateItem()
    **/
-   function post_updateItem($history = 1) {
+   function post_updateItem($history=1) {
 
       $alert = new Alert();
       $alert->clear($this->getType(), $this->fields['id'], Alert::ACTION);
@@ -154,13 +155,13 @@ class PlanningRecall extends CommonDBChild {
                                strtotime($item->fields[$data['field']]) - $data['before_time']);
                   if ($data['before_time'] >= 0) {
                      if ($pr->can($pr->fields['id'], UPDATE)) {
-                        $pr->update(['id'          => $pr->fields['id'],
+                        $pr->update(array('id'          => $pr->fields['id'],
                                           'before_time' => $data['before_time'],
-                                          'when'        => $when]);
+                                          'when'        => $when));
                      }
                   } else {
                      if ($pr->can($pr->fields['id'], PURGE)) {
-                        $pr->delete(['id' => $pr->fields['id']]);
+                        $pr->delete(array('id' => $pr->fields['id']));
                      }
                   }
                }
@@ -170,19 +171,19 @@ class PlanningRecall extends CommonDBChild {
       } else {
          // Recall does not exists : create it
          if ($pr->can(-1, CREATE, $data)) {
-            if ($item = getItemForItemtype($data['itemtype'])) {
-               $item->getFromDB($data['items_id']);
-               if ($item->getFromDB($data['items_id'])
-                       && isset($item->fields[$data['field']])
-                        && !empty($item->fields[$data['field']])) {
-                  $data['when'] = date("Y-m-d H:i:s",
-                                       strtotime($item->fields[$data['field']])
-                                                   - $data['before_time']);
-                  if ($data['before_time'] >= 0) {
-                     $pr->add($data);
+               if ($item = getItemForItemtype($data['itemtype'])) {
+                  $item->getFromDB($data['items_id']);
+                  if ($item->getFromDB($data['items_id'])
+                      && isset($item->fields[$data['field']])
+                      && !empty($item->fields[$data['field']])) {
+                     $data['when'] = date("Y-m-d H:i:s",
+                                          strtotime($item->fields[$data['field']])
+                                                      - $data['before_time']);
+                     if ($data['before_time'] >= 0) {
+                        $pr->add($data);
+                     }
                   }
                }
-            }
          }
       }
    }
@@ -222,7 +223,7 @@ class PlanningRecall extends CommonDBChild {
     *
     * @return nothing (print out an HTML select box) / return false if mandatory fields are not ok
    **/
-   static function dropdown($options = []) {
+   static function dropdown($options=array()) {
       global $DB, $CFG_GLPI;
 
       // Default values
@@ -247,32 +248,32 @@ class PlanningRecall extends CommonDBChild {
          $p['value'] = $pr->fields['before_time'];
       }
 
-      $possible_values                       = [];
+      $possible_values                       = array();
       $possible_values[Entity::CONFIG_NEVER] = __('None');
 
-      $min_values = [0, 15, 30, 45];
+      $min_values = array(0, 15, 30, 45);
       foreach ($min_values as $val) {
-         $possible_values[$val*MINUTE_TIMESTAMP] = sprintf(_n('%d minute', '%d minutes', $val),
+         $possible_values[$val*MINUTE_TIMESTAMP] = sprintf(_n('%d minute','%d minutes',$val),
                                                            $val);
       }
 
-      $h_values = [1, 2, 3, 4, 12];
+      $h_values = array(1, 2, 3, 4, 12);
       foreach ($h_values as $val) {
-         $possible_values[$val*HOUR_TIMESTAMP] = sprintf(_n('%d hour', '%d hours', $val), $val);
+         $possible_values[$val*HOUR_TIMESTAMP] = sprintf(_n('%d hour','%d hours',$val), $val);
       }
-      $d_values = [1, 2];
+      $d_values = array(1, 2);
       foreach ($d_values as $val) {
-         $possible_values[$val*DAY_TIMESTAMP] = sprintf(_n('%d day', '%d days', $val), $val);
+         $possible_values[$val*DAY_TIMESTAMP] = sprintf(_n('%d day','%d days',$val), $val);
       }
-      $w_values = [1];
+      $w_values = array(1);
       foreach ($w_values as $val) {
-         $possible_values[$val*7*DAY_TIMESTAMP] = sprintf(_n('%d week', '%d weeks', $val), $val);
+         $possible_values[$val*7*DAY_TIMESTAMP] = sprintf(_n('%d week','%d weeks',$val), $val);
       }
 
       ksort($possible_values);
 
       Dropdown::showFromArray('_planningrecall[before_time]', $possible_values,
-                              ['value' => $p['value']]);
+                              array('value' => $p['value']));
       echo "<input type='hidden' name='_planningrecall[itemtype]' value='".$p['itemtype']."'>";
       echo "<input type='hidden' name='_planningrecall[items_id]' value='".$p['items_id']."'>";
       echo "<input type='hidden' name='_planningrecall[users_id]' value='".$p['users_id']."'>";
@@ -295,7 +296,7 @@ class PlanningRecall extends CommonDBChild {
     *
     * @return nothing (print out an HTML select box) / return false if mandatory fields are not ok
    **/
-   static function specificForm($options = []) {
+   static function specificForm($options=array()) {
       global $CFG_GLPI;
 
       // Default values
@@ -335,9 +336,9 @@ class PlanningRecall extends CommonDBChild {
 
       switch ($name) {
          case 'planningrecall' :
-            return ['description' => __('Send planning recalls')];
+            return array('description' => __('Send planning recalls'));
       }
-      return [];
+      return array();
    }
 
 
@@ -346,10 +347,10 @@ class PlanningRecall extends CommonDBChild {
     *
     * @param $task for log, if NULL display (default NULL)
    **/
-   static function cronPlanningRecall($task = null) {
+   static function cronPlanningRecall($task=NULL) {
       global $DB, $CFG_GLPI;
 
-      if (!$CFG_GLPI["use_notifications"]) {
+      if (!$CFG_GLPI["use_mailing"]) {
          return 0;
       }
 
@@ -387,3 +388,4 @@ class PlanningRecall extends CommonDBChild {
    }
 
 }
+?>

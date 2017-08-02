@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -42,12 +43,13 @@ if (!$CFG_GLPI["use_anonymous_helpdesk"]) {
 
 // Send UTF8 Headers
 header("Content-Type: text/html; charset=UTF-8");
-echo "<!DOCTYPE html>\n";
-echo "<html lang=\"{$CFG_GLPI["languages"][$_SESSION['glpilanguage']][3]}\">";
+
 ?>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
 <head>
-    <meta charset="utf-8">
-    <title>GLPI</title>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+<title>GLPI</title>
 
 <?php
 // Appel CSS
@@ -61,7 +63,7 @@ echo "<script type='text/javascript' src='".$CFG_GLPI["root_doc"]."/script.js'><
 </head>
 
 <body>
-    <script type="text/javascript">
+<script language="javascript" type="text/javascript">
 function fillidfield(Type,Id) {
 
    window.opener.document.forms["helpdeskform"].elements["items_id"].value = Id;
@@ -98,11 +100,11 @@ if (isset($_POST["send"])) {
    echo " <td class='center b' width='10%'>".__('Inventory number')."</td>";
    echo " </tr>";
 
-   $types = ['Computer'         => __('Computer'),
+   $types = array('Computer'         => __('Computer'),
                   'NetworkEquipment' => __('Network device'),
                   'Printer'          => __('Printer'),
                   'Monitor'          => __('Monitor'),
-                  'Peripheral'       => __('Device')];
+                  'Peripheral'       => __('Device'));
    foreach ($types as $type => $label) {
       $query = "SELECT `name`, `id`, `contact`, `serial`, `otherserial`
                 FROM `".getTableForItemType($type)."`
@@ -155,3 +157,4 @@ if (isset($_POST["send"])) {
    echo "</table>";
 }
 echo '</body></html>';
+?>

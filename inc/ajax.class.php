@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -43,34 +44,33 @@ if (!defined('GLPI_ROOT')) {
 **/
 class Ajax {
 
+
    /**
     * Create modal window
     * After display it using $name.dialog("open");
     *
     * @since version 0.84
     *
-    * @param string   $name    name of the js object
-    * @param string   $url     URL to display in modal
-    * @param string[] $options Possible options:
+    * @param $name            name of the js object
+    * @param $url             URL to display in modal
+    * @param $options array   of possible options:
     *     - width      (default 800)
     *     - height     (default 400)
-    *     - modal      is a modal window? (default true)
+    *     - modal      is a modal window ? (default true)
     *     - container  specify a html element to render (default empty to html.body)
     *     - title      window title (default empty)
-    *     - display    display or get string? (default true)
-    *
-    * @return void|string (see $options['display'])
-    */
-   static function createModalWindow($name, $url, $options = []) {
+    *     - display    display or get string ? (default true)
+   **/
+   static function createModalWindow($name, $url, $options=array() ) {
 
-      $param = ['width'           => 800,
+      $param = array('width'           => 800,
                      'height'          => 400,
                      'modal'           => true,
                      'container'       => '',
                      'title'           => '',
-                     'extraparams'     => [],
+                     'extraparams'     => array(),
                      'display'         => true,
-                     'js_modal_fields' => ''];
+                     'js_modal_fields' => '');
 
       if (count($options)) {
          foreach ($options as $key => $val) {
@@ -96,7 +96,7 @@ class Ajax {
          open: function (){
             var fields = ";
       if (is_array($param['extraparams']) && count($param['extraparams'])) {
-         $out .= json_encode($param['extraparams'], JSON_FORCE_OBJECT);
+         $out .= json_encode($param['extraparams'],JSON_FORCE_OBJECT);
       } else {
          $out .= '{}';
       }
@@ -116,104 +116,6 @@ class Ajax {
       }
    }
 
-   /**
-    * Create a side slide panel
-    *
-    * @param string $name    name of the js object
-    * @param array  $options Possible options:
-    *          - title       Title to display
-    *          - position    position (either left or right - defaults to right)
-    *          - display     display or get string? (default true)
-    *          - icon        Path to aditional icon
-    *          - icon_url    Link for aditional icon
-    *          - icon_txt    Alternative text and title for aditional icon_
-    *
-    * @return void|string (see $options['display'])
-    */
-   static function createSlidePanel($name, $options = []) {
-      global $CFG_GLPI;
-
-      $param = [
-         'title'     => '',
-         'position'  => 'right',
-         'url'       => '',
-         'display'   => true,
-         'icon'      => false,
-         'icon_url'  => false,
-         'icon_txt'  => false
-      ];
-
-      if (count($options)) {
-         foreach ($options as $key => $val) {
-            if (isset($param[$key])) {
-               $param[$key] = $val;
-            }
-         }
-      }
-
-      $out  =  "<script type='text/javascript'>\n";
-      $out .= "$(function() {";
-      $out .= "$('<div id=\'$name\' class=\'slidepanel on{$param['position']}\'><div class=\"header\">" .
-         "<button type=\'button\' class=\'close ui-button ui-widget ui-state-default ui-corner-all ui-button-icon-only ui-dialog-titlebar-close\' title=\'". __('Close') . "\'><span class=\'ui-button-icon-primary ui-icon ui-icon-closethick\'></span><span class=\'ui-button-text\'>". __('Close') ."</span></button>";
-
-      if ($param['icon']) {
-         $icon = "<img class=\'icon\' src=\'{$CFG_GLPI['root_doc']}{$param['icon']}\' alt=\'{$param['icon_txt']}\' title=\'{$param['icon_txt']}\'/>";
-         if ($param['icon_url']) {
-            $out .= "<a href=\'{$param['icon_url']}\'>$icon</a>";
-         } else {
-            $out .= $icon;
-         }
-      }
-
-      if ($param['title'] != '') {
-         $out .= "<h3>{$param['title']}</h3>";
-      }
-
-      $out .= "</div><div class=\'contents\'></div></div>')
-         .hide()
-         .appendTo('body');\n";
-      $out .= "$('#{$name} .close').on('click', function() {
-         $('#$name').hide(
-            'slow',
-            function () {
-               $(this).find('.contents').empty();
-            }
-         );
-       });\n";
-      $out .= "$('#{$name}Link').on('click', function() {
-         $('#$name').show(
-            'slow',
-            function() {
-               _load$name();
-            }
-         );
-      });\n";
-      $out .= "});";
-      if ($param['url'] != null) {
-         $out .= "var _load$name = function() {
-            $.ajax({
-               url: '{$param['url']}',
-               beforeSend: function() {
-                  var _loader = $('<div id=\'loadingslide\'><div class=\'loadingindicator\'>" . __s('Loading...') . "</div></div>');
-                  $('#$name .contents').html(_loader);
-               },
-               complete: function() {
-                  $('#loadingslide').remove();
-               },
-               success: function(res) {
-                  $('#$name .contents').html(res);
-               }
-            });
-         };\n";
-      }
-      $out .= "</script>";
-
-      if ($param['display']) {
-         echo $out;
-      } else {
-         return $out;
-      }
-   }
 
    /**
     * Create fixed modal window
@@ -221,25 +123,23 @@ class Ajax {
     *
     * @since version 0.84
     *
-    * @param string $name    name of the js object
-    * @param array  $options Possible options:
+    * @param $name            name of the js object
+    * @param $options array   of possible options:
     *          - width       (default 800)
     *          - height      (default 400)
-    *          - modal       is a modal window? (default true)
+    *          - modal       is a modal window ? (default true)
     *          - container   specify a html element to render (default empty to html.body)
     *          - title       window title (default empty)
-    *          - display     display or get string? (default true)
-    *
-    * @return void|string (see $options['display'])
-    */
-   static function createFixedModalWindow($name, $options = []) {
+    *          - display     display or get string ? (default true)
+   **/
+   static function createFixedModalWindow($name, $options=array() ) {
 
-      $param = ['width'     => 800,
+      $param = array('width'     => 800,
                      'height'    => 400,
                      'modal'     => true,
                      'container' => '',
                      'title'     => '',
-                     'display'   => true];
+                     'display'   => true);
 
       if (count($options)) {
          foreach ($options as $key => $val) {
@@ -250,7 +150,6 @@ class Ajax {
       }
 
       $out  =  "<script type='text/javascript'>\n";
-      $out .= "$(function() {";
       $out .= "var $name=";
       if (!empty($param['container'])) {
          $out .= Html::jsGetElementbyID(Html::cleanId($param['container']));
@@ -263,7 +162,7 @@ class Ajax {
          height:".$param['height'].",\n
          modal: ".($param['modal']?'true':'false').",\n
          title: \"".addslashes($param['title'])."\"\n
-         });\n});";
+         });\n";
       $out .= "</script>";
 
       if ($param['display']) {
@@ -281,26 +180,24 @@ class Ajax {
     *
     * @since version 0.85
     *
-    * @param string $domid   DOM ID of the js object
-    * @param string $url     URL to display in modal
-    * @param array  $options Possible options:
+    * @param $domid           DOM ID of the js object
+    * @param $url             URL to display in modal
+    * @param $options array   of possible options:
     *          - width          (default 800)
     *          - height         (default 400)
-    *          - modal          is a modal window? (default true)
+    *          - modal          is a modal window ? (default true)
     *          - title          window title (default empty)
-    *          - display        display or get string? (default true)
-    *          - reloadonclose  reload main page on close? (default false)
-    *
-    * @return void|string (see $options['display'])
-    */
-   static function createIframeModalWindow($domid, $url, $options = []) {
+    *          - display        display or get string ? (default true)
+    *          - reloadonclose  reload main page on close ? (default false)
+   **/
+   static function createIframeModalWindow($domid, $url, $options=array() ) {
 
-      $param = ['width'         => 1050,
+      $param = array('width'         => 1050,
                      'height'        => 500,
                      'modal'         => true,
                      'title'         => '',
                      'display'       => true,
-                     'reloadonclose' => false];
+                     'reloadonclose' => false);
 
       if (count($options)) {
          foreach ($options as $key => $val) {
@@ -309,13 +206,13 @@ class Ajax {
             }
          }
       }
-      $url .= (strstr($url, '?') ?'&' :  '?').'_in_modal=1';
+      $url .= (strstr($url,'?') ?'&' :  '?').'_in_modal=1';
 
       $out  = "<div id=\"$domid\">";
-      $out .= "<iframe id='Iframe$domid' class='iframe hidden'></iframe></div>";
+      $out .= "<iframe id='Iframe$domid' width='100%' height='100%' marginWidth='0' marginHeight='0'
+                frameBorder='0' scrolling='auto'></iframe></div>";
 
       $out .= "<script type='text/javascript'>
-         $(function() {
             $('#$domid').dialog({
                modal: true,
                autoOpen: false,
@@ -324,13 +221,12 @@ class Ajax {
                draggable: true,
                resizeable: true,
                open: function(ev, ui){
-               $('#Iframe$domid').attr('src','$url').removeClass('hidden');},";
+               $('#Iframe$domid').attr('src','$url');},";
       if ($param['reloadonclose']) {
          $out .= "close: function(ev, ui) { window.location.reload() },";
       }
 
       $out.= "title: \"".addslashes($param['title'])."\"});
-         });
             </script>";
 
       if ($param['display']) {
@@ -342,44 +238,64 @@ class Ajax {
 
 
    /**
-    *  Create Ajax Tabs apply to 'tabspanel' div. Content is displayed in 'tabcontent'
+    * Input text used as search system in ajax system
     *
-    * @param string  $tabdiv_id        ID of the div containing the tabs (default 'tabspanel')
-    * @param string  $tabdivcontent_id ID of the div containing the content loaded by tabs (default 'tabcontent')
-    * @param array   $tabs             Tabs to create : tabs is array('key' => array('title'=> 'x',
-    *                                  tabs is array('key' => array('title'=> 'x',
-    *                                                                   url    => 'url_toload',
-    *                                                                   params => 'url_params')...
-    * @param string  $type             itemtype for active tab
-    * @param integer $ID               ID of element for active tab (default 0)
-    * @param string  $orientation      orientation of tabs (default vertical may also be horizontal)
-    * @param array   $options          Display options
+    * @param $id   ID of the ajax item
+    * @param $size size of the input text field (default 4)
+    * @deprecated since version 0.85
+   **/
+   static function displaySearchTextForDropdown($id, $size=4) {
+      echo self::getSearchTextForDropdown($id, $size);
+   }
+
+
+   /**
+    * Input text used as search system in ajax system
+    * @since version 0.84
     *
-    * @return void
-    */
-   static function createTabs(
-      $tabdiv_id = 'tabspanel',
-      $tabdivcontent_id = 'tabcontent',
-      $tabs = [],
-      $type = '',
-      $ID = 0,
-      $orientation = 'vertical',
-      $options = []
-   ) {
+    * @param $id   ID of the ajax item
+    * @param $size size of the input text field (default 4)
+    * @deprecated since version 0.85
+   **/
+   static function getSearchTextForDropdown($id, $size=4) {
       global $CFG_GLPI;
 
-      // TODO need to clean params !!
-      $active_tabs = Session::getActiveTab($type);
+      //TRANS: %s is the character used as wildcard in ajax search
+//       return "<input title=\"".sprintf(__s('Search (%s for all)'), $CFG_GLPI["ajax_wildcard"]).
+//              "\" type='text' ondblclick=\"this.value='".
+//              $CFG_GLPI["ajax_wildcard"]."';\" id='search_$id' name='____data_$id' size='$size'>\n";
+      return "<input title=\"".sprintf(__s('Search (%s for all)'), '*').
+             "\" type='text' ondblclick=\"this.value='*';\" id='search_$id' name='____data_$id' size='$size'>\n";
+   }
 
-      $mainclass = '';
-      if (isset($options['main_class'])) {
-         $mainclass = " {$options['main_class']}";
-      }
+
+   /**
+    *  Create Ajax Tabs apply to 'tabspanel' div. Content is displayed in 'tabcontent'
+    *
+    * @param $tabdiv_id                ID of the div containing the tabs (default 'tabspanel')
+    * @param $tabdivcontent_id         ID of the div containing the content loaded by tabs
+    *                                  (default 'tabcontent')
+    * @param $tabs               array of tabs to create :
+    *                                  tabs is array('key' => array('title'=> 'x',
+    *                                                                url    => 'url_toload',
+    *                                                                params => 'url_params')...
+    * @param $type                     itemtype for active tab
+    * @param $ID                       ID of element for active tab (default 0)
+    * @param $orientation              orientation of tabs (default vertical may also be horizontal)
+    *
+    * @return nothing
+   **/
+   static function createTabs($tabdiv_id='tabspanel', $tabdivcontent_id='tabcontent', $tabs=array(),
+                              $type, $ID=0, $orientation='vertical') {
+      global $CFG_GLPI;
+
+      /// TODO need to clean params !!
+      $active_tabs = Session::getActiveTab($type);
 
       $rand = mt_rand();
       if (count($tabs) > 0) {
-         echo "<div id='tabs$rand' class='center$mainclass $orientation'>";
-         if (CommonGLPI::isLayoutWithMain()
+         echo "<div id='tabs$rand' class='center $orientation'>";
+         if (CommonGLPI::isLayoutWithMain() 
              && !CommonGLPI::isLayoutExcludedPage()) {
             $orientation = 'horizontal';
          }
@@ -391,18 +307,28 @@ class Ajax {
                $selected_tab = $current;
             }
             echo "<li><a title=\"".
-                 str_replace(["<sup class='tab_nb'>", '</sup>'], '', $val['title'])."\" ";
+                 str_replace(array("<sup class='tab_nb'>", '</sup>'),'',$val['title'])."\" ";
             echo " href='".$val['url'].(isset($val['params'])?'?'.$val['params']:'')."'>";
             // extract sup information
-            // $title = '';
-            // $limit = 16;
+//             $title = '';
+//             $limit = 16;
             // No title strip for horizontal menu
-            $title = $val['title'];
+//             if ($orientation == 'vertical') {
+//                if (preg_match('/(.*)(<sup>.*<\/sup>)/',$val['title'], $regs)) {
+//                   $title = Html::resume_text(trim($regs[1]),$limit-2).$regs[2];
+//                } else {
+//                   $title = Html::resume_text(trim($val['title']),$limit);
+//                }
+//             } else {
+               $title = $val['title'];
+//             }
             echo $title."</a></li>";
             $current ++;
          }
          echo "</ul>";
          echo "</div>";
+         echo "<div id='loadingtabs$rand' class='invisible'>".
+              "<div class='loadingindicator'>".__s('Loading...')."</div></div>";
          $js = "
          forceReload$rand = false;
          $('#tabs$rand').tabs({
@@ -413,25 +339,9 @@ class Ajax {
                    && !forceReload$rand) {
                   event.preventDefault();
                } else {
+                  ui.panel.html($('#loadingtabs$rand').html());
                   forceReload$rand = false;
-                  var _loader = $('<div id=\'loadingtabs\'><div class=\'loadingindicator\'>" . __s('Loading...') . "</div></div>');
-                  ui.panel.html(_loader);
-
-                  ui.jqXHR.complete(function() {
-                     $('#loadingtabs').remove();
-                  });
-
-                  ui.jqXHR.error(function(e) {
-                     console.log(e);
-                     ui.panel.html(
-                        '<div class=\'error\'><h3>" .
-                        __('An error occured loading contents!')  . "</h3><p>" .
-                        __('Please check GLPI logs or contact your administrator.')  .
-                        "<br/>" . __('or') . " <a href=\'#\' onclick=\'return reloadTab()\'>" . __('try to reload')  . "</a></p></div>'
-                     );
-                  });
-               }
-
+                }
                var newIndex = ui.tab.parent().children().index(ui.tab);
                $.get('".$CFG_GLPI['root_doc']."/ajax/updatecurrenttab.php',
                   { itemtype: '$type', id: '$ID', tab: newIndex });
@@ -469,27 +379,24 @@ class Ajax {
    /**
     * Javascript code for update an item when another item changed
     *
-    * @param string  $toobserve    id (or array of id) of the select to observe
-    * @param string  $toupdate     id of the item to update
-    * @param string  $url          Url to get datas to update the item
-    * @param array   $parameters   of parameters to send to ajax URL
-    * @param array   $events       of the observed events (default 'change')
-    * @param integer $minsize      minimum size of data to update content (default -1)
-    * @param integer $buffertime   minimum time to wait before reload (default -1)
-    * @param array   $forceloadfor of content which must force update content
-    * @param boolean $display      display or get string (default true)
-    *
-    * @return void|string (see $display)
-    */
-   static function updateItemOnEvent($toobserve, $toupdate, $url, $parameters = [],
-                                     $events = ["change"], $minsize = -1, $buffertime = -1,
-                                     $forceloadfor = [], $display = true) {
+    * @param $toobserve             id (or array of id) of the select to observe
+    * @param $toupdate              id of the item to update
+    * @param $url                   Url to get datas to update the item
+    * @param $parameters   array    of parameters to send to ajax URL
+    * @param $events       array    of the observed events (default 'change')
+    * @param $minsize               minimum size of data to update content (default -1)
+    * @param $buffertime            minimum time to wait before reload (default -1)
+    * @param $forceloadfor array    of content which must force update content
+    * @param $display      boolean  display or get string (default true)
+   **/
+   static function updateItemOnEvent($toobserve, $toupdate, $url, $parameters=array(),
+                                     $events=array("change"), $minsize=-1, $buffertime=-1,
+                                     $forceloadfor=array(), $display=true) {
 
       $output  = "<script type='text/javascript'>";
-      $output .= "$(function() {";
       $output .= self::updateItemOnEventJsCode($toobserve, $toupdate, $url, $parameters, $events,
                                                $minsize, $buffertime, $forceloadfor, false);
-      $output .=  "});</script>";
+      $output .=  "</script>";
       if ($display) {
          echo $output;
       } else {
@@ -501,52 +408,54 @@ class Ajax {
    /**
     * Javascript code for update an item when a select item changed
     *
-    * @param string  $toobserve  id of the select to observe
-    * @param string  $toupdate   id of the item to update
-    * @param string  $url        Url to get datas to update the item
-    * @param array   $parameters of parameters to send to ajax URL
-    * @param boolean $display    display or get string (default true)
-    *
-    * @return void|string (see $display)
-    */
-   static function updateItemOnSelectEvent($toobserve, $toupdate, $url, $parameters = [],
-                                           $display = true) {
+    * @param $toobserve             id of the select to observe
+    * @param $toupdate              id of the item to update
+    * @param $url                   Url to get datas to update the item
+    * @param $parameters   array    of parameters to send to ajax URL
+    * @param $display      boolean  display or get string (default true)
+   **/
+   static function updateItemOnSelectEvent($toobserve, $toupdate, $url, $parameters=array(),
+                                           $display=true) {
 
-      return self::updateItemOnEvent($toobserve, $toupdate, $url, $parameters, ["change"],
-                                     -1, -1, [], $display);
+      return self::updateItemOnEvent($toobserve, $toupdate, $url, $parameters, array("change"),
+                                     -1, -1, array(), $display);
    }
 
 
    /**
     * Javascript code for update an item when a Input text item changed
     *
-    * @param string  $toobserve    id of the Input text to observe
-    * @param string  $toupdate     id of the item to update
-    * @param string  $url          Url to get datas to update the item
-    * @param array   $parameters   of parameters to send to ajax URL
-    * @param integer $minsize      minimum size of data to update content (default -1)
-    * @param integer $buffertime   minimum time to wait before reload (default -1)
-    * @param array   $forceloadfor of content which must force update content
-    * @param boolean $display      display or get string (default true)
+    * @param $toobserve             id of the Input text to observe
+    * @param $toupdate              id of the item to update
+    * @param $url                   Url to get datas to update the item
+    * @param $parameters   array    of parameters to send to ajax URL
+    * @param $minsize               minimum size of data to update content (default -1)
+    * @param $buffertime            minimum time to wait before reload (default -1)
+    * @param $forceloadfor array    of content which must force update content
+    * @param $display      boolean  display or get string (default true)
     *
-    * @return void|string (see $display)
-    */
-   static function updateItemOnInputTextEvent($toobserve, $toupdate, $url, $parameters = [],
-                                              $minsize = -1, $buffertime = -1, $forceloadfor = [],
-                                              $display = true) {
+   **/
+   static function updateItemOnInputTextEvent($toobserve, $toupdate, $url, $parameters=array(),
+                                              $minsize=-1, $buffertime=-1, $forceloadfor=array(),
+                                              $display=true) {
+      global $CFG_GLPI;
 
       if (count($forceloadfor) == 0) {
-         $forceloadfor = ['*'];
+//          $forceloadfor = array($CFG_GLPI['ajax_wildcard']);
+         $forceloadfor = array('*');
       }
       // Need to define min size for text search
       if ($minsize < 0) {
+//          $minsize = $CFG_GLPI['ajax_min_textsearch_load'];
          $minsize = 0;
       }
       if ($buffertime < 0) {
          $buffertime = 0;
+//         $buffertime = $CFG_GLPI['ajax_buffertime_load'];
       }
+
       return self::updateItemOnEvent($toobserve, $toupdate, $url, $parameters,
-                                     ["dblclick", "keyup"], $minsize, $buffertime,
+                                     array("dblclick", "keyup"),  $minsize, $buffertime,
                                      $forceloadfor, $display);
    }
 
@@ -554,26 +463,24 @@ class Ajax {
    /**
     * Javascript code for update an item when another item changed (Javascript code only)
     *
-    * @param string  $toobserve    id (or array of id) of the select to observe
-    * @param string  $toupdate     id of the item to update
-    * @param string  $url          Url to get datas to update the item
-    * @param array   $parameters   of parameters to send to ajax URL
-    * @param array   $events       of the observed events (default 'change')
-    * @param integer $minsize      minimum size of data to update content (default -1)
-    * @param integer $buffertime   minimum time to wait before reload (default -1)
-    * @param array   $forceloadfor of content which must force update content
-    * @param boolean $display      display or get string (default true)
-    *
-    * @return void|string (see $display)
-    */
-   static function updateItemOnEventJsCode($toobserve, $toupdate, $url, $parameters = [],
-                                           $events = ["change"], $minsize = -1, $buffertime = -1,
-                                           $forceloadfor = [], $display = true) {
+    * @param $toobserve             id (or array of id) of the select to observe
+    * @param $toupdate              id of the item to update
+    * @param $url                   Url to get datas to update the item
+    * @param $parameters   array    of parameters to send to ajax URL
+    * @param $events       array    of the observed events (default 'change')
+    * @param $minsize               minimum size of data to update content (default -1)
+    * @param $buffertime            minimum time to wait before reload (default -1)
+    * @param $forceloadfor array    of content which must force update content
+    * @param $display      boolean  display or get string (default true)
+   **/
+   static function updateItemOnEventJsCode($toobserve, $toupdate, $url, $parameters=array(),
+                                           $events=array("change"), $minsize = -1, $buffertime=-1,
+                                           $forceloadfor=array(), $display=true) {
 
       if (is_array($toobserve)) {
          $zones = $toobserve;
       } else {
-         $zones = [$toobserve];
+         $zones = array($toobserve);
       }
       $output = '';
       foreach ($zones as $zone) {
@@ -582,37 +489,37 @@ class Ajax {
                $output .= "var last$zone$event = 0;";
             }
             $output .= Html::jsGetElementbyID(Html::cleanId($zone)).".on(
-               '$event',
-               function(event) {";
-            // TODO manage buffer time !!?
-            // if ($buffertime > 0) {
-            //    $output.= "var elapsed = new Date().getTime() - last$zone$event;
-            //          last$zone$event = new Date().getTime();
-            //          if (elapsed < $buffertime) {
-            //             return;
-            //          }";
-            // }
-
-            $condition = '';
-            if ($minsize >= 0) {
-               $condition = Html::jsGetElementbyID(Html::cleanId($zone)).".val().length >= $minsize ";
-            }
-            if (count($forceloadfor)) {
-               foreach ($forceloadfor as $value) {
-                  if (!empty($condition)) {
-                     $condition .= " || ";
+                '$event',
+                function(event) {";
+                  /// TODO manage buffer time !! ?
+                  if ($buffertime > 0) {
+//                      $output.= "var elapsed = new Date().getTime() - last$zone$event;
+//                            last$zone$event = new Date().getTime();
+//                            if (elapsed < $buffertime) {
+//                               return;
+//                            }";
                   }
-                  $condition .= Html::jsGetElementbyID(Html::cleanId($zone)).".val() == '$value'";
-               }
-            }
-            if (!empty($condition)) {
-               $output .= "if ($condition) {";
-            }
-            $output .= self::updateItemJsCode($toupdate, $url, $parameters, $toobserve, false);
-            if (!empty($condition)) {
-               $output .= "}";
-            }
-            $output .=  "}";
+
+                  $condition = '';
+                  if ($minsize >= 0) {
+                     $condition = Html::jsGetElementbyID(Html::cleanId($zone)).".val().length >= $minsize ";
+                  }
+                  if (count($forceloadfor)) {
+                     foreach ($forceloadfor as $value) {
+                        if (!empty($condition)) {
+                           $condition .= " || ";
+                        }
+                        $condition .= Html::jsGetElementbyID(Html::cleanId($zone)).".val() == '$value'";
+                     }
+                  }
+                  if (!empty($condition)) {
+                     $output .= "if ($condition) {";
+                  }
+                  $output .= self::updateItemJsCode($toupdate, $url, $parameters, $toobserve, false);
+                  if (!empty($condition)) {
+                     $output .= "}";
+                  }
+               $output .=  "}";
             $output .=");\n";
          }
       }
@@ -627,16 +534,14 @@ class Ajax {
    /**
     * Javascript code for update an item (Javascript code only)
     *
-    * @param array   $options Options :
+    * @param $options    array    of options
     *  - toupdate : array / Update a specific item on select change on dropdown
     *               (need value_fieldname, to_update,
     *                url (@see Ajax::updateItemOnSelectEvent for information)
     *                and may have moreparams)
-    * @param boolean $display display or get string (default true)
-    *
-    * @return void|string (see $display)
-    */
-   static function commonDropdownUpdateItem($options, $display = true) {
+    * @param $display    boolean  display or get string (default true)
+   **/
+   static function commonDropdownUpdateItem($options, $display=true) {
 
       $field     = '';
       $fieldname = '';
@@ -660,12 +565,12 @@ class Ajax {
          if (is_array($datas) && count($datas)) {
             // Put it in array
             if (isset($datas['to_update'])) {
-               $datas = [$datas];
+               $datas = array($datas);
             }
             foreach ($datas as $data) {
-               $paramsupdate = [];
+               $paramsupdate = array();
                if (isset($data['value_fieldname'])) {
-                  $paramsupdate = [$data['value_fieldname'] => '__VALUE__'];
+                  $paramsupdate = array($data['value_fieldname'] => '__VALUE__');
                }
 
                if (isset($data["moreparams"])
@@ -677,9 +582,9 @@ class Ajax {
                   }
                }
 
-               $output .= self::updateItemOnSelectEvent("dropdown_".$options["name"].$options["rand"],
-                                                        $data['to_update'], $data['url'],
-                                                        $paramsupdate, $display);
+             $output .= self::updateItemOnSelectEvent("dropdown_".$options["name"].$options["rand"],
+                                                      $data['to_update'], $data['url'],
+                                                      $paramsupdate, $display);
             }
          }
       }
@@ -694,18 +599,16 @@ class Ajax {
    /**
     * Javascript code for update an item (Javascript code only)
     *
-    * @param string       $toupdate   id of the item to update
-    * @param string       $url        Url to get datas to update the item
-    * @param array        $parameters of parameters to send to ajax URL
-    * @param string|array $toobserve  id of another item used to get value in case of __VALUE__ used or array    of id to get value in case of __VALUE#__ used (default '')
+    * @param $toupdate              id of the item to update
+    * @param $url                   Url to get datas to update the item
+    * @param $parameters   array    of parameters to send to ajax URL
+    * @param $toobserve             id of another item used to get value in case of __VALUE__ used
     *                               or
     *                      array    of id to get value in case of __VALUE#__ used (default '')
-    * @param boolean      $display    display or get string (default true)
-    *
-    * @return void|string (see $display)
-    */
-   static function updateItemJsCode($toupdate, $url, $parameters = [], $toobserve = "",
-                                    $display = true) {
+    * @param $display      boolean  display or get string (default true)
+   **/
+   static function updateItemJsCode($toupdate, $url, $parameters=array(), $toobserve="",
+                                    $display=true) {
 
       $out = Html::jsGetElementbyID($toupdate).".load('$url'\n";
       if (count($parameters)) {
@@ -719,7 +622,7 @@ class Ajax {
             }
 
             $out .= $key.":";
-            if (!is_array($val) && preg_match('/^__VALUE(\d+)__$/', $val, $regs)) {
+            if (!is_array($val) && preg_match('/^__VALUE(\d+)__$/',$val,$regs)) {
                $out .=  Html::jsGetElementbyID(Html::cleanId($toobserve[$regs[1]])).".val()";
 
             } else if (!is_array($val) && $val==="__VALUE__") {
@@ -743,21 +646,19 @@ class Ajax {
    /**
     * Javascript code for update an item
     *
-    * @param string  $toupdate   id of the item to update
-    * @param string  $url        Url to get datas to update the item
-    * @param array   $parameters of parameters to send to ajax URL
-    * @param string  $toobserve  id of another item used to get value in case of __VALUE__ used
+    * @param $toupdate              id of the item to update
+    * @param $url                   Url to get datas to update the item
+    * @param $parameters   array    of parameters to send to ajax URL
+    * @param $toobserve             id of another item used to get value in case of __VALUE__ used
     *                               (default '')
-    * @param boolean $display    display or get string (default true)
+    * @param $display      boolean  display or get string (default true)
     *
-    * @return void|string (see $display)
-    */
-   static function updateItem($toupdate, $url, $parameters = [], $toobserve = "", $display = true) {
+   **/
+   static function updateItem($toupdate, $url, $parameters=array(), $toobserve="", $display=true) {
 
-      $output  = "<script type='text/javascript'>";
-      $output .= "$(function() {";
-      $output .= self::updateItemJsCode($toupdate, $url, $parameters, $toobserve, false);
-      $output .= "});</script>";
+      $output = "<script type='text/javascript'>";
+      $output .= self::updateItemJsCode($toupdate,$url,$parameters,$toobserve, false);
+      $output .= "</script>";
       if ($display) {
          echo $output;
       } else {
@@ -766,3 +667,4 @@ class Ajax {
    }
 
 }
+?>

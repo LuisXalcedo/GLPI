@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -49,7 +50,7 @@ class ComputerDisk extends CommonDBChild {
    public $dohistory       = true;
 
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Volume', 'Volumes', $nb);
    }
 
@@ -63,7 +64,7 @@ class ComputerDisk extends CommonDBChild {
    /**
     * @see CommonGLPI::getTabNameForItem()
    **/
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       // can exists for template
       if (($item->getType() == 'Computer')
@@ -71,7 +72,7 @@ class ComputerDisk extends CommonDBChild {
          $nb = 0;
          if ($_SESSION['glpishow_count_on_tabs']) {
             $nb = countElementsInTable('glpi_computerdisks',
-                                       ['computers_id' => $item->getID(), 'is_deleted' => 0 ]);
+                                       "computers_id = '".$item->getID()."' AND `is_deleted`='0'");
          }
          return self::createTabEntry(self::getTypeName(Session::getPluralNumber()), $nb);
       }
@@ -84,7 +85,7 @@ class ComputerDisk extends CommonDBChild {
     * @param $tabnum          (default 1)
     * @param $withtemplate    (default 0)
     */
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       self::showForComputer($item, $withtemplate);
       return true;
@@ -96,12 +97,12 @@ class ComputerDisk extends CommonDBChild {
     *
     * @since version 0.85
    **/
-   function defineTabs($options = []) {
+   function defineTabs($options=array()) {
 
-      $ong = [];
+      $ong = array();
       $this->addDefaultFormTab($ong);
       $this->addStandardTab('Log', $ong, $options);
-
+      
       return $ong;
    }
 
@@ -140,7 +141,7 @@ class ComputerDisk extends CommonDBChild {
     *
     * @return true if displayed  false if item not found or not right to display
    **/
-   function showForm($ID, $options = []) {
+   function showForm($ID, $options=array()) {
       global $CFG_GLPI;
 
       if (!Session::haveRight("computer", UPDATE)) {
@@ -171,7 +172,7 @@ class ComputerDisk extends CommonDBChild {
          if ($ID && $this->fields['is_dynamic']) {
             Plugin::doHook("autoinventory_information", $this);
          } else {
-            echo __('No');
+            _e('No');
          }
          echo "</td>";
       } else {
@@ -194,7 +195,7 @@ class ComputerDisk extends CommonDBChild {
       Html::autocompletionTextField($this, "mountpoint");
       echo "</td><td>".__('File system')."</td>";
       echo "<td>";
-      FileSystem::dropdown(['value' => $this->fields["filesystems_id"]]);
+      FileSystem::dropdown(array('value' => $this->fields["filesystems_id"]));
       echo "</td></tr>";
 
       echo "<tr class='tab_bg_1'>";
@@ -223,7 +224,7 @@ class ComputerDisk extends CommonDBChild {
     *
     * @return Nothing (call to classes members)
    **/
-   static function showForComputer(Computer $comp, $withtemplate = '') {
+   static function showForComputer(Computer $comp, $withtemplate='') {
       global $DB;
 
       $ID = $comp->fields['id'];
@@ -234,12 +235,13 @@ class ComputerDisk extends CommonDBChild {
       }
       $canedit = $comp->canEdit($ID);
 
+
       if ($canedit
           && !(!empty($withtemplate) && ($withtemplate == 2))) {
          echo "<div class='center firstbloc'>".
                "<a class='vsubmit' href='computerdisk.form.php?computers_id=$ID&amp;withtemplate=".
                   $withtemplate."'>";
-         echo __('Add a volume');
+         _e('Add a volume');
          echo "</a></div>\n";
       }
 
@@ -304,8 +306,8 @@ class ComputerDisk extends CommonDBChild {
                if ($data['totalsize'] > 0) {
                   $percent = round(100*$data['freesize']/$data['totalsize']);
                }
-               Html::displayProgressBar('100', $percent, ['simple'       => true,
-                                                               'forcepadding' => false]);
+               Html::displayProgressBar('100', $percent, array('simple'       => true,
+                                                               'forcepadding' => false));
                echo "</td>";
                echo "</tr>";
                Session::addToNavigateListItems(__CLASS__, $data['id']);
@@ -321,3 +323,4 @@ class ComputerDisk extends CommonDBChild {
    }
 
 }
+?>

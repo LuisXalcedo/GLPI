@@ -1,40 +1,39 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
 * @brief
 */
-
-use Glpi\Event;
 
 include ('../inc/includes.php');
 
@@ -103,8 +102,8 @@ if (isset($_GET['getvcard'])) {
    Session::checkRight('user', User::UPDATEAUTHENT);
 
    $user->getFromDB($_POST["id"]);
-   AuthLdap::ldapImportUserByServerId(['method' => AuthLDAP::IDENTIFIER_LOGIN,
-                                            'value'  => $user->fields["name"]],
+   AuthLdap::ldapImportUserByServerId(array('method' => AuthLDAP::IDENTIFIER_LOGIN,
+                                            'value'  => $user->fields["name"]),
                                       true, $user->fields["auths_id"], true);
    Html::back();
 
@@ -129,7 +128,7 @@ if (isset($_GET['getvcard'])) {
    if (count($_POST["item"])) {
       foreach ($_POST["item"] as $key => $val) {
          if ($groupuser->can($key, DELETE)) {
-            $groupuser->delete(['id' => $key]);
+            $groupuser->delete(array('id' => $key));
          }
       }
    }
@@ -142,19 +141,8 @@ if (isset($_GET['getvcard'])) {
    Session::checkRight('user', User::UPDATEAUTHENT);
 
    if (isset($_POST["auths_id"])) {
-      User::changeAuthMethod([$_POST["id"]], $_POST["authtype"], $_POST["auths_id"]);
+      User::changeAuthMethod(array($_POST["id"]), $_POST["authtype"], $_POST["auths_id"]);
    }
-   Html::back();
-
-} else if (isset($_POST['language'])) {
-   $user->update(
-      [
-         'id'        => Session::getLoginUserID(),
-         'language'  => $_POST['language']
-      ]
-   );
-
-   Session::addMessageAfterRedirect(__('Lang has been changed!'));
    Html::back();
 
 } else {
@@ -169,28 +157,29 @@ if (isset($_GET['getvcard'])) {
       Session::checkRight("user", User::IMPORTEXTAUTHUSERS);
 
       if (isset($_POST['login']) && !empty($_POST['login'])) {
-         AuthLdap::importUserFromServers(['name' => $_POST['login']]);
+         AuthLdap::importUserFromServers(array('name' => $_POST['login']));
       }
       Html::back();
    } else if (isset($_POST['add_ext_auth_simple'])) {
-      if (isset($_POST['login']) && !empty($_POST['login'])) {
-         Session::checkRight("user", User::IMPORTEXTAUTHUSERS);
-         $input = ['name'     => $_POST['login'],
-                     '_extauth' => 1,
-                     'add'      => 1];
-         $user->check(-1, CREATE, $input);
-         $newID = $user->add($input);
-         Event::log($newID, "users", 4, "setup",
-                 sprintf(__('%1$s adds the item %2$s'), $_SESSION["glpiname"],
-                         $_POST["login"]));
-      }
+         if (isset($_POST['login']) && !empty($_POST['login'])) {
+            Session::checkRight("user", User::IMPORTEXTAUTHUSERS);
+            $input = array('name'     => $_POST['login'],
+                           '_extauth' => 1,
+                           'add'      => 1);
+            $user->check(-1, CREATE, $input);
+            $newID = $user->add($input);
+            Event::log($newID, "users", 4, "setup",
+                       sprintf(__('%1$s adds the item %2$s'), $_SESSION["glpiname"],
+                               $_POST["login"]));
+         }
 
          Html::back();
    } else {
       Session::checkRight("user", READ);
       Html::header(User::getTypeName(Session::getPluralNumber()), '', "admin", "user");
-      $user->display(['id' => $_GET["id"]]);
+      $user->display(array('id' => $_GET["id"]));
       Html::footer();
 
    }
 }
+?>

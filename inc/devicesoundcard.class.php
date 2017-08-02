@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -43,9 +44,9 @@ if (!defined('GLPI_ROOT')) {
 **/
 class DeviceSoundCard extends CommonDevice {
 
-   static protected $forward_entity_to = ['Item_DeviceSoundCard', 'Infocom'];
-
-   static function getTypeName($nb = 0) {
+   static protected $forward_entity_to = array('Item_DeviceSoundCard', 'Infocom');
+   
+   static function getTypeName($nb=0) {
       return _n('Soundcard', 'Soundcards', $nb);
    }
 
@@ -53,39 +54,26 @@ class DeviceSoundCard extends CommonDevice {
    function getAdditionalFields() {
 
       return array_merge(parent::getAdditionalFields(),
-                         [['name'  => 'type',
+                         array(array('name'  => 'type',
                                      'label' => __('Type'),
-                                     'type'  => 'text'],
-                               ['name'  => 'none',
+                                     'type'  => 'text'),
+                               array('name'  => 'none',
                                      'label' => RegisteredID::getTypeName(Session::getPluralNumber()).
                                         RegisteredID::showAddChildButtonForItemForm($this,
                                                                                     '_registeredID',
-                                                                                    null, false),
-                                     'type'  => 'registeredIDChooser'],
-                               ['name'  => 'devicesoundcardmodels_id',
-                                     'label' => __('Model'),
-                                     'type'  => 'dropdownValue']]);
+                                                                                    NULL, false),
+                                     'type'  => 'registeredIDChooser')));
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = parent::getSearchOptionsNew();
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => '12',
-         'table'              => $this->getTable(),
-         'field'              => 'type',
-         'name'               => __('Type'),
-         'datatype'           => 'string'
-      ];
+      $tab                 = parent::getSearchOptions();
 
-      $tab[] = [
-         'id'                 => '13',
-         'table'              => 'glpi_devicesoundcardmodels',
-         'field'              => 'name',
-         'name'               => __('Model'),
-         'datatype'           => 'dropdown'
-      ];
+      $tab[12]['table']    = $this->getTable();
+      $tab[12]['field']    = 'type';
+      $tab[12]['name']     = __('Type');
+      $tab[12]['datatype'] = 'string';
 
       return $tab;
    }
@@ -97,8 +85,8 @@ class DeviceSoundCard extends CommonDevice {
     * @see CommonDevice::getHTMLTableHeader()
    **/
    static function getHTMLTableHeader($itemtype, HTMLTableBase $base,
-                                      HTMLTableSuperHeader $super = null,
-                                      HTMLTableHeader $father = null, array $options = []) {
+                                      HTMLTableSuperHeader $super=NULL,
+                                      HTMLTableHeader $father=NULL, array $options=array()) {
 
       $column = parent::getHTMLTableHeader($itemtype, $base, $super, $father, $options);
 
@@ -121,8 +109,8 @@ class DeviceSoundCard extends CommonDevice {
     *
     * @see CommonDevice::getHTMLTableCellForItem()
    **/
-   function getHTMLTableCellForItem(HTMLTableRow $row = null, CommonDBTM $item = null,
-                                    HTMLTableCell $father = null, array $options = []) {
+   function getHTMLTableCellForItem(HTMLTableRow $row=NULL, CommonDBTM $item=NULL,
+                                    HTMLTableCell $father=NULL, array $options=array()) {
 
       $column = parent::getHTMLTableCellForItem($row, $item, $father, $options);
 
@@ -132,7 +120,7 @@ class DeviceSoundCard extends CommonDevice {
 
       switch ($item->getType()) {
          case 'Computer' :
-            Manufacturer::getHTMLTableCellsForItem($row, $this, null, $options);
+            Manufacturer::getHTMLTableCellsForItem($row, $this, NULL, $options);
             if ($this->fields["type"]) {
                $row->addCell($row->getHeaderByName('devicesoundcard_type'), $this->fields["type"],
                              $father);
@@ -140,3 +128,4 @@ class DeviceSoundCard extends CommonDevice {
       }
    }
 }
+?>

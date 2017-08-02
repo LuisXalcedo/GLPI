@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
@@ -73,7 +74,7 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
    /**
     * @see RuleCollection::replayRulesOnExistingDB()
    **/
-   function replayRulesOnExistingDB($offset = 0, $maxtime = 0, $items = [], $params = []) {
+   function replayRulesOnExistingDB($offset=0, $maxtime=0, $items=array(), $params=array()) {
       global $DB;
 
       if (isCommandLine()) {
@@ -115,9 +116,9 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
          }
 
          //Replay printer dictionnary rules
-         $res_rule = $this->processAllRules($input, [], []);
+         $res_rule = $this->processAllRules($input, array(), array());
 
-         foreach (['manufacturer', 'is_global', 'name'] as $attr) {
+         foreach (array('manufacturer', 'is_global', 'name') as $attr) {
             if (isset($res_rule[$attr]) && ($res_rule[$attr] == '')) {
                unset($res_rule[$attr]);
             }
@@ -126,7 +127,7 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
          //If the software's name or version has changed
          if (self::somethingHasChanged($res_rule, $input)) {
 
-            $IDs = [];
+            $IDs = array();
             //Find all the printers in the database with the same name and manufacturer
             $sql = "SELECT `id`
                     FROM `glpi_printers`
@@ -190,11 +191,11 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
     *
     * @return Query result handler
    **/
-   function replayDictionnaryOnPrintersByID(array $IDs, $res_rule = []) {
+   function replayDictionnaryOnPrintersByID(array $IDs, $res_rule=array()) {
       global $DB;
 
-      $new_printers  = [];
-      $delete_ids    = [];
+      $new_printers  = array();
+      $delete_ids    = array();
 
       foreach ($IDs as $ID) {
          $sql = "SELECT `glpi_printers`.`id`,
@@ -223,11 +224,11 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
    /**
     * @param $IDS array
    */
-   function putOldPrintersInTrash($IDS = []) {
+   function putOldPrintersInTrash($IDS=array()) {
 
       $printer = new Printer();
       foreach ($IDS as $id) {
-         $printer->delete(['id' => $id]);
+         $printer->delete(array('id' => $id));
       }
    }
 
@@ -240,8 +241,8 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
     * @param $params          array
     * @param &$printers_ids   array containing replay printer need to be dustbined
    **/
-   function replayDictionnaryOnOnePrinter(array &$new_printers, array $res_rule,
-                                          array $params, array &$printers_ids) {
+   function replayDictionnaryOnOnePrinter(array &$new_printers, array $res_rule, $params=array(),
+                                          array &$printers_ids) {
       global $DB;
 
       $p['id']           = 0;
@@ -257,7 +258,7 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
       $input["manufacturer"] = $p['manufacturer'];
 
       if (empty($res_rule)) {
-         $res_rule = $this->processAllRules($input, [], []);
+         $res_rule = $this->processAllRules($input, array(), array());
       }
 
       $printer = new Printer();
@@ -328,12 +329,12 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
 
          //Direct connection exists in the target printer ?
          if (!countElementsInTable("glpi_computers_items",
-                                   ['itemtype'     => 'Printer',
-                                    'items_id'     => $new_printers_id,
-                                    'computers_id' => $connection["computers_id"]])) {
+                                   "`itemtype` = 'Printer'
+                                       AND `items_id` = '$new_printers_id'
+                                       AND `computers_id`='".$connection["computers_id"]."'")) {
             //Direct connection doesn't exists in the target printer : move it
-            $computeritem->update(['id'       => $connection['id'],
-                                        'items_id' => $new_printers_id]);
+            $computeritem->update(array('id'       => $connection['id'],
+                                        'items_id' => $new_printers_id));
          } else {
             //Direct connection already exists in the target printer : delete it
             $computeritem->delete($connection);
@@ -342,3 +343,4 @@ class RuleDictionnaryPrinterCollection extends RuleCollection {
    }
 
 }
+?>

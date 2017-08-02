@@ -1,40 +1,39 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
 * @brief
 */
-
-use Glpi\Event;
 
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
@@ -48,14 +47,14 @@ class Document extends CommonDBTM {
    // From CommonDBTM
    public $dohistory                   = true;
 
-   static protected $forward_entity_to = ['Document_Item'];
+   static protected $forward_entity_to = array('Document_Item');
 
    static $rightname                   = 'document';
    static $tag_prefix                  = '#';
    protected $usenotepad               = true;
 
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Document', 'Documents', $nb);
    }
 
@@ -83,7 +82,7 @@ class Document extends CommonDBTM {
          $item = $item->getType();
       }
 
-      if (in_array($item, $CFG_GLPI['document_types'])) {
+      if (in_array($item, $CFG_GLPI['document_types'])){
          return true;
       }
 
@@ -162,7 +161,7 @@ class Document extends CommonDBTM {
          if (is_file(GLPI_DOC_DIR."/".$this->fields["filepath"])
              && !is_dir(GLPI_DOC_DIR."/".$this->fields["filepath"])
              && (countElementsInTable($this->getTable(),
-                                     ['sha1sum' => $this->fields["sha1sum"] ]) <= 1)) {
+                                     "`sha1sum`='".$this->fields["sha1sum"]."'") <= 1)) {
 
             if (unlink(GLPI_DOC_DIR."/".$this->fields["filepath"])) {
                Session::addMessageAfterRedirect(sprintf(__('Succesful deletion of the file %s'),
@@ -177,9 +176,9 @@ class Document extends CommonDBTM {
    }
 
 
-   function defineTabs($options = []) {
+   function defineTabs($options=array()) {
 
-      $ong = [];
+      $ong = array();
       $this->addDefaultFormTab($ong);
       $this->addStandardTab('Document_Item', $ong, $options);
       $this->addStandardTab('Notepad', $ong, $options);
@@ -218,7 +217,7 @@ class Document extends CommonDBTM {
          //TRANS: %1$s is Document, %2$s is item type, %3$s is item name
          $input["name"] = addslashes(Html::resume_text(sprintf(__('%1$s: %2$s'),
                                                                __('Document'),
-                                                       sprintf(__('%1$s - %2$s'), $typename, $name)),
+                                                       sprintf(__('%1$s - %2$s'),$typename, $name)),
                                                        200));
          $create_from_item = true;
       }
@@ -294,24 +293,13 @@ class Document extends CommonDBTM {
           && !empty($this->input["itemtype"])) {
 
          $docitem = new Document_Item();
-         $docitem->add(['documents_id' => $this->fields['id'],
+         $docitem->add(array('documents_id' => $this->fields['id'],
                              'itemtype'     => $this->input["itemtype"],
-                             'items_id'     => $this->input["items_id"]]);
+                             'items_id'     => $this->input["items_id"]));
 
          Event::log($this->fields['id'], "documents", 4, "document",
                   //TRANS: %s is the user login
                     sprintf(__('%s adds a link with an item'), $_SESSION["glpiname"]));
-      }
-   }
-
-
-   public function post_getFromDB() {
-      if (isAPI()
-          && (isset($_SERVER['HTTP_ACCEPT']) && $_SERVER['HTTP_ACCEPT'] == 'application/octet-stream'
-              || isset($_GET['alt']) && $_GET['alt'] == 'media')) {
-         // This is a API request to download the document
-         $this->send();
-         exit();
       }
    }
 
@@ -350,11 +338,11 @@ class Document extends CommonDBTM {
     *
     * @return Nothing (display)
    **/
-   function showForm($ID, $options = []) {
+   function showForm($ID, $options=array()) {
       global $CFG_GLPI;
 
       $this->initForm($ID, $options);
-      // $options['formoptions'] = " enctype='multipart/form-data'";
+//       $options['formoptions'] = " enctype='multipart/form-data'";
       $this->showFormHeader($options);
 
       $showuserlink = 0;
@@ -384,7 +372,7 @@ class Document extends CommonDBTM {
       echo "</td>";
       if ($ID > 0) {
          echo "<td>".__('Current file')."</td>";
-         echo "<td>".$this->getDownloadLink('', 45);
+         echo "<td>".$this->getDownloadLink('',45);
          echo "<input type='hidden' name='current_filepath' value='".$this->fields["filepath"]."'>";
          echo "<input type='hidden' name='current_filename' value='".$this->fields["filename"]."'>";
          echo "</td>";
@@ -396,7 +384,7 @@ class Document extends CommonDBTM {
       echo "<tr class='tab_bg_1'>";
       echo "<td>".__('Heading')."</td>";
       echo "<td>";
-      DocumentCategory::dropdown(['value' => $this->fields["documentcategories_id"]]);
+      DocumentCategory::dropdown(array('value' => $this->fields["documentcategories_id"]));
       echo "</td>";
       if ($ID > 0) {
          echo "<td>".sprintf(__('%1$s (%2$s)'), __('Checksum'), __('SHA1'))."</td>";
@@ -437,7 +425,7 @@ class Document extends CommonDBTM {
 
       echo "<td>".sprintf(__('%1$s (%2$s)'), __('File'), self::getMaxUploadSize())."</td>";
       echo "<td>";
-      Html::file();
+      echo Html::file();
       echo "</td></tr>";
 
       $this->showFormButtons($options);
@@ -465,7 +453,30 @@ class Document extends CommonDBTM {
 
       $file = GLPI_DOC_DIR."/".$this->fields['filepath'];
 
-      Toolbox::sendFile($file, $this->fields['filename'], $this->fields['mime']);
+      if (!file_exists($file)) {
+         die("Error file ".$file." does not exist");
+      }
+
+      // don't download picture files, see them inline
+      $attachment = "";
+      $filename_parts = explode(".", $this->fields['filename']);
+      $extension = array_pop($filename_parts);
+      $extension = strtolower($extension);
+      if (!in_array($extension, array('jpg', 'png', 'gif', 'bmp'))) {
+         $attachment = " attachment;";
+      }
+
+      // Now send the file with header() magic
+      header("Expires: Mon, 26 Nov 1962 00:00:00 GMT");
+      header('Pragma: private'); /// IE BUG + SSL
+      header('Cache-control: private, must-revalidate'); /// IE BUG + SSL
+      header("Content-disposition:$attachment filename=\""
+         .addslashes(utf8_decode($this->fields['filename']))
+         ."\"; filename*=utf-8''"
+         .rawurlencode($this->fields['filename']));
+      header("Content-type: ".$this->fields['mime']);
+
+      readfile($file) or die ("Error opening file $file");
    }
 
 
@@ -476,10 +487,10 @@ class Document extends CommonDBTM {
     * @param $len       maximum length of displayed string (default 20)
     *
    **/
-   function getDownloadLink($params = '', $len = 20) {
+   function getDownloadLink($params='', $len=20) {
       global $DB,$CFG_GLPI;
 
-      $splitter = explode("/", $this->fields['filename']);
+      $splitter = explode("/",$this->fields['filename']);
 
       if (count($splitter) == 2) {
          // Old documents in EXT/filename
@@ -492,20 +503,20 @@ class Document extends CommonDBTM {
       $initfileout = $fileout;
 
       if (Toolbox::strlen($fileout) > $len) {
-         $fileout = Toolbox::substr($fileout, 0, $len)."&hellip;";
+         $fileout = Toolbox::substr($fileout,0,$len)."&hellip;";
       }
 
       $out   = '';
       $open  = '';
       $close = '';
       if (self::canView()
-          || self::canViewFile(['tickets_id' =>$this->fields['tickets_id']])) {
+          || self::canViewFile(array('tickets_id' =>$this->fields['tickets_id']))) {
          $open  = "<a href='".$CFG_GLPI["root_doc"]."/front/document.send.php?docid=".
                     $this->fields['id'].$params."' alt=\"".$initfileout."\"
                     title=\"".$initfileout."\"target='_blank'>";
          $close = "</a>";
       }
-      $splitter = explode("/", $this->fields['filepath']);
+      $splitter = explode("/",$this->fields['filepath']);
 
       if (count($splitter)) {
          $query = "SELECT *
@@ -515,9 +526,9 @@ class Document extends CommonDBTM {
 
          if ($result = $DB->query($query)) {
             if ($DB->numrows($result) > 0) {
-               $icon = $DB->result($result, 0, 'icon');
+               $icon = $DB->result($result,0,'icon');
                if (!file_exists(GLPI_ROOT."/pics/icones/$icon")) {
-                  $icon = "defaut-dist.png";
+                  $icon = "defaut-dist.png" ;
                }
                $out .= "&nbsp;<img class='middle' style='margin-left:3px; margin-right:6px;' alt=\"".
                                $initfileout."\" title=\"".$initfileout."\" src='".
@@ -720,27 +731,22 @@ class Document extends CommonDBTM {
    }
 
 
-   static function getSearchOptionsToAddNew($itemtype = null) {
-      $tab = [];
+   /**
+    * @since version 0.84
+   **/
+   static function getSearchOptionsToAdd() {
 
-      $tab[] = [
-         'id'                 => 'document',
-         'name'               => self::getTypeName(Session::getPluralNumber())
-      ];
+      $tab                       = array();
+      $tab['document']           = self::getTypeName(Session::getPluralNumber());
 
-      $tab[] = [
-         'id'                 => '119',
-         'table'              => 'glpi_documents_items',
-         'field'              => 'id',
-         'name'               => _x('quantity', 'Number of documents'),
-         'forcegroupby'       => true,
-         'usehaving'          => true,
-         'datatype'           => 'count',
-         'massiveaction'      => false,
-         'joinparams'         => [
-            'jointype'           => 'itemtype_item'
-         ]
-      ];
+      $tab[119]['table']         = 'glpi_documents_items';
+      $tab[119]['field']         = 'id';
+      $tab[119]['name']          = _x('quantity', 'Number of documents');
+      $tab[119]['forcegroupby']  = true;
+      $tab[119]['usehaving']     = true;
+      $tab[119]['datatype']      = 'count';
+      $tab[119]['massiveaction'] = false;
+      $tab[119]['joinparams']    = array('jointype' => 'itemtype_item');
 
       return $tab;
    }
@@ -749,7 +755,7 @@ class Document extends CommonDBTM {
    /**
     * @see CommonDBTM::getSpecificMassiveActions()
    **/
-   function getSpecificMassiveActions($checkitem = null) {
+   function getSpecificMassiveActions($checkitem=NULL) {
 
       $isadmin = static::canUpdate();
       $actions = parent::getSpecificMassiveActions($checkitem);
@@ -762,148 +768,100 @@ class Document extends CommonDBTM {
    }
 
 
-   function getSearchOptionsNew() {
+   function getSearchOptions() {
       global $CFG_GLPI;
 
-      $tab = [];
+      $tab                       = array();
+      $tab['common']             = __('Characteristics');
 
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
+      $tab[1]['table']           = $this->getTable();
+      $tab[1]['field']           = 'name';
+      $tab[1]['name']            = __('Name');
+      $tab[1]['datatype']        = 'itemlink';
+      $tab[1]['massiveaction']   = false;
 
-      $tab[] = [
-         'id'                 => '1',
-         'table'              => $this->getTable(),
-         'field'              => 'name',
-         'name'               => __('Name'),
-         'datatype'           => 'itemlink',
-         'massiveaction'      => false
-      ];
+      $tab[2]['table']           = $this->getTable();
+      $tab[2]['field']           = 'id';
+      $tab[2]['name']            = __('ID');
+      $tab[2]['massiveaction']   = false;
+      $tab[2]['datatype']        = 'number';
 
-      $tab[] = [
-         'id'                 => '2',
-         'table'              => $this->getTable(),
-         'field'              => 'id',
-         'name'               => __('ID'),
-         'massiveaction'      => false,
-         'datatype'           => 'number'
-      ];
+      $tab[3]['table']           = $this->getTable();
+      $tab[3]['field']           = 'filename';
+      $tab[3]['name']            = __('File');
+      $tab[3]['massiveaction']   = false;
+      $tab[3]['datatype']        = 'string';
 
-      $tab[] = [
-         'id'                 => '3',
-         'table'              => $this->getTable(),
-         'field'              => 'filename',
-         'name'               => __('File'),
-         'massiveaction'      => false,
-         'datatype'           => 'string'
-      ];
+      $tab[4]['table']           = $this->getTable();
+      $tab[4]['field']           = 'link';
+      $tab[4]['name']            = __('Web Link');
+      $tab[4]['datatype']        = 'weblink';
 
-      $tab[] = [
-         'id'                 => '4',
-         'table'              => $this->getTable(),
-         'field'              => 'link',
-         'name'               => __('Web Link'),
-         'datatype'           => 'weblink'
-      ];
-
-      $tab[] = [
-         'id'                 => '5',
-         'table'              => $this->getTable(),
-         'field'              => 'mime',
-         'name'               => __('MIME type'),
-         'datatype'           => 'string'
-      ];
+      $tab[5]['table']           = $this->getTable();
+      $tab[5]['field']           = 'mime';
+      $tab[5]['name']            = __('MIME type');
+      $tab[5]['datatype']        = 'string';
 
       if ($CFG_GLPI['use_rich_text']) {
-         $tab[] = [
-            'id'                 => '6',
-            'table'              => $this->getTable(),
-            'field'              => 'tag',
-            'name'               => __('Tag'),
-            'datatype'           => 'text',
-            'massiveaction'      => false
-         ];
+         $tab[6]['table']           = $this->getTable();
+         $tab[6]['field']           = 'tag';
+         $tab[6]['name']            = __('Tag');
+         $tab[6]['datatype']        = 'text';
+         $tab[6]['massiveaction']   = false;
       }
 
-      $tab[] = [
-         'id'                 => '7',
-         'table'              => 'glpi_documentcategories',
-         'field'              => 'completename',
-         'name'               => __('Heading'),
-         'datatype'           => 'dropdown'
-      ];
+      $tab[7]['table']           = 'glpi_documentcategories';
+      $tab[7]['field']           = 'completename';
+      $tab[7]['name']            = __('Heading');
+      $tab[7]['datatype']        = 'dropdown';
 
-      $tab[] = [
-         'id'                 => '80',
-         'table'              => 'glpi_entities',
-         'field'              => 'completename',
-         'name'               => __('Entity'),
-         'massiveaction'      => false,
-         'datatype'           => 'dropdown'
-      ];
+      $tab[80]['table']          = 'glpi_entities';
+      $tab[80]['field']          = 'completename';
+      $tab[80]['name']           = __('Entity');
+      $tab[80]['massiveaction']  = false;
+      $tab[80]['datatype']       = 'dropdown';
 
-      $tab[] = [
-         'id'                 => '86',
-         'table'              => $this->getTable(),
-         'field'              => 'is_recursive',
-         'name'               => __('Child entities'),
-         'datatype'           => 'bool'
-      ];
+      $tab[86]['table']          = $this->getTable();
+      $tab[86]['field']          = 'is_recursive';
+      $tab[86]['name']           = __('Child entities');
+      $tab[86]['datatype']       = 'bool';
 
-      $tab[] = [
-         'id'                 => '19',
-         'table'              => $this->getTable(),
-         'field'              => 'date_mod',
-         'name'               => __('Last update'),
-         'datatype'           => 'datetime',
-         'massiveaction'      => false
-      ];
+      $tab[19]['table']          = $this->getTable();
+      $tab[19]['field']          = 'date_mod';
+      $tab[19]['name']           = __('Last update');
+      $tab[19]['datatype']       = 'datetime';
+      $tab[19]['massiveaction']  = false;
 
-      $tab[] = [
-         'id'                 => '121',
-         'table'              => $this->getTable(),
-         'field'              => 'date_creation',
-         'name'               => __('Creation date'),
-         'datatype'           => 'datetime',
-         'massiveaction'      => false
-      ];
+      $tab[121]['table']          = $this->getTable();
+      $tab[121]['field']          = 'date_creation';
+      $tab[121]['name']           = __('Creation date');
+      $tab[121]['datatype']       = 'datetime';
+      $tab[121]['massiveaction']  = false;
 
-      $tab[] = [
-         'id'                 => '20',
-         'table'              => $this->getTable(),
-         'field'              => 'sha1sum',
-         'name'               => sprintf(__('%1$s (%2$s)'), __('Checksum'), __('SHA1')),
-         'massiveaction'      => false,
-         'datatype'           => 'string'
-      ];
+      $tab[20]['table']          = $this->getTable();
+      $tab[20]['field']          = 'sha1sum';
+      $tab[20]['name']           = sprintf(__('%1$s (%2$s)'), __('Checksum'), __('SHA1'));
+      $tab[20]['massiveaction']  = false;
+      $tab[20]['datatype']       = 'string';
 
-      $tab[] = [
-         'id'                 => '16',
-         'table'              => $this->getTable(),
-         'field'              => 'comment',
-         'name'               => __('Comments'),
-         'datatype'           => 'text'
-      ];
+      $tab[16]['table']          = $this->getTable();
+      $tab[16]['field']          = 'comment';
+      $tab[16]['name']           = __('Comments');
+      $tab[16]['datatype']       = 'text';
 
-      $tab[] = [
-         'id'                 => '72',
-         'table'              => 'glpi_documents_items',
-         'field'              => 'id',
-         'name'               => _x('quantity', 'Number of associated items'),
-         'forcegroupby'       => true,
-         'usehaving'          => true,
-         'datatype'           => 'count',
-         'massiveaction'      => false,
-         'joinparams'         => [
-            'jointype'           => 'child'
-         ]
-      ];
+      $tab[72]['table']          = 'glpi_documents_items';
+      $tab[72]['field']          = 'id';
+      $tab[72]['name']           = _x('quantity', 'Number of associated items');
+      $tab[72]['forcegroupby']   = true;
+      $tab[72]['usehaving']      = true;
+      $tab[72]['datatype']       = 'count';
+      $tab[72]['massiveaction']  = false;
+      $tab[72]['joinparams']     = array('jointype' => 'child');
 
       // add objectlock search options
-      $tab = array_merge($tab, ObjectLock::getSearchOptionsToAddNew(get_class($this)));
+      $tab += ObjectLock::getSearchOptionsToAdd( get_class($this) ) ;
 
-      $tab = array_merge($tab, Notepad::getSearchOptionsToAddNew());
+      $tab += Notepad::getSearchOptionsToAdd();
 
       return $tab;
    }
@@ -927,7 +885,7 @@ class Document extends CommonDBTM {
          return true;
       }
       // Move
-      return rename($srce, $dest);
+      return rename($srce,$dest);
    }
 
 
@@ -967,8 +925,8 @@ class Document extends CommonDBTM {
           && !empty($input['current_filepath'])
           && is_file(GLPI_DOC_DIR."/".$input['current_filepath'])
           && (countElementsInTable('glpi_documents',
-                                  ['sha1sum' => sha1_file(GLPI_DOC_DIR."/".
-                                             $input['current_filepath']) ]) <= 1)) {
+                                   "`sha1sum`='".sha1_file(GLPI_DOC_DIR."/".
+                                             $input['current_filepath'])."'") <= 1)) {
 
          if (unlink(GLPI_DOC_DIR."/".$input['current_filepath'])) {
             Session::addMessageAfterRedirect(sprintf(__('Succesful deletion of the file %s'),
@@ -1048,8 +1006,8 @@ class Document extends CommonDBTM {
           && !empty($input['current_filepath'])
           && is_file(GLPI_DOC_DIR."/".$input['current_filepath'])
           && (countElementsInTable('glpi_documents',
-                                  ['sha1sum' => sha1_file(GLPI_DOC_DIR."/".
-                                             $input['current_filepath']) ]) <= 1)) {
+                                   "`sha1sum`='".sha1_file(GLPI_DOC_DIR."/".
+                                             $input['current_filepath'])."'") <= 1)) {
 
          if (unlink(GLPI_DOC_DIR."/".$input['current_filepath'])) {
             Session::addMessageAfterRedirect(sprintf(__('Succesful deletion of the file %s'),
@@ -1116,7 +1074,7 @@ class Document extends CommonDBTM {
                break;
 
             case 4 :
-               // Session::addMessageAfterRedirect(__('No file specified.'),false,ERROR);
+//                Session::addMessageAfterRedirect(__('No file specified.'),false,ERROR);
                break;
          }
 
@@ -1125,7 +1083,7 @@ class Document extends CommonDBTM {
 
       $sha1sum = sha1_file($FILEDESC['tmp_name']);
       $dir     = self::isValidDoc($FILEDESC['name']);
-      $path    = self::getUploadFileValidLocationName($dir, $sha1sum);
+      $path    = self::getUploadFileValidLocationName($dir,$sha1sum);
 
       if (!$sha1sum || !$dir || !$path) {
          return false;
@@ -1135,8 +1093,8 @@ class Document extends CommonDBTM {
       if (isset($input['current_filepath'])
           && !empty($input['current_filepath'])
           && (countElementsInTable('glpi_documents',
-                                  ['sha1sum'=> sha1_file(GLPI_DOC_DIR."/".
-                                             $input['current_filepath']) ]) <= 1)) {
+                                  "`sha1sum`='".sha1_file(GLPI_DOC_DIR."/".
+                                             $input['current_filepath'])."'") <= 1)) {
 
          if (unlink(GLPI_DOC_DIR."/".$input['current_filepath'])) {
             Session::addMessageAfterRedirect(sprintf(__('Succesful deletion of the file %s'),
@@ -1188,8 +1146,8 @@ class Document extends CommonDBTM {
 
          if (Session::haveRight('dropdown', READ)) {
             $dt       = new DocumentType();
-            $message .= " <a target='_blank' href='".$dt->getSearchURL()."' class='pointer'>
-                         <i class='fa fa-info'</i><span class='sr-only'>" . __('Manage document types')  . "</span></a>";
+            $message .= " <a target='_blank' href='".$dt->getSearchURL()."'>
+                         <img src=\"".$CFG_GLPI["root_doc"]."/pics/info-small.png\" class='pointer'></a>";
          }
          Session::addMessageAfterRedirect($message, false, ERROR);
          return '';
@@ -1201,10 +1159,10 @@ class Document extends CommonDBTM {
                                           false, ERROR);
          return '';
       }
-      $subdir = $dir.'/'.substr($sha1sum, 0, 2);
+      $subdir = $dir.'/'.substr($sha1sum,0,2);
 
       if (!is_dir(GLPI_DOC_DIR."/".$subdir)
-          && @mkdir(GLPI_DOC_DIR."/".$subdir, 0777, true)) {
+          && @mkdir(GLPI_DOC_DIR."/".$subdir,0777,true)) {
          Session::addMessageAfterRedirect(sprintf(__('Create the directory %s'),
                                                   GLPI_DOC_DIR."/".$subdir));
       }
@@ -1215,7 +1173,7 @@ class Document extends CommonDBTM {
                                           false, ERROR);
          return '';
       }
-      return $subdir.'/'.substr($sha1sum, 2).'.'.$dir;
+      return $subdir.'/'.substr($sha1sum,2).'.'.$dir;
    }
 
 
@@ -1243,13 +1201,13 @@ class Document extends CommonDBTM {
          }
 
          if (count($uploaded_files)) {
-            Dropdown::showFromArray($myname, $uploaded_files, ['display_emptychoice' => true]);
+            Dropdown::showFromArray($myname, $uploaded_files, array('display_emptychoice' => true));
          } else {
-            echo __('No file available');
+           _e('No file available');
          }
 
       } else {
-         echo __("Upload directory doesn't exist");
+         _e("Upload directory doesn't exist");
       }
    }
 
@@ -1262,7 +1220,7 @@ class Document extends CommonDBTM {
    static function isValidDoc($filename) {
       global $DB;
 
-      $splitter = explode(".", $filename);
+      $splitter = explode(".",$filename);
       $ext      = end($splitter);
 
       $query="SELECT *
@@ -1304,12 +1262,13 @@ class Document extends CommonDBTM {
     *
     * @return nothing (print out an HTML select box)
    **/
-   static function dropdown($options = []) {
+   static function dropdown($options=array()) {
       global $DB, $CFG_GLPI;
+
 
       $p['name']    = 'documents_id';
       $p['entity']  = '';
-      $p['used']    = [];
+      $p['used']    = array();
       $p['display'] = true;
 
       if (is_array($options) && count($options)) {
@@ -1322,7 +1281,7 @@ class Document extends CommonDBTM {
                        getEntitiesRestrictRequest("AND", "glpi_documents", '', $p['entity'], true);
 
       if (count($p['used'])) {
-         $where .= " AND `id` NOT IN (0, ".implode(",", $p['used']).")";
+         $where .= " AND `id` NOT IN (0, ".implode(",",$p['used']).")";
       }
 
       $query = "SELECT *
@@ -1333,24 +1292,24 @@ class Document extends CommonDBTM {
                 ORDER BY `name`";
       $result = $DB->query($query);
 
-      $values = [];
+      $values = array();
       while ($data = $DB->fetch_assoc($result)) {
          $values[$data['id']] = $data['name'];
       }
       $rand = mt_rand();
-      $out  = Dropdown::showFromArray('_rubdoc', $values, ['width'               => '30%',
+      $out  = Dropdown::showFromArray('_rubdoc', $values, array('width'               => '30%',
                                                                 'rand'                => $rand,
                                                                 'display'             => false,
-                                                                'display_emptychoice' => true]);
+                                                                'display_emptychoice' => true));
       $field_id = Html::cleanId("dropdown__rubdoc$rand");
 
-      $params   = ['rubdoc' => '__VALUE__',
+      $params   = array('rubdoc' => '__VALUE__',
                         'entity' => $p['entity'],
                         'rand'   => $rand,
                         'myname' => $p['name'],
-                        'used'   => $p['used']];
+                        'used'   => $p['used']);
 
-      $out .= Ajax::updateItemOnSelectEvent($field_id, "show_".$p['name'].$rand,
+      $out .= Ajax::updateItemOnSelectEvent($field_id,"show_".$p['name'].$rand,
                                             $CFG_GLPI["root_doc"]."/ajax/dropdownRubDocument.php",
                                             $params, false);
       $out .= "<span id='show_".$p['name']."$rand'>";
@@ -1373,8 +1332,8 @@ class Document extends CommonDBTM {
     *
     * @see CommonDBTM::getMassiveActionsForItemtype()
    **/
-   static function getMassiveActionsForItemtype(array &$actions, $itemtype, $is_deleted = 0,
-                                                CommonDBTM $checkitem = null) {
+   static function getMassiveActionsForItemtype(array &$actions, $itemtype, $is_deleted=0,
+                                                CommonDBTM $checkitem=NULL) {
       global $CFG_GLPI;
 
       $action_prefix = 'Document_Item'.MassiveAction::CLASS_ACTION_SEPARATOR;
@@ -1400,8 +1359,9 @@ class Document extends CommonDBTM {
     *
     * @return string
    **/
-   static function getImageTag($string) {
+   static function getImageTag($string){
       return self::$tag_prefix.$string.self::$tag_prefix;
    }
 
 }
+?>

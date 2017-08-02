@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 class Framework_CommonDBTM_CanCheck extends PHPUnit_Framework_TestCase {
 
@@ -45,23 +46,23 @@ class Framework_CommonDBTM_CanCheck extends PHPUnit_Framework_TestCase {
 
       $printer = new Printer();
 
-      $id[0] = $printer->add(['name'         => "Printer 1",
+      $id[0] = $printer->add(array('name'         => "Printer 1",
                                    'entities_id'  => $ent0,
-                                   'is_recursive' => 0]);
+                                   'is_recursive' => 0));
       $this->assertGreaterThan(0, $id[0], "Fail to create Printer 1");
 
-      $id[1] = $printer->add(['name'         => "Printer 2",
+      $id[1] = $printer->add(array('name'         => "Printer 2",
                                    'entities_id'  => $ent0,
-                                   'is_recursive' => 1]);
+                                   'is_recursive' => 1));
       $this->assertGreaterThan(0, $id[1], "Fail to create Printer 2");
 
-      $id[2] = $printer->add(['name'         => "Printer 3",
+      $id[2] = $printer->add(array('name'         => "Printer 3",
                                    'entities_id'  => $ent1,
-                                   'is_recursive' => 1]);
+                                   'is_recursive' => 1));
       $this->assertGreaterThan(0, $id[2], "Fail to create Ptiner 3");
 
-      $id[3] = $printer->add(['name'         => "Printer 4",
-                                   'entities_id'  => $ent2]);
+      $id[3] = $printer->add(array('name'         => "Printer 4",
+                                   'entities_id'  => $ent2));
       $this->assertGreaterThan(0, $id[3], "Fail to create Printer 4");
 
       // Super admin
@@ -145,126 +146,126 @@ class Framework_CommonDBTM_CanCheck extends PHPUnit_Framework_TestCase {
       // Create some contacts
       $contact = new Contact();
 
-      $idc[0] = $contact->add(['name'         => "Contact 1",
+      $idc[0] = $contact->add(array('name'         => "Contact 1",
                                    'entities_id'  => $ent0,
-                                   'is_recursive' => 0]);
+                                   'is_recursive' => 0));
       $this->assertGreaterThan(0, $idc[0]);
 
-      $idc[1] = $contact->add(['name'         => "Contact 2",
+      $idc[1] = $contact->add(array('name'         => "Contact 2",
                                    'entities_id'  => $ent0,
-                                   'is_recursive' => 1]);
+                                   'is_recursive' => 1));
       $this->assertGreaterThan(0, $idc[1]);
 
-      $idc[2] = $contact->add(['name'         => "Contact 3",
+      $idc[2] = $contact->add(array('name'         => "Contact 3",
                                    'entities_id'  => $ent1,
-                                   'is_recursive' => 1]);
+                                   'is_recursive' => 1));
       $this->assertGreaterThan(0, $idc[2]);
 
-      $idc[3] = $contact->add(['name'         => "Contact 4",
-                                   'entities_id'  => $ent2]);
+      $idc[3] = $contact->add(array('name'         => "Contact 4",
+                                   'entities_id'  => $ent2));
       $this->assertGreaterThan(0, $idc[3]);
 
       // Create some suppliers
       $supplier = new Supplier();
 
-      $ids[0] = $supplier->add(['name'         => "Supplier 1",
+      $ids[0] = $supplier->add(array('name'         => "Supplier 1",
                                    'entities_id'  => $ent0,
-                                   'is_recursive' => 0]);
+                                   'is_recursive' => 0));
       $this->assertGreaterThan(0, $ids[0]);
 
-      $ids[1] = $supplier->add(['name'         => "Supplier 2",
+      $ids[1] = $supplier->add(array('name'         => "Supplier 2",
                                    'entities_id'  => $ent0,
-                                   'is_recursive' => 1]);
+                                   'is_recursive' => 1));
       $this->assertGreaterThan(0, $ids[1]);
 
-      $ids[2] = $supplier->add(['name'         => "Supplier 3",
-                                   'entities_id'  => $ent1]);
+      $ids[2] = $supplier->add(array('name'         => "Supplier 3",
+                                   'entities_id'  => $ent1));
       $this->assertGreaterThan(0, $ids[2]);
 
-      $ids[3] = $supplier->add(['name'         => "Supplier 4",
-                                   'entities_id'  => $ent2]);
+      $ids[3] = $supplier->add(array('name'         => "Supplier 4",
+                                   'entities_id'  => $ent2));
       $this->assertGreaterThan(0, $ids[3]);
 
       // Relation
       $rel = new Contact_Supplier();
-      $input = ['contacts_id' =>  $idc[0],    // root
-                     'suppliers_id' => $ids[0]];   // root
+      $input = array('contacts_id' =>  $idc[0],    // root
+                     'suppliers_id' => $ids[0]);   // root
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[0] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[0]);
       $this->assertTrue($rel->can($idr[0], READ));
       $this->assertTrue($rel->canEdit($idr[0]));
 
-      $input = ['contacts_id' =>  $idc[0],    // root
-                     'suppliers_id' => $ids[1]];   // root + rec
+      $input = array('contacts_id' =>  $idc[0],    // root
+                     'suppliers_id' => $ids[1]);   // root + rec
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[1] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[1]);
       $this->assertTrue($rel->can($idr[1], READ));
       $this->assertTrue($rel->canEdit($idr[1]));
 
-      $input = ['contacts_id' =>  $idc[0],    // root
-                     'suppliers_id' => $ids[2]];   // child 1
+      $input = array('contacts_id' =>  $idc[0],    // root
+                     'suppliers_id' => $ids[2]);   // child 1
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[0],    // root
-                     'suppliers_id' => $ids[3]];   // child 2
+      $input = array('contacts_id' =>  $idc[0],    // root
+                     'suppliers_id' => $ids[3]);   // child 2
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[1],    // root + rec
-                     'suppliers_id' => $ids[0]];   // root
+      $input = array('contacts_id' =>  $idc[1],    // root + rec
+                     'suppliers_id' => $ids[0]);   // root
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[2] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[2]);
       $this->assertTrue($rel->can($idr[2], READ));
       $this->assertTrue($rel->canEdit($idr[2]));
 
-      $input = ['contacts_id' =>  $idc[1],    // root + rec
-                     'suppliers_id' => $ids[1]];   // root + rec
+      $input = array('contacts_id' =>  $idc[1],    // root + rec
+                     'suppliers_id' => $ids[1]);   // root + rec
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[3] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[3]);
       $this->assertTrue($rel->can($idr[3], READ));
       $this->assertTrue($rel->canEdit($idr[3]));
 
-      $input = ['contacts_id' =>  $idc[1],    // root + rec
-                     'suppliers_id' => $ids[2]];   // child 1
+      $input = array('contacts_id' =>  $idc[1],    // root + rec
+                     'suppliers_id' => $ids[2]);   // child 1
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[4] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[4]);
       $this->assertTrue($rel->can($idr[4], READ));
       $this->assertTrue($rel->canEdit($idr[4]));
 
-      $input = ['contacts_id' =>  $idc[1],    // root + rec
-                     'suppliers_id' => $ids[3]];   // child 2
+      $input = array('contacts_id' =>  $idc[1],    // root + rec
+                     'suppliers_id' => $ids[3]);   // child 2
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[5] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[5]);
       $this->assertTrue($rel->can($idr[5], READ));
       $this->assertTrue($rel->canEdit($idr[5]));
 
-      $input = ['contacts_id' =>  $idc[2],    // Child 1
-                     'suppliers_id' => $ids[0]];   // root
+      $input = array('contacts_id' =>  $idc[2],    // Child 1
+                     'suppliers_id' => $ids[0]);   // root
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[2],    // Child 1
-                     'suppliers_id' => $ids[1]];   // root + rec
+      $input = array('contacts_id' =>  $idc[2],    // Child 1
+                     'suppliers_id' => $ids[1]);   // root + rec
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[6] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[6]);
       $this->assertTrue($rel->can($idr[6], READ));
       $this->assertTrue($rel->canEdit($idr[6]));
 
-      $input = ['contacts_id' =>  $idc[2],    // Child 1
-                     'suppliers_id' => $ids[2]];   // Child 1
+      $input = array('contacts_id' =>  $idc[2],    // Child 1
+                     'suppliers_id' => $ids[2]);   // Child 1
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[7] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[7]);
       $this->assertTrue($rel->can($idr[7], READ));
       $this->assertTrue($rel->canEdit($idr[7]));
 
-      $input = ['contacts_id' =>  $idc[2],    // Child 1
-                     'suppliers_id' => $ids[3]];   // Child 2
+      $input = array('contacts_id' =>  $idc[2],    // Child 1
+                     'suppliers_id' => $ids[3]);   // Child 2
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
       // See only in child entity 2 + parent if recursive
@@ -287,36 +288,36 @@ class Framework_CommonDBTM_CanCheck extends PHPUnit_Framework_TestCase {
       $this->assertFalse($rel->can($idr[7], READ));  // child 1 / child 1
       $this->assertFalse($rel->canEdit($idr[7]));
 
-      $input = ['contacts_id' =>  $idc[0],    // root
-                     'suppliers_id' => $ids[0]];   // root
+      $input = array('contacts_id' =>  $idc[0],    // root
+                     'suppliers_id' => $ids[0]);   // root
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[0],    // root
-                     'suppliers_id' => $ids[1]];   // root + rec
+      $input = array('contacts_id' =>  $idc[0],    // root
+                     'suppliers_id' => $ids[1]);   // root + rec
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[1],    // root + rec
-                     'suppliers_id' => $ids[0]];   // root
+      $input = array('contacts_id' =>  $idc[1],    // root + rec
+                     'suppliers_id' => $ids[0]);   // root
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[3],    // Child 2
-                     'suppliers_id' => $ids[0]];   // root
+      $input = array('contacts_id' =>  $idc[3],    // Child 2
+                     'suppliers_id' => $ids[0]);   // root
       $this->assertFalse($rel->can(-1, CREATE, $input));
 
-      $input = ['contacts_id' =>  $idc[3],    // Child 2
-                     'suppliers_id' => $ids[1]];   // root + rec
+      $input = array('contacts_id' =>  $idc[3],    // Child 2
+                     'suppliers_id' => $ids[1]);   // root + rec
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[7] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[7]);
       $this->assertTrue($rel->can($idr[7], READ));
       $this->assertTrue($rel->canEdit($idr[7]));
 
-      $input = ['contacts_id' =>  $idc[3],    // Child 2
-                     'suppliers_id' => $ids[2]];   // Child 1
-      $this->assertFalse($rel->can(-1, CREATE, $input));
+      $input = array('contacts_id' =>  $idc[3],    // Child 2
+                     'suppliers_id' => $ids[2]);   // Child 1
+      $this->assertFalse($rel->can(-1, CREATE,$input));
 
-      $input = ['contacts_id' =>  $idc[3],    // Child 2
-                     'suppliers_id' => $ids[3]];   // Child 3
+      $input = array('contacts_id' =>  $idc[3],    // Child 2
+                     'suppliers_id' => $ids[3]);   // Child 3
       $this->assertTrue($rel->can(-1, CREATE, $input));
       $idr[8] = $rel->add($input);
       $this->assertGreaterThan(0, $idr[8]);
@@ -356,18 +357,18 @@ class Framework_CommonDBTM_CanCheck extends PHPUnit_Framework_TestCase {
       $this->assertTrue($entity->canEdit($ent3), "Fail: can't write entity 2.1");
       $this->assertTrue($entity->canEdit($ent4), "Fail: can't write entity 2.2");
 
-      $input=['entities_id' => $ent1];
+      $input=array('entities_id' => $ent1);
       $this->assertTrue($entity->can(-1, CREATE, $input), "Fail: can create entity in root");
-      $input=['entities_id' => $ent2];
+      $input=array('entities_id' => $ent2);
       $this->assertTrue($entity->can(-1, CREATE, $input), "Fail: can't create entity in 2");
-      $input=['entities_id' => $ent3];
+      $input=array('entities_id' => $ent3);
       $this->assertTrue($entity->can(-1, CREATE, $input), "Fail: can't create entity in 2.1");
-      $input=['entities_id' => 99999];
+      $input=array('entities_id' => 99999);
       $this->assertFalse($entity->can(-1, CREATE, $input), "Fail: can create entity in not existing entity");
-      $input=['entities_id' => -1];
+      $input=array('entities_id' => -1);
       $this->assertFalse($entity->can(-1, CREATE, $input), "Fail: can create entity in not existing entity");
 
-      $this->assertTrue(Session::changeActiveEntities($ent2, true));
+      $this->assertTrue(Session::changeActiveEntities($ent2,true));
 
       $this->assertTrue($entity->can(0, READ), "Fail: can't read root entity");
       $this->assertTrue($entity->can($ent0, READ), "Fail: can't read entity 0");
@@ -385,28 +386,29 @@ class Framework_CommonDBTM_CanCheck extends PHPUnit_Framework_TestCase {
       $this->assertTrue($entity->canEdit($ent4), "Fail: can't write entity 2.2");
       $this->assertFalse($entity->canEdit(99999), "Fail: can write not existing entity");
 
-      $input=['entities_id' => $ent1];
+      $input=array('entities_id' => $ent1);
       $this->assertFalse($entity->can(-1, CREATE, $input), "Fail: can create entity in root");
-      $input=['entities_id' => $ent2];
+      $input=array('entities_id' => $ent2);
       $this->assertTrue($entity->can(-1, CREATE, $input), "Fail: can't create entity in 2");
-      $input=['entities_id' => $ent3];
+      $input=array('entities_id' => $ent3);
       $this->assertTrue($entity->can(-1, CREATE, $input), "Fail: can't create entity in 2.1");
-      $input=['entities_id' => 99999];
+      $input=array('entities_id' => 99999);
       $this->assertFalse($entity->can(-1, CREATE, $input),
                          "Fail: can create entity in not existing entity");
-      $input=['entities_id' => -1];
+      $input=array('entities_id' => -1);
       $this->assertFalse($entity->can(-1, CREATE, $input),
                          "Fail: can create entity in not existing entity");
 
-      $this->assertTrue(Session::changeActiveEntities($ent2, false));
-      $input=['entities_id' => $ent1];
+      $this->assertTrue(Session::changeActiveEntities($ent2,false));
+      $input=array('entities_id' => $ent1);
       $this->assertFalse($entity->can(-1, CREATE, $input), "Fail: can create entity in root");
-      $input=['entities_id' => $ent2];
+      $input=array('entities_id' => $ent2);
       // next should be false (or not).... but check is done on glpiactiveprofile
       // will require to save current state in session - this is probably acceptable
       // this allow creation when no child defined yet (no way to select tree in this case)
       $this->assertTrue($entity->can(-1, CREATE, $input), "Fail: can't create entity in 2");
-      $input=['entities_id' => $ent3];
+      $input=array('entities_id' => $ent3);
       $this->assertFalse($entity->can(-1, CREATE, $input), "Fail: can create entity in 2.1");
    }
 }
+?>

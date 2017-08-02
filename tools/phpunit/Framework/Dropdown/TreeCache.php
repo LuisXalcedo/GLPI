@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
 
@@ -46,7 +47,7 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $this->assertEquals(1, count($parent));
       $this->assertArrayHasKey(0, $parent);
 
-      $sons = getSonsOf('glpi_entities', $ent0);
+      $sons = getSonsOf('glpi_entities',$ent0);
       $this->assertEquals(5, count($sons));
       $this->assertArrayHasKey($ent0, $sons);
       $this->assertArrayHasKey($ent1, $sons);
@@ -59,11 +60,11 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $this->assertArrayHasKey(0, $parent);
       $this->assertArrayHasKey($ent0, $parent);
 
-      $sons = getSonsOf('glpi_entities', $ent1);
+      $sons = getSonsOf('glpi_entities',$ent1);
       $this->assertEquals(1, count($sons));
       $this->assertArrayHasKey($ent1, $sons);
 
-      $sons = getSonsOf('glpi_entities', $ent2);
+      $sons = getSonsOf('glpi_entities',$ent2);
       $this->assertEquals(3, count($sons));
       $this->assertArrayHasKey($ent2, $sons);
       $this->assertArrayHasKey($ent3, $sons);
@@ -86,29 +87,29 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $loc = new Location();
 
       // A
-      $id[0] = $loc->add(['entities_id'  => $entity,
+      $id[0] = $loc->add(array('entities_id'  => $entity,
                                'locations_id' => 0,
-                               'name'         => 'A']);
+                               'name'         => 'A'));
       $this->assertGreaterThan(0, $id[0]);
 
       // A > AA
-      $id[1] = $loc->add(['entities_id'  => $entity,
+      $id[1] = $loc->add(array('entities_id'  => $entity,
                                'locations_id' => $id[0],
-                               'name'         => 'AA']);
+                               'name'         => 'AA'));
       $this->assertGreaterThan(0, $id[1]);
       $this->assertTrue($loc->getFromDB($id[1]));
       $this->assertEquals('A > AA', $loc->fields['completename']);
 
       // A > BB
-      $id[2] = $loc->add(['entities_id'  => $entity,
+      $id[2] = $loc->add(array('entities_id'  => $entity,
                                'locations_id' => $id[0],
-                               'name'         => 'BB']);
+                               'name'         => 'BB'));
       $this->assertGreaterThan(0, $id[2]);
       $this->assertTrue($loc->getFromDB($id[2]));
       $this->assertEquals('A > BB', $loc->fields['completename']);
 
       // Sons of A (A, AA, BB)
-      $sons = getSonsOf('glpi_locations', $id[0]);
+      $sons = getSonsOf('glpi_locations',$id[0]);
       $this->assertEquals(3, count($sons));
       $this->assertArrayHasKey($id[0], $sons);
       $this->assertArrayHasKey($id[1], $sons);
@@ -129,34 +130,34 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $this->assertArrayHasKey($id[0], $parent);
 
       // B
-      $id[3] = $loc->add(['entities_id'  => $entity,
+      $id[3] = $loc->add(array('entities_id'  => $entity,
                                'locations_id' => 0,
-                               'name'         => 'B']);
+                               'name'         => 'B'));
       $this->assertGreaterThan(0, $id[3]);
 
       // B > CC
-      $id[4] = $loc->add(['entities_id'  => $entity,
+      $id[4] = $loc->add(array('entities_id'  => $entity,
                                'locations_id' => $id[3],
-                               'name'         => 'CC']);
+                               'name'         => 'CC'));
       $this->assertGreaterThan(0, $id[4]);
       $this->assertTrue($loc->getFromDB($id[4]));
       $this->assertEquals('B > CC', $loc->fields['completename']);
 
-      $sons = getSonsOf('glpi_locations', $id[3]);
+      $sons = getSonsOf('glpi_locations',$id[3]);
       $this->assertEquals(2, count($sons));
       $this->assertArrayHasKey($id[4], $sons);
 
       // B > CC > XXX
-      $id[5] = $loc->add(['entities_id'  => $entity,
+      $id[5] = $loc->add(array('entities_id'  => $entity,
                                'locations_id' => $id[4],
-                               'name'         => 'XXX']);
+                               'name'         => 'XXX'));
       $this->assertGreaterThan(0, $id[5]);
       $this->assertTrue($loc->getFromDB($id[5]));
       $this->assertEquals('B > CC > XXX', $loc->fields['completename']);
 
       // B > CC => A > CC
-      $res = $loc->update(['id'           => $id[4],
-                                'locations_id' => $id[0]]);
+      $res = $loc->update(array('id'           => $id[4],
+                                'locations_id' => $id[0]));
       $this->assertTrue($res);
       $this->assertTrue($loc->getFromDB($id[4]));
       $this->assertEquals('A > CC', $loc->fields['completename']);
@@ -171,19 +172,19 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $this->assertArrayHasKey($id[0], $parent);
 
       // New sons of B (only B)
-      $sons = getSonsOf('glpi_locations', $id[3]);
+      $sons = getSonsOf('glpi_locations',$id[3]);
       $this->assertEquals(1, count($sons));
       $this->assertArrayHasKey($id[3], $sons);
 
       // New sons of A (A, AA, BB, CC)
-      $sons = getSonsOf('glpi_locations', $id[0]);
+      $sons = getSonsOf('glpi_locations',$id[0]);
       $this->assertEquals(5, count($sons));
       $this->assertArrayHasKey($id[4], $sons);
       $this->assertArrayHasKey($id[5], $sons);
 
       // Rename A => C
-      $res = $loc->update(['id'   => $id[0],
-                                'name' => 'C']);
+      $res = $loc->update(array('id'   => $id[0],
+                                'name' => 'C'));
       $this->assertTrue($res);
 
       // Check complete name of sons
@@ -195,12 +196,12 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $this->assertEquals(3, $loc->fields['level']);
 
       // Delete CC and move child under B
-      $res = $loc->delete(['id' => $id[4],
-                                '_replace_by' => $id[3]]);
+      $res = $loc->delete(array('id' => $id[4],
+                                '_replace_by' => $id[3]));
       $this->assertTrue($res);
 
       // Sons of B (B and XXX)
-      $sons = getSonsOf('glpi_locations', $id[3]);
+      $sons = getSonsOf('glpi_locations',$id[3]);
       $this->assertEquals(2, count($sons));
       $this->assertArrayHasKey($id[5], $sons);
 
@@ -209,3 +210,4 @@ class Framework_Dropdown_TreeCache extends PHPUnit_Framework_TestCase {
       $this->assertEquals(2, $loc->fields['level']);
    }
 }
+?>

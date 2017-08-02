@@ -1,37 +1,38 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
-* @brief
+* @brief 
 */
 
 if (!defined('GLPI_ROOT')) {
@@ -44,26 +45,26 @@ if (!defined('GLPI_ROOT')) {
 class NetworkPortWifi extends NetworkPortInstantiation {
 
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return __('Wifi port');
    }
 
 
    function getNetworkCardInterestingFields() {
-      return ['link.`mac`' => 'mac'];
-   }
+      return array('link.`mac`' => 'mac');
+  }
 
 
    /**
     * @see NetworkPortInstantiation::showInstantiationForm()
    **/
-   function showInstantiationForm(NetworkPort $netport, $options, $recursiveItems) {
+   function showInstantiationForm(NetworkPort $netport, $options=array(), $recursiveItems) {
 
       if (!$options['several']) {
          echo "<tr class='tab_bg_1'>\n";
          $this->showNetworkCardField($netport, $options, $recursiveItems);
          echo "<td>" . WifiNetwork::getTypeName(1) . "</td><td>";
-         WifiNetwork::dropdown(['value'  => $this->fields["wifinetworks_id"]]);
+         WifiNetwork::dropdown(array('value'  => $this->fields["wifinetworks_id"]));
          echo "</td>";
          echo "</tr>\n";
 
@@ -72,13 +73,13 @@ class NetworkPortWifi extends NetworkPortInstantiation {
          echo "<td>";
 
          Dropdown::showFromArray('mode', WifiNetwork::getWifiCardModes(),
-                                 ['value' => $this->fields['mode']]);
+                                 array('value' => $this->fields['mode']));
 
          echo "</td>\n";
          echo "<td>" . __('Wifi protocol version') . "</td><td>";
 
          Dropdown::showFromArray('version', WifiNetwork::getWifiCardVersion(),
-                                 ['value' => $this->fields['version']]);
+                                 array('value' => $this->fields['version']));
 
          echo "</td>\n";
          echo "</tr>\n";
@@ -94,18 +95,18 @@ class NetworkPortWifi extends NetworkPortInstantiation {
     * @see NetworkPortInstantiation::getInstantiationHTMLTableHeaders
    **/
    function getInstantiationHTMLTableHeaders(HTMLTableGroup $group, HTMLTableSuperHeader $super,
-                                             HTMLTableSuperHeader $internet_super = null,
-                                             HTMLTableHeader $father = null,
-                                             array $options = []) {
+                                             HTMLTableSuperHeader $internet_super=NULL,
+                                             HTMLTableHeader $father=NULL,
+                                             array $options=array()) {
 
-      DeviceNetworkCard::getHTMLTableHeader('NetworkPortWifi', $group, $super, null, $options);
+      DeviceNetworkCard::getHTMLTableHeader('NetworkPortWifi', $group, $super, NULL, $options);
 
       $group->addHeader('ESSID', __('ESSID'), $super);
       $group->addHeader('Mode', __('Wifi mode'), $super);
       $group->addHeader('Version', __('Wifi protocol version'), $super);
 
       parent::getInstantiationHTMLTableHeaders($group, $super, $internet_super, $father, $options);
-      return null;
+      return NULL;
    }
 
 
@@ -113,9 +114,9 @@ class NetworkPortWifi extends NetworkPortInstantiation {
     * @see NetworkPortInstantiation::getInstantiationHTMLTable()
    **/
    function getInstantiationHTMLTable(NetworkPort $netport, HTMLTableRow $row,
-                                      HTMLTableCell $father = null, array $options = []) {
+                                      HTMLTableCell $father=NULL, array $options=array()) {
 
-      DeviceNetworkCard::getHTMLTableCellsForItem($row, $this, null, $options);
+      DeviceNetworkCard::getHTMLTableCellsForItem($row, $this, NULL, $options);
 
       $row->addCell($row->getHeaderByName('Instantiation', 'ESSID'),
                     Dropdown::getDropdownName("glpi_wifinetworks",
@@ -126,52 +127,38 @@ class NetworkPortWifi extends NetworkPortInstantiation {
       $row->addCell($row->getHeaderByName('Instantiation', 'Version'), $this->fields['version']);
 
       parent::getInstantiationHTMLTable($netport, $row, $father, $options);
-      return null;
+      return NULL;
    }
 
 
-   function getSearchOptionsNew() {
-      $tab = [];
+   function getSearchOptions() {
 
-      $tab[] = [
-         'id'                 => 'common',
-         'name'               => __('Characteristics')
-      ];
+      $tab = array();
+      $tab['common']            = __('Characteristics');
 
-      $tab[] = [
-         'id'                 => '10',
-         'table'              => $this->getTable(),
-         'field'              => 'mac',
-         'name'               => __('MAC'),
-         'massiveaction'      => false,
-         'datatype'           => 'mac'
-      ];
+      $tab[10]['table']         = $this->getTable();
+      $tab[10]['field']         = 'mac';
+      $tab[10]['name']          = __('MAC');
+      $tab[10]['massiveaction'] = false;
+      $tab[10]['datatype']      = 'mac';
 
-      $tab[] = [
-         'id'                 => '11',
-         'table'              => $this->getTable(),
-         'field'              => 'mode',
-         'name'               => __('Wifi mode'),
-         'massiveaction'      => false,
-         'datatype'           => 'specific'
-      ];
+      $tab[11]['table']         = $this->getTable();
+      $tab[11]['field']         = 'mode';
+      $tab[11]['name']          = __('Wifi mode');
+      $tab[11]['massiveaction'] = false;
+      $tab[11]['datatype']      = 'specific';
 
-      $tab[] = [
-         'id'                 => '12',
-         'table'              => $this->getTable(),
-         'field'              => 'version',
-         'name'               => __('Wifi protocol version'),
-         'massiveaction'      => false
-      ];
+      $tab[12]['table']         = $this->getTable();
+      $tab[12]['field']         = 'version';
+      $tab[12]['name']          = __('Wifi protocol version');
+      $tab[12]['massiveaction'] = false;
+      $tab[11]['datatype']      = 'specific';
 
-      $tab[] = [
-         'id'                 => '13',
-         'table'              => 'glpi_wifinetworks',
-         'field'              => 'name',
-         'name'               => WifiNetwork::getTypeName(1),
-         'massiveaction'      => false,
-         'datatype'           => 'dropdown'
-      ];
+      $tab[13]['table']         = 'glpi_wifinetworks';
+      $tab[13]['field']         = 'name';
+      $tab[13]['name']          = WifiNetwork::getTypeName(1);
+      $tab[13]['massiveaction'] = false;
+      $tab[13]['datatype']      = 'dropdown';
 
       return $tab;
    }
@@ -182,10 +169,10 @@ class NetworkPortWifi extends NetworkPortInstantiation {
     * @param $values
     * @param $options   array
    **/
-   static function getSpecificValueToDisplay($field, $values, array $options = []) {
+   static function getSpecificValueToDisplay($field, $values, array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       switch ($field) {
          case 'mode':
@@ -212,10 +199,10 @@ class NetworkPortWifi extends NetworkPortInstantiation {
     * @param $values           (default '')
     * @param $options   array
    **/
-   static function getSpecificValueToSelect($field, $name = '', $values = '', array $options = []) {
+   static function getSpecificValueToSelect($field, $name='', $values='', array $options=array()) {
 
       if (!is_array($values)) {
-         $values = [$field => $values];
+         $values = array($field => $values);
       }
       $options['display'] = false;
       switch ($field) {
@@ -234,39 +221,31 @@ class NetworkPortWifi extends NetworkPortInstantiation {
    /**
     * @param $tab          array
     * @param $joinparams   array
+    * @param $itemtype
    **/
-   static function getSearchOptionsToAddForInstantiation(array &$tab, array $joinparams) {
+   static function getSearchOptionsToAddForInstantiation(array &$tab, array $joinparams,
+                                                         $itemtype) {
 
-      $tab[] = [
-         'id'                 => '157',
-         'table'              => 'glpi_wifinetworks',
-         'field'              => 'name',
-         'name'               => WifiNetwork::getTypeName(1),
-         'forcegroupby'       => true,
-         'massiveaction'      => false,
-         'joinparams'         => [
-            'jointype'           => 'standard',
-            'beforejoin'         => [
-               'table'              => 'glpi_networkportwifis',
-               'joinparams'         => $joinparams
-            ]
-         ]
-      ];
+      $tab[157]['table']         = 'glpi_wifinetworks';
+      $tab[157]['field']         = 'name';
+      $tab[157]['name']          = WifiNetwork::getTypeName(1);
+      $tab[157]['forcegroupby']  = true;
+      $tab[157]['massiveaction'] = false;
+      $tab[157]['joinparams']    = array('jointype'   => 'standard',
+                                         'beforejoin' => array('table' => 'glpi_networkportwifis',
+                                                               'joinparams'
+                                                                       => $joinparams));
 
-      $tab[] = [
-         'id'                 => '158',
-         'table'              => 'glpi_wifinetworks',
-         'field'              => 'essid',
-         'name'               => __('ESSID'),
-         'forcegroupby'       => true,
-         'massiveaction'      => false,
-         'joinparams'         => [
-            'jointype'           => 'standard',
-            'beforejoin'         => [
-               'table'              => 'glpi_networkportwifis',
-               'joinparams'         => $joinparams
-            ]
-         ]
-      ];
+      $tab[158]['table']         = 'glpi_wifinetworks';
+      $tab[158]['field']         = 'essid';
+      $tab[158]['name']          = __('ESSID');
+      $tab[158]['forcegroupby']  = true;
+      $tab[158]['massiveaction'] = false;
+      $tab[158]['joinparams']    = array('jointype'   => 'standard',
+                                         'beforejoin' => array('table' => 'glpi_networkportwifis',
+                                                               'joinparams'
+                                                                       => $joinparams));
    }
+
 }
+?>

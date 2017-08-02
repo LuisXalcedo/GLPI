@@ -1,33 +1,34 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ * @version $Id$
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+ 
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 if (!defined('GLPI_ROOT')) {
@@ -49,7 +50,7 @@ if (!defined('GLPI_ROOT')) {
  **/
 class Lock {
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Lock', 'Locks', $nb);
    }
 
@@ -77,23 +78,23 @@ class Lock {
       echo "<input type='hidden' name='id' value='$ID'>\n";
       echo "<input type='hidden' name='itemtype' value='$itemtype'>\n";
       echo "<table class='tab_cadre_fixe'>";
-      echo "<tr><th colspan='2'>".__('Locked items')."</th></tr>";
+      echo "<tr><th colspan='2''>".__('Locked items')."</th></tr>";
 
       //Use a hook to allow external inventory tools to manage per field lock
-      $results =  Plugin::doHookFunction('display_locked_fields', ['item'   => $item,
-                                                                        'header' => $header]);
+      $results =  Plugin::doHookFunction('display_locked_fields', array('item'   => $item,
+                                                                        'header' => $header));
       $header |= $results['header'];
 
       //Special locks for computers only
       if ($itemtype == 'Computer') {
          //Locks for items recorded in glpi_computers_items table
-         $types = ['Monitor', 'Peripheral', 'Printer'];
+         $types = array('Monitor', 'Peripheral', 'Printer');
          foreach ($types as $type) {
-            $params = ['is_dynamic'    => 1,
+            $params = array('is_dynamic'    => 1,
                             'is_deleted'    => 1,
                             'computers_id'  => $ID,
-                            'itemtype'      => $type];
-            $params['FIELDS'] = ['id', 'items_id'];
+                            'itemtype'      => $type);
+            $params['FIELDS'] = array('id', 'items_id');
             $first  = true;
             foreach ($DB->request('glpi_computers_items', $params) as $line) {
                $tmp    = new $type();
@@ -112,12 +113,12 @@ class Lock {
 
          }
 
-         $types = ['ComputerDisk', 'ComputerVirtualMachine'];
+         $types = array('ComputerDisk', 'ComputerVirtualMachine');
          foreach ($types as $type) {
-            $params = ['is_dynamic'    => 1,
+            $params = array('is_dynamic'    => 1,
                             'is_deleted'    => 1,
-                            'computers_id'  => $ID];
-            $params['FIELDS'] = ['id', 'name'];
+                            'computers_id'  => $ID);
+            $params['FIELDS'] = array('id', 'name');
             $first  = true;
             foreach ($DB->request(getTableForItemType($type), $params) as $line) {
                $header = true;
@@ -134,9 +135,9 @@ class Lock {
          }
 
          //Software versions
-         $params = ['is_dynamic'    => 1,
+         $params = array('is_dynamic'    => 1,
                          'is_deleted'    => 1,
-                         'computers_id'  => $ID];
+                         'computers_id'  => $ID);
          $first  = true;
          $query  = "SELECT `csv`.`id` AS `id`,
                            `sv`.`name` AS `version`,
@@ -164,9 +165,9 @@ class Lock {
          }
 
          //Software licenses
-         $params = ['is_dynamic'    => 1,
+         $params = array('is_dynamic'    => 1,
                          'is_deleted'    => 1,
-                         'computers_id'  => $ID];
+                         'computers_id'  => $ID);
          $first  = true;
          $query  = "SELECT `csv`.`id` AS `id`,
                            `sv`.`name` AS `version`,
@@ -194,13 +195,14 @@ class Lock {
          }
       }
 
+
       $first  = true;
       $item   = new NetworkPort();
-      $params = ['is_dynamic' => 1,
+      $params = array('is_dynamic' => 1,
                       'is_deleted' => 1,
                       'items_id'   => $ID,
-                      'itemtype'   => $itemtype];
-      $params['FIELDS'] = ['id'];
+                      'itemtype'   => $itemtype);
+      $params['FIELDS'] = array('id');
       foreach ($DB->request('glpi_networkports', $params) as $line) {
          $item->getFromDB($line['id']);
          $header = true;
@@ -218,14 +220,14 @@ class Lock {
 
       $first = true;
       $item  = new NetworkName();
-      $params = ['`glpi_networknames`.`is_dynamic`' => 1,
+      $params = array('`glpi_networknames`.`is_dynamic`' => 1,
                       '`glpi_networknames`.`is_deleted`' => 1,
                       '`glpi_networknames`.`itemtype`'   => 'NetworkPort',
                       '`glpi_networknames`.`items_id`'   => '`glpi_networkports`.`id`',
                       '`glpi_networkports`.`items_id`'   => $ID,
-                      '`glpi_networkports`.`itemtype`'   => $itemtype];
-      $params['FIELDS'] = ['glpi_networknames' => 'id'];
-      foreach ($DB->request(['glpi_networknames', 'glpi_networkports'], $params) as $line) {
+                      '`glpi_networkports`.`itemtype`'   => $itemtype);
+      $params['FIELDS'] = array('glpi_networknames' => 'id');
+      foreach ($DB->request(array('glpi_networknames', 'glpi_networkports'), $params) as $line) {
          $item->getFromDB($line['id']);
          $header = true;
          if ($first) {
@@ -242,18 +244,18 @@ class Lock {
 
       $first  = true;
       $item   = new IPAddress();
-      $params = ['`glpi_ipaddresses`.`is_dynamic`' => 1,
+      $params = array('`glpi_ipaddresses`.`is_dynamic`' => 1,
                       '`glpi_ipaddresses`.`is_deleted`' => 1,
                       '`glpi_ipaddresses`.`itemtype`'   => 'Networkname',
                       '`glpi_ipaddresses`.`items_id`'   => '`glpi_networknames`.`id`',
                       '`glpi_networknames`.`itemtype`'  => 'NetworkPort',
                       '`glpi_networknames`.`items_id`'  => '`glpi_networkports`.`id`',
                       '`glpi_networkports`.`items_id`'  => $ID,
-                      '`glpi_networkports`.`itemtype`'  => $itemtype];
-      $params['FIELDS'] = ['glpi_ipaddresses' => 'id'];
-      foreach ($DB->request(['glpi_ipaddresses',
+                      '`glpi_networkports`.`itemtype`'  => $itemtype);
+      $params['FIELDS'] = array('glpi_ipaddresses' => 'id');
+      foreach ($DB->request(array('glpi_ipaddresses',
                                   'glpi_networknames',
-                                  'glpi_networkports'], $params) as $line) {
+                                  'glpi_networkports'), $params) as $line) {
          $item->getFromDB($line['id']);
          $header = true;
          if ($first) {
@@ -272,10 +274,10 @@ class Lock {
       $nb    = 0;
       foreach ($types as $old => $type) {
          $nb += countElementsInTable(getTableForItemType($type),
-                                     ['items_id'   => $ID,
-                                      'itemtype'   => $itemtype,
-                                      'is_dynamic' => 1,
-                                      'is_deleted' => 1 ]);
+                                     "`items_id`='$ID'
+                                         AND `itemtype`='$itemtype'
+                                         AND `is_dynamic`='1'
+                                         AND `is_deleted`='1'");
       }
       if ($nb) {
          $header = true;
@@ -309,8 +311,7 @@ class Lock {
          echo "</th><th>&nbsp</th></tr>\n";
          echo "</table>";
          Html::openArrowMassives('lock_form', true);
-         Html::closeArrowMassives(['unlock' => _sx('button', 'Unlock'),
-                                   'purge'  => _sx('button', 'Delete permanently')]);
+         Html::closeArrowMassives(array('unlock' => _sx('button', 'Unlock')));
       } else {
          echo "<tr class='tab_bg_2'>";
          echo "<td class='center' colspan='2'>". __('No locked item')."</td></tr>";
@@ -328,7 +329,7 @@ class Lock {
     * @param $item               CommonGLPI object
     * @param $withtemplate       (default 0)
    **/
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       if ($item->isDynamic() && $item->canCreate()) {
          return Lock::getTypeName(Session::getPluralNumber());
@@ -342,7 +343,7 @@ class Lock {
     * @param $tabnum          (default 1)
     * @param $withtemplate    (default 0)
    **/
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
       if ($item->isDynamic()) {
          self::showForItem($item);
@@ -361,7 +362,7 @@ class Lock {
    **/
    static function getLocksQueryInfosByItemType($itemtype, $baseitemtype) {
 
-      $condition = [];
+      $condition = array();
       $table     = false;
       $field     = '';
       $type      = $itemtype;
@@ -371,65 +372,65 @@ class Lock {
          case 'Monitor' :
          case 'Printer' :
          case 'Phone' :
-            $condition = ['itemtype'   => $itemtype,
+            $condition = array('itemtype'   => $itemtype,
                                'is_dynamic' => 1,
-                               'is_deleted' => 1];
+                               'is_deleted' => 1);
             $table     = 'glpi_computers_items';
             $field     = 'computers_id';
             $type      = 'Computer_Item';
             break;
 
          case 'NetworkPort' :
-            $condition = ['itemtype'   => $baseitemtype,
+            $condition = array('itemtype'   => $baseitemtype,
                                'is_dynamic' => 1,
-                               'is_deleted' => 1];
+                               'is_deleted' => 1);
             $table     = 'glpi_networkports';
             $field     = 'items_id';
             break;
 
          case 'NetworkName' :
-            $condition = ['`glpi_networknames`.`is_dynamic`' => 1,
+            $condition = array('`glpi_networknames`.`is_dynamic`' => 1,
                                '`glpi_networknames`.`is_deleted`' => 1,
                                '`glpi_networknames`.`itemtype`'   => 'NetworkPort',
                                '`glpi_networknames`.`items_id`'   => '`glpi_networkports`.`id`',
-                               '`glpi_networkports`.`itemtype`'   => $baseitemtype];
+                               '`glpi_networkports`.`itemtype`'   => $baseitemtype);
             $condition['FIELDS']
-                       = ['glpi_networknames' => 'id'];
-            $table     = ['glpi_networknames', 'glpi_networkports'];
+                       = array('glpi_networknames' => 'id');
+            $table     = array('glpi_networknames', 'glpi_networkports');
             $field     = '`glpi_networkports`.`items_id`';
             break;
 
          case 'IPAddress' :
-            $condition = ['`glpi_ipaddresses`.`is_dynamic`' => 1,
+            $condition = array('`glpi_ipaddresses`.`is_dynamic`' => 1,
                                '`glpi_ipaddresses`.`is_deleted`' => 1,
                                '`glpi_ipaddresses`.`itemtype`'   => 'NetworkName',
                                '`glpi_ipaddresses`.`items_id`'   => '`glpi_networknames`.`id`',
                                '`glpi_networknames`.`itemtype`'   => 'NetworkPort',
                                '`glpi_networknames`.`items_id`'   => '`glpi_networkports`.`id`',
-                               '`glpi_networkports`.`itemtype`'   => $baseitemtype];
+                               '`glpi_networkports`.`itemtype`'   => $baseitemtype);
             $condition['FIELDS']
-                       = ['glpi_ipaddresses' => 'id'];
-            $table     = ['glpi_ipaddresses', 'glpi_networknames', 'glpi_networkports'];
+                       = array('glpi_ipaddresses' => 'id');
+            $table     = array('glpi_ipaddresses', 'glpi_networknames', 'glpi_networkports');
             $field     = '`glpi_networkports`.`items_id`';
             break;
 
          case 'ComputerDisk' :
-            $condition = ['is_dynamic' => 1,
-                               'is_deleted' => 1];
+            $condition = array('is_dynamic' => 1,
+                               'is_deleted' => 1);
             $table     = 'glpi_computerdisks';
             $field     = 'computers_id';
             break;
 
          case 'ComputerVirtualMachine' :
-            $condition = ['is_dynamic' => 1,
-                               'is_deleted' => 1];
+            $condition = array('is_dynamic' => 1,
+                               'is_deleted' => 1);
             $table     = 'glpi_computervirtualmachines';
             $field     = 'computers_id';
             break;
 
          case 'SoftwareVersion' :
-            $condition = ['is_dynamic' => 1,
-                               'is_deleted' => 1];
+            $condition = array('is_dynamic' => 1,
+                               'is_deleted' => 1);
             $table     = 'glpi_computers_softwareversions';
             $field     = 'computers_id';
             $type      = 'Computer_SoftwareVersion';
@@ -437,20 +438,20 @@ class Lock {
 
          default :
             // Devices
-            if (preg_match('/^Item\_Device/', $itemtype)) {
-               $condition = ['itemtype'   => $baseitemtype,
+            if (preg_match('/^Item\_Device/',$itemtype)) {
+               $condition = array('itemtype'   => $baseitemtype,
                                   'is_dynamic' => 1,
-                                  'is_deleted' => 1];
+                                  'is_deleted' => 1);
                $table     = getTableForItemType($itemtype);
                $field     = 'items_id';
             }
 
       }
 
-      return ['condition' => $condition,
+      return array('condition' => $condition,
                    'table'     => $table,
                    'field'     => $field,
-                   'type'      => $type];
+                   'type'      => $type);
    }
 
 
@@ -459,8 +460,8 @@ class Lock {
     *
     * @see CommonDBTM::getMassiveActionsForItemtype()
    **/
-   static function getMassiveActionsForItemtype(array &$actions, $itemtype, $is_deleted = 0,
-                                                CommonDBTM $checkitem = null) {
+   static function getMassiveActionsForItemtype(array &$actions, $itemtype, $is_deleted=0,
+                                                CommonDBTM $checkitem=NULL) {
 
       $action_name = __CLASS__.MassiveAction::CLASS_ACTION_SEPARATOR.'unlock';
 
@@ -481,7 +482,7 @@ class Lock {
 
       switch ($ma->getAction()) {
          case 'unlock' :
-            $types = ['Monitor'                => _n('Monitor', 'Monitors', Session::getPluralNumber()),
+            $types = array('Monitor'                => _n('Monitor', 'Monitors', Session::getPluralNumber()),
                            'Peripheral'             => _n('Device', 'Devices', Session::getPluralNumber()),
                            'Printer'                => _n('Printer', 'Printers', Session::getPluralNumber()),
                            'SoftwareVersion'        => _n('Version', 'Versions', Session::getPluralNumber()),
@@ -490,17 +491,17 @@ class Lock {
                            'IPAddress'              => _n('IP address', 'IP addresses', Session::getPluralNumber()),
                            'ComputerDisk'           => _n('Volume', 'Volumes', Session::getPluralNumber()),
                            'Device'                 => _n('Component', 'Components', Session::getPluralNumber()),
-                           'ComputerVirtualMachine' => _n('Virtual machine', 'Virtual machines', Session::getPluralNumber())];
+                           'ComputerVirtualMachine' => _n('Virtual machine', 'Virtual machines', Session::getPluralNumber()));
 
-            echo __('Select the type of the item that must be unlock');
+            _e('Select the type of the item that must be unlock');
             echo "<br><br>\n";
 
             Dropdown::showFromArray('attached_item', $types,
-                                    ['multiple' => true,
+                                    array('multiple' => true,
                                           'size'     => 5,
-                                          'values'   => array_keys($types)]);
+                                          'values'   => array_keys($types)));
 
-            echo "<br><br>".Html::submit(_x('button', 'Post'), ['name' => 'massiveaction']);
+            echo "<br><br>".Html::submit(_x('button','Post'), array('name' => 'massiveaction'));
             return true;
       }
       return false;
@@ -525,7 +526,7 @@ class Lock {
                   unset($attached_items[$device_key]);
                   $attached_items = array_merge($attached_items, Item_Devices::getDeviceTypes());
                }
-               $links = [];
+               $links = array();
                foreach ($attached_items as $attached_item) {
                   $infos = self::getLocksQueryInfosByItemType($attached_item, $baseitem->getType());
                   if ($item = getItemForItemtype($infos['type'])) {
@@ -539,7 +540,7 @@ class Lock {
                      $infos['condition'][$infos['field']] = $id;
                      foreach ($DB->request($infos['table'], $infos['condition']) as $data) {
                         // Restore without history
-                        $action_valid = $infos['item']->restore(['id' => $data['id']]);
+                        $action_valid = $infos['item']->restore(array('id' => $data['id']));
                      }
                   }
                   if ($action_valid) {
@@ -555,3 +556,4 @@ class Lock {
    }
 
 }
+?>

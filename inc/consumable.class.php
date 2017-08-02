@@ -1,40 +1,38 @@
 <?php
-/**
- * ---------------------------------------------------------------------
- * GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2015-2017 Teclib' and contributors.
- *
- * http://glpi-project.org
- *
- * based on GLPI - Gestionnaire Libre de Parc Informatique
- * Copyright (C) 2003-2014 by the INDEPNET Development Team.
- *
- * ---------------------------------------------------------------------
- *
- * LICENSE
- *
- * This file is part of GLPI.
- *
- * GLPI is free software; you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation; either version 2 of the License, or
- * (at your option) any later version.
- *
- * GLPI is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with GLPI. If not, see <http://www.gnu.org/licenses/>.
- * ---------------------------------------------------------------------
+/*
+ -------------------------------------------------------------------------
+ GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2015-2016 Teclib'.
+
+ http://glpi-project.org
+
+ based on GLPI - Gestionnaire Libre de Parc Informatique
+ Copyright (C) 2003-2014 by the INDEPNET Development Team.
+
+ -------------------------------------------------------------------------
+
+ LICENSE
+
+ This file is part of GLPI.
+
+ GLPI is free software; you can redistribute it and/or modify
+ it under the terms of the GNU General Public License as published by
+ the Free Software Foundation; either version 2 of the License, or
+ (at your option) any later version.
+
+ GLPI is distributed in the hope that it will be useful,
+ but WITHOUT ANY WARRANTY; without even the implied warranty of
+ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ GNU General Public License for more details.
+
+ You should have received a copy of the GNU General Public License
+ along with GLPI. If not, see <http://www.gnu.org/licenses/>.
+ --------------------------------------------------------------------------
  */
 
 /** @file
 * @brief
 */
-
-use Glpi\Event;
 
 if (!defined('GLPI_ROOT')) {
    die("Sorry. You can't access this file directly");
@@ -49,7 +47,7 @@ if (!defined('GLPI_ROOT')) {
 class Consumable extends CommonDBChild {
 
    // From CommonDBTM
-   static protected $forward_entity_to = ['Infocom'];
+   static protected $forward_entity_to = array('Infocom');
    public $no_form_page                = true;
 
    static $rightname                   = 'consumable';
@@ -78,7 +76,7 @@ class Consumable extends CommonDBChild {
       return 'id';
    }
 
-   static function getTypeName($nb = 0) {
+   static function getTypeName($nb=0) {
       return _n('Consumable', 'Consumables', $nb);
    }
 
@@ -98,11 +96,11 @@ class Consumable extends CommonDBChild {
 
       $item = new ConsumableItem();
       if ($item->getFromDB($input["consumableitems_id"])) {
-         return ["consumableitems_id" => $item->fields["id"],
+         return array("consumableitems_id" => $item->fields["id"],
                       "entities_id"        => $item->getEntityID(),
-                      "date_in"            => date("Y-m-d")];
+                      "date_in"            => date("Y-m-d"));
       }
-      return [];
+      return array();
    }
 
 
@@ -116,7 +114,7 @@ class Consumable extends CommonDBChild {
    /**
     * send back to stock
    **/
-   function backToStock(array $input, $history = 1) {
+   function backToStock(array $input, $history=1) {
       global $DB;
 
       $query = "UPDATE `".$this->getTable()."`
@@ -156,7 +154,7 @@ class Consumable extends CommonDBChild {
     *
     * @return boolean
    **/
-   function out($ID, $itemtype = '', $items_id = 0) {
+   function out($ID, $itemtype='', $items_id=0) {
       global $DB;
 
       if (!empty($itemtype)
@@ -188,16 +186,16 @@ class Consumable extends CommonDBChild {
       switch ($ma->getAction()) {
          case 'give' :
             if (isset($input["entities_id"])) {
-               Dropdown::showSelectItemFromItemtypes(['itemtype_name'
+               Dropdown::showSelectItemFromItemtypes(array('itemtype_name'
                                                               => 'give_itemtype',
                                                            'items_id_name'
                                                               => 'give_items_id',
                                                            'entity_restrict'
                                                               => $input["entities_id"],
                                                            'itemtypes'
-                                                              => $CFG_GLPI["consumables_types"]]);
+                                                              => $CFG_GLPI["consumables_types"]));
                echo "<br><br>".Html::submit(_x('button', 'Give'),
-                                            ['name' => 'massiveaction']);
+                                            array('name' => 'massiveaction'));
                return true;
             }
       }
@@ -217,7 +215,7 @@ class Consumable extends CommonDBChild {
          case 'backtostock' :
             foreach ($ids as $id) {
                if ($item->can($id, UPDATE)) {
-                  if ($item->backToStock(["id" => $id])) {
+                  if ($item->backToStock(array("id" => $id))) {
                      $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_OK);
                   } else {
                      $ma->itemDone($item->getType(), $id, MassiveAction::ACTION_KO);
@@ -235,7 +233,7 @@ class Consumable extends CommonDBChild {
                 && !empty($input['give_itemtype'])) {
                foreach ($ids as $key) {
                   if ($item->can($key, UPDATE)) {
-                     if ($item->out($key, $input['give_itemtype'], $input["give_items_id"])) {
+                     if ($item->out($key, $input['give_itemtype'],$input["give_items_id"])) {
                         $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_OK);
                      } else {
                         $ma->itemDone($item->getType(), $key, MassiveAction::ACTION_KO);
@@ -326,7 +324,7 @@ class Consumable extends CommonDBChild {
     *
     * @return string to display
    **/
-   static function getCount($tID, $alarm_threshold, $nohtml = 0) {
+   static function getCount($tID, $alarm_threshold, $nohtml=0) {
 
       // Get total
       $total = self::getTotalNumber($tID);
@@ -403,10 +401,10 @@ class Consumable extends CommonDBChild {
    static function getStatus($cID) {
 
       if (self::isNew($cID)) {
-         return _nx('consumable', 'New', 'New', 1);
+         return _nx('consumable', 'New', 'New',1);
 
       } else if (self::isOld($cID)) {
-         return _nx('consumable', 'Used', 'Used', 1);
+         return _nx('consumable', 'Used', 'Used',1);
       }
    }
 
@@ -433,10 +431,10 @@ class Consumable extends CommonDBChild {
          echo "<table class='tab_cadre_fixe'>";
          echo "<tr><td class='tab_bg_2 center'>";
          echo "<input type='hidden' name='consumableitems_id' value='$ID'>\n";
-         Dropdown::showNumber('to_add', ['value' => 1,
+         Dropdown::showNumber('to_add', array('value' => 1,
                                               'min'   => 1,
-                                              'max'   => 100]);
-         echo " <input type='submit' name='add_several' value=\""._sx('button', 'Add consumables')."\"
+                                              'max'   => 100));
+         echo " <input type='submit' name='add_several' value=\""._sx('button','Add consumables')."\"
                 class='submit'>";
          echo "</td></tr>";
          echo "</table>";
@@ -454,7 +452,7 @@ class Consumable extends CommonDBChild {
     *
     * @return Nothing (displays)
    **/
-   static function showForConsumableItem(ConsumableItem $consitem, $show_old = 0) {
+   static function showForConsumableItem(ConsumableItem $consitem, $show_old=0) {
       global $DB, $CFG_GLPI;
 
       $tID = $consitem->getField('id');
@@ -510,14 +508,14 @@ class Consumable extends CommonDBChild {
          } else {
             $actions[__CLASS__.MassiveAction::CLASS_ACTION_SEPARATOR.'give'] = _x('button', 'Give');
          }
-         $entparam = ['entities_id' => $consitem->getEntityID()];
+         $entparam = array('entities_id' => $consitem->getEntityID());
          if ($consitem->isRecursive()) {
-            $entparam = ['entities_id' => getSonsOf('glpi_entities', $consitem->getEntityID())];
+            $entparam = array('entities_id' => getSonsOf('glpi_entities', $consitem->getEntityID()));
          }
-         $massiveactionparams = ['num_displayed'    => min($_SESSION['glpilist_limit'], $number),
+         $massiveactionparams = array('num_displayed'    => min($_SESSION['glpilist_limit'], $number),
                            'specific_actions' => $actions,
                            'container'        => 'mass'.__CLASS__.$rand,
-                           'extraparams'      => $entparam];
+                           'extraparams'      => $entparam);
          Html::showMassiveActions($massiveactionparams);
          echo "<input type='hidden' name='consumableitems_id' value='$tID'>\n";
       }
@@ -613,7 +611,7 @@ class Consumable extends CommonDBChild {
                                                    getEntitiesRestrictRequest("WHERE",
                                                                            "glpi_consumableitems").")
                 GROUP BY `itemtype`, `items_id`, `consumableitems_id`";
-      $used = [];
+      $used = array();
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result)) {
@@ -631,7 +629,7 @@ class Consumable extends CommonDBChild {
                                                    getEntitiesRestrictRequest("WHERE",
                                                                            "glpi_consumableitems").")
                 GROUP BY `consumableitems_id`";
-      $new = [];
+      $new = array();
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result)) {
@@ -641,10 +639,10 @@ class Consumable extends CommonDBChild {
          }
       }
 
-      $types = [];
+      $types = array();
       $query = "SELECT *
                 FROM `glpi_consumableitems` ".
-                getEntitiesRestrictRequest("WHERE", "glpi_consumableitems");
+                getEntitiesRestrictRequest("WHERE","glpi_consumableitems");
 
       if ($result = $DB->query($query)) {
          if ($DB->numrows($result)) {
@@ -654,7 +652,7 @@ class Consumable extends CommonDBChild {
          }
       }
       asort($types);
-      $total = [];
+      $total = array();
       if (count($types) > 0) {
          // Produce headline
          echo "<div class='center'><table class='tab_cadrehov'><tr>";
@@ -685,7 +683,7 @@ class Consumable extends CommonDBChild {
 
          foreach ($used as $itemtype_items_id => $val) {
             echo "<tr class='tab_bg_2'><td>";
-            list($itemtype,$items_id) = explode('####', $itemtype_items_id);
+            list($itemtype,$items_id) = explode('####',$itemtype_items_id);
             $item = new $itemtype();
             if ($item->getFromDB($items_id)) {
                //TRANS: %1$s is a type name - %2$s is a name
@@ -701,8 +699,8 @@ class Consumable extends CommonDBChild {
                $total[$id_type] += $val[$id_type];
                $tot             += $val[$id_type];
             }
-            echo "<td class='numeric'>".$tot."</td>";
-            echo "</tr>";
+         echo "<td class='numeric'>".$tot."</td>";
+         echo "</tr>";
          }
          echo "<tr class='tab_bg_1'><td class='b'>".__('Total')."</td>";
          $tot = 0;
@@ -720,7 +718,7 @@ class Consumable extends CommonDBChild {
    }
 
 
-   function getTabNameForItem(CommonGLPI $item, $withtemplate = 0) {
+   function getTabNameForItem(CommonGLPI $item, $withtemplate=0) {
 
       if (!$withtemplate && Consumable::canView()) {
          $nb = 0;
@@ -741,22 +739,24 @@ class Consumable extends CommonDBChild {
    **/
    static function countForConsumableItem(ConsumableItem $item) {
 
-      return countElementsInTable(['glpi_consumables'], ['glpi_consumables.consumableitems_id' => $item->getField('id')]);
+      $restrict = "`glpi_consumables`.`consumableitems_id` = '".$item->getField('id') ."'";
+
+      return countElementsInTable(array('glpi_consumables'), $restrict);
    }
 
 
-   static function displayTabContentForItem(CommonGLPI $item, $tabnum = 1, $withtemplate = 0) {
+   static function displayTabContentForItem(CommonGLPI $item, $tabnum=1, $withtemplate=0) {
 
-      switch ($item->getType()) {
-         case 'ConsumableItem' :
-            self::showAddForm($item);
-            self::showForConsumableItem($item);
-            self::showForConsumableItem($item, 1);
-            return true;
-      }
+         switch ($item->getType()) {
+            case 'ConsumableItem' :
+               self::showAddForm($item);
+               self::showForConsumableItem($item);
+               self::showForConsumableItem($item, 1);
+               return true;
+         }
    }
 
-   function getRights($interface = 'central') {
+   function getRights($interface='central') {
       $ci = new ConsumableItem();
       return $ci->getRights($interface);
    }
